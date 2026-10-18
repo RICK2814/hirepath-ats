@@ -265,8 +265,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var
 .btn.pri:active{transform:translateY(0) scale(.985)}
 .card{transition:border-color .22s ease,box-shadow .22s ease,background .22s ease}
 body:not(.login-page-active) .kpi,
-body:not(.login-page-active) .grid>.card,
-body:not(.login-page-active) .jobs>.job{animation:premiumRise .48s var(--ease-premium) both}
+body:not(.login-page-active) .grid>.card{animation:premiumRise .48s var(--ease-premium) both}
+body:not(.login-page-active) .jobs>.job{animation:premiumFade .48s ease both}
 body:not(.login-page-active) .kpis>.kpi:nth-child(2){animation-delay:35ms}
 body:not(.login-page-active) .kpis>.kpi:nth-child(3){animation-delay:70ms}
 body:not(.login-page-active) .kpis>.kpi:nth-child(4){animation-delay:105ms}
@@ -289,7 +289,7 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
 .login-workflow-step{animation:premiumRise .55s var(--ease-premium) both}
 .login-workflow-step:nth-child(2){animation-delay:70ms}.login-workflow-step:nth-child(3){animation-delay:130ms}.login-workflow-step:nth-child(4){animation-delay:190ms}
 .login-info-panel{animation:premiumRise .62s var(--ease-premium) both}
-.login-info-card,.login-why-point{animation:premiumRise .58s var(--ease-premium) both}
+.login-info-card,.login-why-point{animation:premiumFade .58s ease both}
 .login-info-card:before{content:"";position:absolute;left:14%;right:14%;top:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(123,159,255,.6),rgba(203,116,244,.55),transparent);opacity:.58}
 .login-info-card:nth-child(2),.login-why-point:nth-child(2){animation-delay:55ms}
 .login-info-card:nth-child(3),.login-why-point:nth-child(3){animation-delay:100ms}
@@ -306,6 +306,7 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
 .password-login-form .btn.pri:focus-visible{outline:2px solid #c5bcff;outline-offset:4px}
 .login-info-panel,.login-auth-panel,.login-info-card,.login-why-point{overflow-anchor:none}
 @keyframes premiumRise{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes premiumFade{from{opacity:0}to{opacity:1}}
 @media(max-width:600px){
   body{font-size:14px}
   .login-info-panel h2{line-height:1.16}
