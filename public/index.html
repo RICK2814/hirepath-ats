@@ -108,91 +108,93 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login label{display:block;margin:14px 0 5px;font-weight:600;font-size:13px}
 .err{color:var(--bad);margin:10px 0 0;min-height:20px}
 #root{min-height:100vh}
-.login.login-experience{--lx-bg:#08111f;--lx-panel:#101d32;--lx-border:rgba(164,190,225,.17);--lx-muted:#a1b1cc;--lx-text:#f6f8ff;position:relative;isolation:isolate;display:block;min-height:100vh;width:100%;overflow:hidden;padding:0;color:var(--lx-text);background:radial-gradient(ellipse at 18% 20%,rgba(34,211,194,.15),transparent 38%),radial-gradient(ellipse at 83% 75%,rgba(109,91,255,.19),transparent 36%),linear-gradient(135deg,#07111e 0%,#0b1630 48%,#0d1430 100%)}
-.login.login-experience:before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(rgba(139,164,199,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(139,164,199,.055) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 94%);animation:loginGridDrift 18s linear infinite}
-.login.login-experience:after{content:"";position:absolute;z-index:-1;inset:-35%;pointer-events:none;background:conic-gradient(from 180deg at 50% 50%,transparent 0deg,rgba(40,212,196,.07) 55deg,transparent 115deg,rgba(141,110,255,.08) 205deg,transparent 290deg);filter:blur(42px);animation:loginAurora 24s linear infinite}
-.login-shell{position:relative;z-index:1;display:flex;flex-direction:column;max-width:1440px;min-height:100vh;margin:0 auto;padding:24px clamp(18px,4vw,58px) 18px}
-.login-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:2px 0 12px}
-.login-brand{display:flex;align-items:center;gap:11px;min-width:0}
-.login-brand-mark{display:grid;place-items:center;width:43px;height:43px;flex:none;border-radius:14px;color:#06202c;background:linear-gradient(135deg,#75f4e0,#38bacb);box-shadow:0 0 30px rgba(64,223,209,.2)}
-.login-brand-name{font-size:19px;font-weight:750;letter-spacing:-.5px;line-height:1.1}
-.login-brand-name span{color:#73e9dc}
-.login-brand-sub{margin-top:5px;color:#8298b8;font-size:10px;font-weight:700;letter-spacing:1.6px}
-.login-secure-pill{display:flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid rgba(124,164,207,.2);border-radius:99px;color:#c8d8ec;background:rgba(12,27,48,.55);font-size:10px;font-weight:750;letter-spacing:1.1px;white-space:nowrap}
-.login-secure-pill span{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;color:#7cf0dc;background:rgba(73,221,203,.12);font-size:12px}
-.login-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(390px,.9fr);align-items:center;gap:clamp(30px,5vw,76px);flex:1;padding:24px 0 30px}
-.login-hero{min-width:0;max-width:690px;padding:10px 0;animation:loginEnter .7s both}
-.login-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid rgba(79,223,211,.24);border-radius:99px;color:#9cf2e4;background:rgba(35,162,158,.09);font-size:10px;font-weight:800;letter-spacing:1.45px}
-.login-live-dot{width:7px;height:7px;border-radius:50%;background:#59efd0;box-shadow:0 0 0 4px rgba(89,239,208,.1);animation:loginPing 1.7s ease-in-out infinite}
-.login-hero h2{margin:22px 0 14px;color:#f4f7ff;font-size:clamp(42px,4.5vw,68px);font-weight:720;letter-spacing:-3.4px;line-height:1.02}
-.login-hero h2 span{display:block;color:transparent;background:linear-gradient(95deg,#84f4df 0%,#51cfe0 45%,#a99aff 100%);background-clip:text;-webkit-background-clip:text}
-.login-hero-copy{max-width:510px;margin:0;color:#a2b3cd;font-size:clamp(14px,1.2vw,17px);line-height:1.75}
-.login-feature-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
-.login-feature-row span{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid rgba(141,169,206,.16);border-radius:9px;color:#cbd8e9;background:rgba(15,31,53,.54);font-size:11px;font-weight:650}
-.login-feature-row i{display:grid;place-items:center;width:16px;height:16px;border-radius:5px;color:#83f0dd;background:rgba(65,224,205,.12);font-size:10px;font-style:normal}
-.login-scene{position:relative;width:min(100%,600px);height:290px;margin-top:10px;perspective:800px}
-.login-orbit{position:absolute;left:50%;top:50%;border:1px solid rgba(100,170,215,.18);border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg)}
-.login-orbit.one{width:270px;height:160px;animation:loginOrbit 13s linear infinite}
-.login-orbit.two{width:350px;height:214px;transform:translate(-50%,-50%) rotate(57deg);border-color:rgba(153,132,255,.17);animation:loginOrbitBack 17s linear infinite}
-.login-orbit:after{content:"";position:absolute;top:14%;left:12%;width:6px;height:6px;border-radius:50%;background:#75f3e0;box-shadow:0 0 16px #54e6db}
-.login-orbit.two:after{top:auto;left:auto;right:17%;bottom:9%;width:7px;height:7px;background:#ab9bff;box-shadow:0 0 17px #9d8cff}
-.login-robot-stage{position:absolute;left:50%;top:50%;width:190px;height:190px;transform:translate(-50%,-51%);animation:loginRobotFloat 4.6s ease-in-out infinite;filter:drop-shadow(0 20px 36px rgba(31,203,193,.12))}
-.login-robot-svg{width:100%;height:100%;overflow:visible}
-.login-robot-antenna{transform-origin:120px 31px;animation:loginAntenna 1.9s ease-in-out infinite}
-.login-robot-wave{transform-box:fill-box;transform-origin:20% 80%;animation:loginWave 1.35s ease-in-out infinite}
-.login-robot-eye{transform-box:fill-box;transform-origin:center;animation:loginBlink 4.4s ease-in-out infinite}
-.login-robot-eye:nth-of-type(2){animation-delay:.15s}
-.login-robot-pulse{animation:loginEyeGlow 1.8s ease-in-out infinite}
-.login-floating-card{position:absolute;z-index:2;display:flex;align-items:center;gap:10px;max-width:250px;padding:11px 13px;border:1px solid rgba(155,190,226,.21);border-radius:13px;background:linear-gradient(140deg,rgba(21,43,68,.94),rgba(13,27,49,.94));box-shadow:0 12px 32px rgba(0,0,0,.22);backdrop-filter:blur(12px)}
-.login-floating-card.top{left:0;top:31px;animation:loginCardDrift 4.4s ease-in-out infinite}
-.login-floating-card.bottom{right:0;bottom:27px;animation:loginCardDrift 4.9s ease-in-out infinite reverse}
-.login-float-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid rgba(97,234,217,.19);border-radius:10px;color:#7df1dd;background:rgba(62,207,192,.11);font-size:16px;font-weight:800}
-.login-float-copy{min-width:0}
-.login-float-copy b{display:block;color:#f2f6ff;font-size:11px;font-weight:750;white-space:nowrap}
-.login-float-copy small{display:block;margin-top:3px;color:#91a8c5;font-size:10px;white-space:nowrap}
-.login-float-check{display:grid;place-items:center;width:20px;height:20px;margin-left:auto;border-radius:50%;color:#86f4d9;background:rgba(62,214,182,.13);font-size:11px}
-.login-scene-caption{position:absolute;left:50%;bottom:-2px;display:flex;align-items:center;gap:9px;transform:translateX(-50%);color:#8095b2;font-size:10px;font-weight:700;letter-spacing:1.2px;white-space:nowrap}
-.login-bars{display:flex;align-items:flex-end;gap:3px;height:13px}
-.login-bars i{display:block;width:3px;border-radius:2px;background:#58dcca;animation:loginBar .8s ease-in-out infinite alternate}
-.login-bars i:nth-child(1){height:5px}.login-bars i:nth-child(2){height:10px;animation-delay:.15s}.login-bars i:nth-child(3){height:7px;animation-delay:.3s}.login-bars i:nth-child(4){height:12px;animation-delay:.45s}
-.login-hero-note{display:flex;align-items:center;gap:8px;margin:3px 0 0;color:#8198b8;font-size:11px}
-.login-hero-note span{color:#73ebd9;font-size:16px}
-.login-auth-panel{width:100%;max-width:480px;justify-self:center;padding:clamp(21px,3vw,34px);border:1px solid rgba(177,200,232,.2);border-radius:25px;background:linear-gradient(145deg,rgba(23,39,64,.9),rgba(13,24,44,.88));box-shadow:0 25px 85px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(22px);animation:loginPanelEnter .75s .08s both}
-.login-auth-panel:before{content:"";display:block;width:52px;height:3px;margin-bottom:23px;border-radius:99px;background:linear-gradient(90deg,#67eedc,#998cff);box-shadow:0 0 18px rgba(83,222,206,.32)}
-.login-auth-panel h3{margin:0;color:#f7f9ff;font-size:29px;letter-spacing:-1.1px;line-height:1.12}
-.login-auth-panel h3 span{color:#7ce6db}
-.login-auth-panel .auth-subtitle{margin:10px 0 24px;color:#96a9c5;font-size:13px;line-height:1.6}
-.login-auth-panel .auth-eyebrow{margin:0 0 9px;color:#78e6da;font-size:10px;font-weight:800;letter-spacing:1.7px}
-.login.clerk-mode .clerk-widget{width:100%;display:flex;align-items:center;justify-content:center}
-.login.clerk-mode .clerk-widget>*{width:100%;max-width:430px}
-.login.clerk-mode .clerk-footnote{margin-top:14px;color:#8499b8;font-size:11px;text-align:center}
-.login.clerk-mode .err{width:100%;text-align:center;overflow-wrap:anywhere}
-.login.clerk-mode #clerk-signout{align-self:center;margin-top:10px}
-.login-footer{display:flex;justify-content:space-between;gap:14px;padding:12px 0 3px;border-top:1px solid rgba(130,158,196,.14);color:#607694;font-size:9px;font-weight:750;letter-spacing:1.2px}
-.login-footer span:last-child{letter-spacing:.3px;font-weight:500}
-.password-login-form{width:100%}
-.password-login-form input{color:#f5f8ff;background:rgba(7,17,32,.6);border-color:rgba(143,171,207,.24)}
-.password-login-form input::placeholder{color:#7187a6}
-.password-login-form .btn.pri{background:linear-gradient(95deg,#48d7c9,#53bddd);color:#081829;box-shadow:0 9px 25px rgba(51,206,194,.14)}
-.login-auth-panel .mut{color:#93a9c5!important}
-@keyframes loginGridDrift{to{background-position:42px 42px}}
-@keyframes loginAurora{to{transform:rotate(360deg)}}
-@keyframes loginPing{0%,100%{opacity:.8;box-shadow:0 0 0 4px rgba(89,239,208,.1)}50%{opacity:1;box-shadow:0 0 0 8px rgba(89,239,208,.02)}}
-@keyframes loginEnter{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-@keyframes loginPanelEnter{from{opacity:0;transform:translateY(20px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes loginOrbit{to{transform:translate(-50%,-50%) rotate(342deg)}}
-@keyframes loginOrbitBack{to{transform:translate(-50%,-50%) rotate(-303deg)}}
-@keyframes loginRobotFloat{0%,100%{transform:translate(-50%,-51%)}50%{transform:translate(-50%,-55%)}}
-@keyframes loginAntenna{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(8deg)}}
-@keyframes loginWave{0%,100%{transform:rotate(0)}45%,70%{transform:rotate(-19deg)}}
-@keyframes loginBlink{0%,43%,47%,100%{transform:scaleY(1)}45%{transform:scaleY(.12)}}
-@keyframes loginEyeGlow{0%,100%{opacity:.72;filter:drop-shadow(0 0 2px #60eee0)}50%{opacity:1;filter:drop-shadow(0 0 7px #60eee0)}}
-@keyframes loginCardDrift{0%,100%{translate:0 0}50%{translate:0 -7px}}
-@keyframes loginBar{from{opacity:.4;transform:scaleY(.65)}to{opacity:1;transform:scaleY(1)}}
-@media(max-width:1050px){.login-layout{grid-template-columns:minmax(0,1fr) minmax(350px,.9fr);gap:25px}.login-hero h2{font-size:clamp(40px,5vw,56px);letter-spacing:-2.5px}.login-scene{height:265px}.login-floating-card.top{left:-2px}.login-floating-card.bottom{right:-2px}}
-@media(max-width:820px){.login-shell{padding:18px 18px 12px}.login-layout{grid-template-columns:1fr;gap:22px;max-width:580px;width:100%;margin:0 auto;padding:20px 0 24px}.login-hero{padding-top:10px}.login-hero h2{font-size:clamp(40px,8vw,56px)}.login-hero-copy{max-width:520px}.login-feature-row{margin-top:16px}.login-scene{height:230px;max-width:500px;margin:8px auto 0}.login-robot-stage{width:155px;height:155px}.login-orbit.one{width:220px;height:132px}.login-orbit.two{width:280px;height:172px}.login-floating-card.top{top:19px}.login-floating-card.bottom{bottom:17px}.login-auth-panel{max-width:none}.login-footer{margin-top:auto}}
-@media(max-width:520px){.login-shell{padding:15px 14px 12px}.login-brand-mark{width:38px;height:38px;border-radius:12px}.login-brand-name{font-size:17px}.login-brand-sub{font-size:8px;letter-spacing:1.1px}.login-secure-pill{padding:7px 9px;font-size:8px;letter-spacing:.5px}.login-secure-pill span{width:18px;height:18px}.login-hero h2{margin-top:18px;font-size:39px;letter-spacing:-1.9px}.login-hero-copy{font-size:13px}.login-feature-row{gap:6px}.login-feature-row span{padding:7px 8px;font-size:10px}.login-scene{height:210px;margin-top:4px}.login-robot-stage{width:140px;height:140px}.login-orbit.one{width:200px;height:122px}.login-orbit.two{width:246px;height:155px}.login-floating-card{gap:7px;padding:8px 9px;max-width:205px}.login-floating-card.top{top:12px;left:-3px}.login-floating-card.bottom{right:-3px;bottom:10px}.login-float-icon{width:27px;height:27px}.login-float-copy b{font-size:9px}.login-float-copy small{font-size:8px}.login-scene-caption{font-size:8px;letter-spacing:.65px}.login-auth-panel{padding:22px 18px;border-radius:20px}.login-auth-panel h3{font-size:26px}.login-footer{font-size:8px;letter-spacing:.6px}}
-@media(prefers-reduced-motion:reduce){.login.login-experience:before,.login.login-experience:after,.login-live-dot,.login-orbit,.login-orbit:after,.login-robot-stage,.login-robot-antenna,.login-robot-wave,.login-robot-eye,.login-robot-pulse,.login-floating-card,.login-bars i,.login-hero,.login-auth-panel{animation:none!important;transition:none!important}}
+.login.login-experience{--lx-text:#f7f8ff;position:relative;isolation:isolate;display:block;min-height:100vh;width:100%;overflow:hidden;padding:0;color:var(--lx-text);background:radial-gradient(ellipse at 16% 24%,rgba(34,76,173,.22),transparent 34%),radial-gradient(ellipse at 65% 16%,rgba(117,43,208,.21),transparent 31%),radial-gradient(ellipse at 87% 76%,rgba(38,87,192,.18),transparent 34%),linear-gradient(123deg,#040713 0%,#070b1b 44%,#08081a 100%)}
+.login.login-experience:before{content:"";position:absolute;inset:0;z-index:-3;pointer-events:none;background-image:linear-gradient(rgba(147,162,222,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(147,162,222,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 94%);animation:loginGridDrift 22s linear infinite}
+.login.login-experience:after{content:"";position:absolute;z-index:-2;inset:-42%;pointer-events:none;background:conic-gradient(from 180deg at 50% 50%,transparent 0deg,rgba(82,67,255,.12) 38deg,transparent 100deg,rgba(217,56,204,.075) 185deg,transparent 235deg,rgba(40,116,255,.09) 290deg,transparent 340deg);filter:blur(58px);animation:loginAurora 32s linear infinite}
+.login-shell{position:relative;z-index:1;display:flex;flex-direction:column;max-width:1600px;min-height:100vh;margin:0 auto;padding:18px clamp(20px,4.8vw,76px) 15px}
+.login-topbar{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:56px}
+.login-brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:#f8f9ff}
+.login-brand-mark{display:grid;place-items:center;width:47px;height:47px;flex:none;color:#fff;filter:drop-shadow(0 0 14px rgba(91,100,255,.36))}
+.login-logo-svg{width:100%;height:100%;display:block;overflow:visible}
+.login-brand-name{font-size:clamp(18px,1.65vw,23px);font-weight:770;letter-spacing:-.75px;line-height:1.1}
+.login-brand-name span{color:#8e8aff}
+.login-nav{display:flex;align-items:center;justify-content:flex-end;gap:clamp(16px,2.7vw,40px)}
+.login-nav button,.login-nav a{padding:8px 0;border:0;background:transparent;color:#d0d4e6;text-decoration:none;font:500 13px/1.2 var(--sans);white-space:nowrap;cursor:pointer;transition:color .2s ease}
+.login-nav button:hover,.login-nav a:hover{color:#fff}
+.login-nav .login-careers-link{display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border:1px solid rgba(149,125,255,.42);border-radius:999px;color:#f6f3ff;background:rgba(34,24,73,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:background .2s,border-color .2s,transform .2s}
+.login-nav .login-careers-link:hover{background:rgba(111,84,255,.14);border-color:rgba(174,147,255,.72);transform:translateY(-1px)}
+.login-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(410px,.88fr);align-items:center;gap:clamp(26px,4vw,64px);flex:1;padding:22px 0 19px}
+.login-hero{position:relative;min-width:0;padding:8px 0 0;animation:loginEnter .7s both}
+.login-hero-top{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(240px,.96fr);align-items:center;gap:2px;min-height:300px}
+.login-hero-copy-col{position:relative;z-index:2;min-width:0}
+.login-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid rgba(141,150,255,.26);border-radius:99px;color:#e5e7ff;background:linear-gradient(105deg,rgba(35,47,99,.36),rgba(30,21,67,.3));font-size:11px;font-weight:700;letter-spacing:.15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.login-live-dot{width:7px;height:7px;border-radius:50%;background:#8b88ff;box-shadow:0 0 0 4px rgba(135,125,255,.1),0 0 14px rgba(117,121,255,.8);animation:loginPing 1.7s ease-in-out infinite}
+.login-hero h2{margin:24px 0 16px;color:#fcfcff;font-size:clamp(42px,4.25vw,65px);font-weight:760;letter-spacing:-3.1px;line-height:1.03}
+.login-hero h2 span{display:block;color:transparent;background:linear-gradient(95deg,#469dff 0%,#8a5dff 39%,#e759b8 73%,#ff9a8b 100%);background-clip:text;-webkit-background-clip:text}
+.login-hero-copy{max-width:505px;margin:0;color:#b7bfd4;font-size:clamp(14px,1.16vw,17px);line-height:1.7}
+.login-globe-scene{position:relative;min-width:0;height:310px;overflow:visible;isolation:isolate;perspective:900px}
+.login-globe-halo{position:absolute;left:52%;top:49%;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(72,95,255,.32),rgba(90,43,195,.12) 46%,transparent 72%);filter:blur(13px);transform:translate(-50%,-50%);animation:loginHaloPulse 5s ease-in-out infinite}
+.login-globe{position:absolute;left:52%;top:49%;width:min(94%,330px);height:auto;overflow:visible;transform:translate(-50%,-50%);filter:drop-shadow(0 0 22px rgba(72,111,255,.24))}
+.login-globe-rotate{transform-box:view-box;transform-origin:50% 50%;animation:loginGlobeRotate 38s linear infinite}
+.login-globe-rim{animation:loginRimGlow 3.4s ease-in-out infinite}
+.login-globe-dot{animation:loginDot 2.1s ease-in-out infinite alternate}.login-globe-dot.d2{animation-delay:.5s}.login-globe-dot.d3{animation-delay:1s}.login-globe-dot.d4{animation-delay:1.4s}
+.login-globe-particle{filter:drop-shadow(0 0 6px currentColor);animation:loginParticleBlink 2.2s ease-in-out infinite}
+.login-candidate-card{position:absolute;z-index:3;display:flex;align-items:center;gap:9px;max-width:230px;padding:10px 12px;border:1px solid rgba(166,172,255,.28);border-radius:14px;background:linear-gradient(140deg,rgba(31,35,74,.89),rgba(18,20,45,.92));box-shadow:0 14px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(15px);white-space:nowrap}
+.login-candidate-card.application{left:-16px;top:42px;animation:loginCardFloat 4.7s ease-in-out infinite}
+.login-candidate-card.interview{right:-12px;top:146px;animation:loginCardFloat 5.2s ease-in-out infinite reverse}
+.login-candidate-card.offer{left:24px;bottom:14px;animation:loginCardFloat 4.2s ease-in-out infinite}
+.login-candidate-avatar{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid rgba(181,173,255,.46);border-radius:10px;color:#dfe0ff;background:linear-gradient(145deg,#615dff,#a84fe7);box-shadow:0 0 16px rgba(112,86,255,.22)}
+.login-candidate-avatar svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.login-candidate-info{min-width:0}.login-candidate-info b{display:block;color:#fafaff;font-size:11px;font-weight:700;line-height:1.4}.login-candidate-info small{display:block;margin-top:3px;color:#acb5d0;font-size:10px;line-height:1.3}
+.login-candidate-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;margin-left:auto;color:#a8b2ce;font-size:9px}
+.login-candidate-dot{width:7px;height:7px;border-radius:50%;background:#53e5b1;box-shadow:0 0 10px rgba(83,229,177,.55)}.login-candidate-dot.orange{background:#ffad55;box-shadow:0 0 10px rgba(255,173,85,.48)}.login-candidate-dot.cyan{background:#52cfff;box-shadow:0 0 10px rgba(82,207,255,.5)}
+.login-feature-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 18px;padding:9px 0;border-top:1px solid rgba(139,148,208,.1);border-bottom:1px solid rgba(139,148,208,.1)}
+.login-feature-row span{display:inline-flex;align-items:center;gap:8px;color:#e1e4f4;font-size:11px;font-weight:500;white-space:nowrap}
+.login-feature-row i{display:grid;place-items:center;width:27px;height:27px;border:1px solid rgba(104,111,255,.3);border-radius:9px;color:#e7e5ff;background:linear-gradient(145deg,rgba(48,65,159,.6),rgba(88,45,165,.45));box-shadow:0 3px 15px rgba(61,56,217,.16);font-size:12px;font-style:normal}
+.login-metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 16px}
+.login-metric-card{position:relative;min-width:0;overflow:hidden;padding:14px 14px 12px;border:1px solid rgba(126,138,223,.23);border-radius:16px;background:linear-gradient(145deg,rgba(15,23,51,.83),rgba(12,13,35,.88));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.login-metric-card:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(106,128,255,.65),transparent);animation:loginMetricShine 4s ease-in-out infinite}
+.login-metric-head{display:flex;align-items:center;gap:10px;min-width:0}
+.login-metric-icon{display:grid;place-items:center;width:36px;height:36px;flex:none;border:1px solid rgba(120,123,255,.4);border-radius:11px;color:#e6e5ff;background:linear-gradient(145deg,#326dff,#803dff);box-shadow:0 5px 18px rgba(81,70,255,.19)}
+.login-metric-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.login-metric-title{display:block;color:#f6f7ff;font-size:12px;font-weight:700;white-space:nowrap}.login-metric-copy{display:block;margin-top:3px;color:#9faac5;font-size:10px;line-height:1.35}
+.login-metric-spark{display:flex;align-items:flex-end;gap:3px;height:22px;margin-top:11px}.login-metric-spark i{display:block;flex:1;min-width:2px;border-radius:3px 3px 0 0;background:linear-gradient(to top,#4338ca,#70a5ff);opacity:.88;transform-origin:bottom;animation:loginSpark .9s ease-in-out infinite alternate}.login-metric-spark i:nth-child(2n){animation-delay:.24s}.login-metric-spark i:nth-child(3n){animation-delay:.48s}
+.login-metric-tail{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-top:4px;color:#9aabd0;font-size:9px}.login-metric-tail b{color:#68e7d0;font-weight:700}
+.login-workflow{position:relative;min-height:100px;margin-top:8px;padding-top:6px;overflow:hidden}
+.login-workflow-path{position:absolute;left:-1%;top:4px;width:102%;height:83px;pointer-events:none;overflow:visible}
+.login-workflow-path path{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:8 8;animation:loginPathFlow 2.2s linear infinite}
+.login-workflow-steps{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.login-workflow-step{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;text-align:center;padding:16px 2px 0}
+.login-workflow-icon{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(135,119,255,.55);border-radius:50%;color:#eae8ff;background:linear-gradient(145deg,rgba(43,63,158,.9),rgba(86,39,145,.94));box-shadow:0 0 18px rgba(92,84,255,.19),inset 0 1px 0 rgba(255,255,255,.1);animation:loginWorkflowPulse 3s ease-in-out infinite}
+.login-workflow-step:nth-child(2) .login-workflow-icon{animation-delay:.5s}.login-workflow-step:nth-child(3) .login-workflow-icon{animation-delay:1s}.login-workflow-step:nth-child(4) .login-workflow-icon{animation-delay:1.5s}
+.login-workflow-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.login-workflow-step b{color:#f2f3ff;font-size:10px;font-weight:700;white-space:nowrap}.login-workflow-step small{color:#8c9ab9;font-size:9px;line-height:1.3}
+.login-auth-panel{width:100%;max-width:488px;justify-self:center;padding:clamp(24px,3vw,39px);border:1px solid rgba(174,155,255,.33);border-radius:30px;background:linear-gradient(150deg,rgba(11,15,34,.9),rgba(9,11,26,.93) 62%,rgba(14,17,42,.9));box-shadow:0 30px 100px rgba(0,0,0,.39),0 0 48px rgba(99,66,255,.11),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(28px);animation:loginPanelEnter .75s .08s both}
+.login-auth-panel:before{content:"";display:block;width:48px;height:2px;margin-bottom:21px;border-radius:99px;background:linear-gradient(90deg,#5da7ff,#8c62ff,#f169be);box-shadow:0 0 18px rgba(125,90,255,.52)}
+.login-auth-logo{display:flex;justify-content:center;margin-bottom:9px}.login-auth-logo .login-brand-mark{width:55px;height:55px;filter:drop-shadow(0 0 20px rgba(108,94,255,.38))}
+.login-auth-title{text-align:center;margin:0;color:#f9f9ff;font-size:clamp(25px,2.1vw,31px);font-weight:760;letter-spacing:-1.1px;line-height:1.12}.login-auth-title span{color:#a47aff}
+.login-auth-panel .auth-subtitle{margin:10px 0 22px;color:#a5afc9;font-size:13px;line-height:1.6;text-align:center}.login-auth-panel .auth-eyebrow{margin:0 0 9px;color:#a9a0ff;font-size:10px;font-weight:800;letter-spacing:1.7px;text-align:center}
+.login.clerk-mode .clerk-widget{width:100%;display:flex;align-items:center;justify-content:center}.login.clerk-mode .clerk-widget>*{width:100%;max-width:430px}
+.login.clerk-mode .clerk-footnote{margin-top:14px;color:#8e9bb7;font-size:11px;text-align:center}.login.clerk-mode .err{width:100%;text-align:center;overflow-wrap:anywhere}.login.clerk-mode #clerk-signout{align-self:center;margin-top:10px}
+.login-security-note{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;color:#7786a7;font-size:10px;line-height:1.5;text-align:center}.login-security-shield{display:grid;place-items:center;width:17px;height:17px;flex:none;border:1px solid rgba(112,106,255,.44);border-radius:50%;color:#bcb6ff;background:rgba(102,87,255,.12);font-size:10px}
+.login-footer{display:flex;justify-content:space-between;gap:14px;padding:10px 0 1px;border-top:1px solid rgba(130,145,193,.13);color:#637394;font-size:9px;font-weight:750;letter-spacing:1.2px}.login-footer span:last-child{letter-spacing:.3px;font-weight:500}
+.password-login-form{width:100%}.password-login-form input{color:#f5f8ff;background:rgba(7,10,24,.64);border-color:rgba(143,151,211,.23)}.password-login-form input::placeholder{color:#7b87a8}
+.password-login-form .btn.pri{background:linear-gradient(105deg,#397aff 0%,#7353ff 47%,#d750d9 77%,#ff907e 100%);color:#fff;border-color:transparent;box-shadow:0 10px 28px rgba(93,78,255,.25)}
+.login-auth-panel .mut{color:#9ca8c4!important}
+@keyframes loginGridDrift{to{background-position:44px 44px}}@keyframes loginAurora{to{transform:rotate(360deg)}}
+@keyframes loginPing{0%,100%{opacity:.8;box-shadow:0 0 0 4px rgba(135,125,255,.1),0 0 14px rgba(117,121,255,.8)}50%{opacity:1;box-shadow:0 0 0 8px rgba(135,125,255,.02),0 0 20px rgba(117,121,255,.9)}}
+@keyframes loginEnter{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}@keyframes loginPanelEnter{from{opacity:0;transform:translateY(20px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes loginGlobeRotate{to{transform:rotate(360deg)}}@keyframes loginRimGlow{0%,100%{opacity:.55;filter:drop-shadow(0 0 4px #6455ff)}50%{opacity:1;filter:drop-shadow(0 0 12px #4c8dff)}}
+@keyframes loginHaloPulse{0%,100%{opacity:.6;scale:.92}50%{opacity:1;scale:1.08}}@keyframes loginDot{from{opacity:.3}to{opacity:1}}@keyframes loginParticleBlink{0%,100%{opacity:.3}45%{opacity:1}}
+@keyframes loginCardFloat{0%,100%{translate:0 0;rotate:-1deg}50%{translate:0 -8px;rotate:1deg}}@keyframes loginMetricShine{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes loginSpark{from{transform:scaleY(.58);opacity:.7}to{transform:scaleY(1);opacity:1}}@keyframes loginPathFlow{to{stroke-dashoffset:-32}}
+@keyframes loginWorkflowPulse{0%,100%{box-shadow:0 0 12px rgba(92,84,255,.13),inset 0 1px 0 rgba(255,255,255,.08)}50%{box-shadow:0 0 22px rgba(148,90,255,.38),inset 0 1px 0 rgba(255,255,255,.13)}}
+@media(max-width:1260px){.login-shell{padding-left:28px;padding-right:28px}.login-layout{grid-template-columns:minmax(0,1.03fr) minmax(390px,.97fr);gap:27px}.login-hero-top{grid-template-columns:minmax(0,1fr) minmax(220px,.88fr)}.login-hero h2{font-size:clamp(40px,4.6vw,56px);letter-spacing:-2.5px}.login-candidate-card{padding:8px 9px;gap:7px}.login-candidate-card.application{left:-6px}.login-candidate-card.interview{right:-5px}.login-candidate-card.offer{left:5px}.login-metric-card{padding:11px 10px}.login-metric-title{font-size:11px}}
+@media(max-width:1040px){.login-nav{gap:18px}.login-layout{grid-template-columns:minmax(0,1fr) minmax(370px,.92fr);gap:20px}.login-hero-top{grid-template-columns:1fr;min-height:0}.login-globe-scene{height:255px;max-width:520px;width:100%;margin:0 auto}.login-hero h2{font-size:clamp(42px,5.3vw,58px)}.login-feature-row{justify-content:flex-start;gap:13px}.login-workflow{min-height:86px}.login-workflow-step b{font-size:9px}}
+@media(max-width:860px){.login-shell{padding:15px 18px 12px}.login-topbar{align-items:center}.login-nav{gap:15px}.login-layout{grid-template-columns:1fr;gap:27px;max-width:680px;width:100%;margin:0 auto;padding:24px 0}.login-hero{width:100%;padding-top:0}.login-hero-top{grid-template-columns:minmax(0,1.05fr) minmax(230px,.95fr)}.login-hero h2{font-size:clamp(42px,6.8vw,60px)}.login-globe-scene{height:275px;margin:0}.login-auth-panel{max-width:600px}.login-footer{margin-top:auto}}
+@media(max-width:600px){.login-shell{padding:12px 15px 12px}.login-topbar{gap:10px}.login-brand{gap:8px}.login-brand-mark{width:37px;height:37px}.login-brand-name{font-size:17px}.login-nav{gap:0}.login-nav button{display:none}.login-nav .login-careers-link{padding:9px 11px;font-size:11px}.login-layout{padding:16px 0 23px;gap:24px}.login-hero-top{grid-template-columns:1fr;gap:0}.login-hero h2{font-size:42px;letter-spacing:-2px;margin:19px 0 12px}.login-hero-copy{font-size:13px}.login-globe-scene{height:245px;max-width:440px;margin:2px auto 0}.login-globe{width:min(80%,300px)}.login-candidate-card{max-width:205px;padding:8px 9px}.login-candidate-card.application{left:0;top:21px}.login-candidate-card.interview{right:0;top:108px}.login-candidate-card.offer{left:10px;bottom:7px}.login-candidate-avatar{width:29px;height:29px}.login-candidate-info b{font-size:10px}.login-candidate-info small{font-size:9px}.login-feature-row{gap:8px 13px;margin:4px 0 13px}.login-feature-row span{font-size:10px}.login-feature-row i{width:25px;height:25px}.login-metric-row{gap:7px;margin-bottom:10px}.login-metric-card{padding:9px 8px;border-radius:12px}.login-metric-head{gap:6px;align-items:flex-start;flex-direction:column}.login-metric-icon{width:27px;height:27px;border-radius:8px}.login-metric-icon svg{width:15px;height:15px}.login-metric-title{font-size:10px;white-space:normal}.login-metric-copy{font-size:9px}.login-metric-spark{height:16px;margin-top:7px}.login-metric-tail{font-size:8px}.login-workflow{min-height:78px;margin-top:5px}.login-workflow-path{height:64px}.login-workflow-steps{gap:2px}.login-workflow-step{padding-top:10px;gap:4px}.login-workflow-icon{width:29px;height:29px}.login-workflow-icon svg{width:14px;height:14px}.login-workflow-step b{font-size:8px;white-space:normal}.login-workflow-step small{font-size:8px}.login-auth-panel{padding:23px 18px;border-radius:23px}.login-auth-title{font-size:26px}.login-footer{font-size:8px;letter-spacing:.5px;flex-wrap:wrap}}
+@media(max-height:860px) and (min-width:861px){.login-shell{padding-top:12px;padding-bottom:10px}.login-layout{padding-top:12px;padding-bottom:11px;gap:29px}.login-hero-top{min-height:250px}.login-globe-scene{height:245px}.login-hero h2{margin-top:18px;font-size:clamp(40px,4.1vw,57px)}.login-hero-copy{font-size:14px;line-height:1.58}.login-feature-row{margin-bottom:12px;padding:7px 0}.login-metric-row{gap:9px;margin-bottom:8px}.login-metric-card{padding:10px}.login-metric-spark{height:16px;margin-top:8px}.login-workflow{min-height:76px}.login-workflow-path{height:67px}.login-auth-panel{padding:24px 26px}.login-auth-panel .auth-subtitle{margin:8px 0 15px}.login-auth-panel:before{margin-bottom:16px}.login-auth-logo .login-brand-mark{width:45px;height:45px}.login-footer{padding-top:8px}}
+@media(prefers-reduced-motion:reduce){.login.login-experience:before,.login.login-experience:after,.login-live-dot,.login-globe-halo,.login-globe-rotate,.login-globe-rim,.login-globe-dot,.login-globe-particle,.login-candidate-card,.login-metric-card:before,.login-metric-spark i,.login-workflow-path path,.login-workflow-icon,.login-hero,.login-auth-panel{animation:none!important;transition:none!important}}
 @media(max-width:900px){.app{grid-template-columns:1fr}aside.nav{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;border-top:1px solid var(--line);border-right:0;justify-content:space-around}
 .brand,.me,.nav .grow,.nav a span{display:none}.nav a{padding:10px 16px}main{padding-bottom:70px}.g2,.g3{grid-template-columns:1fr}.top,.body{padding-left:14px;padding-right:14px}.top h1{font-size:28px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -264,49 +266,82 @@ async function loadClerk(publishableKey) {
   })().catch(error=>{clerkLoadPromise=null;throw error});
   return clerkLoadPromise;
 }
+function loginLogoSvg(which="top"){
+  const blue="hpLogoBlue"+which, violet="hpLogoViolet"+which;
+  return `<svg class="login-logo-svg" viewBox="0 0 64 64" aria-hidden="true"><defs>
+    <linearGradient id="${blue}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fbff"/><stop offset=".42" stop-color="#a6c8ff"/><stop offset="1" stop-color="#566cff"/></linearGradient>
+    <linearGradient id="${violet}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c6a0ff"/><stop offset=".52" stop-color="#7962ff"/><stop offset="1" stop-color="#4a6eff"/></linearGradient>
+    </defs><path d="M14 10h12c2 0 3.2 1.9 2.4 3.7L15.6 49.8A5 5 0 0 1 10.9 53H7.8c-2 0-3.3-2-2.5-3.8L17 17.1c.9-2.2-.4-7.1-3-7.1Z" fill="url(#${blue})"/><path d="M37 10h12c2 0 3.2 1.9 2.4 3.7L38.6 49.8a5 5 0 0 1-4.7 3.2h-3.1c-2 0-3.3-2-2.5-3.8L40 17.1c.9-2.2-.4-7.1-3-7.1Z" fill="url(#${violet})"/><path d="M41 11h8c2 0 3.2 1.9 2.4 3.7l-4 10.1h-8l4.6-11.7c.4-1.1-.7-2.1-3-2.1Z" fill="#fff" opacity=".6"/></svg>`;
+}
 function loginHeroMarkup(){
   return `<section class="login-hero" aria-label="HirePath ATS introduction">
-    <div class="login-kicker"><span class="login-live-dot"></span> BUILT FOR BETTER HIRING</div>
-    <h2>Find the right people.<span>Build what’s next.</span></h2>
-    <p class="login-hero-copy">Keep every role, application, and hiring decision moving in one focused workspace.</p>
-    <div class="login-feature-row"><span><i>✓</i> Smart pipeline</span><span><i>✓</i> Candidate insights</span><span><i>✓</i> Clear hiring stages</span></div>
-    <div class="login-scene" aria-hidden="true">
-      <div class="login-orbit one"></div><div class="login-orbit two"></div>
-      <svg class="login-robot-stage login-robot-svg" viewBox="0 0 240 240" role="img" aria-label="Animated HirePath robot">
-        <defs><linearGradient id="loginRobotShell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7fbff"/><stop offset="1" stop-color="#9fb7d8"/></linearGradient><linearGradient id="loginRobotFace" x1="0" y1="0" x2="0.9" y2="1"><stop stop-color="#172d4c"/><stop offset="1" stop-color="#08162b"/></linearGradient><linearGradient id="loginRobotAccent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#70f7e5"/><stop offset="1" stop-color="#32a9cd"/></linearGradient><filter id="loginRobotGlow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-        <ellipse cx="120" cy="214" rx="57" ry="9" fill="#24c9c1" opacity=".14"/>
-        <path d="M120 43V28" stroke="#89a5c8" stroke-width="7" stroke-linecap="round"/>
-        <g class="login-robot-antenna"><circle cx="120" cy="23" r="11" fill="#12384a" stroke="url(#loginRobotAccent)" stroke-width="2.5"/><circle cx="120" cy="23" r="5.5" fill="#70f7e5" filter="url(#loginRobotGlow)" class="login-robot-pulse"/></g>
-        <path d="M51 113L29 128L21 117" fill="none" stroke="#89a5c8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="115" r="10" fill="url(#loginRobotShell)" stroke="#819dc0" stroke-width="2"/>
-        <g class="login-robot-wave"><path d="M187 107L204 86L210 67" fill="none" stroke="#89a5c8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><circle cx="212" cy="62" r="11" fill="url(#loginRobotShell)" stroke="#819dc0" stroke-width="2"/><path d="M208 53L206 45M216 53L219 46M221 61L229 59" stroke="#63e8db" stroke-width="3" stroke-linecap="round" fill="none"/></g>
-        <rect x="72" y="143" width="96" height="61" rx="20" fill="url(#loginRobotShell)" stroke="#819dc0" stroke-width="2.4"/>
-        <rect x="88" y="155" width="64" height="31" rx="10" fill="url(#loginRobotFace)"/><rect x="97" y="164" width="12" height="13" rx="4" fill="#61f2df" filter="url(#loginRobotGlow)" class="login-robot-pulse"/><rect x="131" y="164" width="12" height="13" rx="4" fill="#61f2df" filter="url(#loginRobotGlow)" class="login-robot-pulse"/><rect x="115" y="164" width="10" height="4" rx="2" fill="#829cb9" opacity=".8"/><rect x="111" y="192" width="18" height="4" rx="2" fill="#7890b0"/>
-        <rect x="46" y="42" width="148" height="112" rx="31" fill="url(#loginRobotShell)" stroke="#8ca6c8" stroke-width="3"/>
-        <rect x="58" y="56" width="124" height="82" rx="22" fill="url(#loginRobotFace)"/>
-        <path d="M69 65Q84 58 99 64" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
-        <g class="login-robot-eye"><ellipse cx="86" cy="91" rx="11" ry="14" fill="#61f2df" filter="url(#loginRobotGlow)"/><circle cx="83" cy="87" r="3.2" fill="#fff"/></g><g class="login-robot-eye"><ellipse cx="154" cy="91" rx="11" ry="14" fill="#61f2df" filter="url(#loginRobotGlow)"/><circle cx="151" cy="87" r="3.2" fill="#fff"/></g>
-        <path d="M99 116Q120 131 141 116" fill="none" stroke="#8aa8c8" stroke-width="3.5" stroke-linecap="round"/>
-        <circle cx="51" cy="94" r="7" fill="url(#loginRobotAccent)"/><circle cx="189" cy="94" r="7" fill="url(#loginRobotAccent)"/><path d="M69 48Q120 29 170 48" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="3" stroke-linecap="round"/><circle cx="169" cy="61" r="3.5" fill="#6ff6c6" class="login-robot-pulse"/>
-      </svg>
-      <div class="login-floating-card top"><span class="login-float-icon">↗</span><span class="login-float-copy"><b>New role published</b><small>Python Developer · Bengaluru</small></span><span class="login-float-check">✓</span></div>
-      <div class="login-floating-card bottom"><span class="login-float-icon">✦</span><span class="login-float-copy"><b>Application received</b><small>Candidate added to pipeline</small></span><span class="login-float-check">✓</span></div>
-      <div class="login-scene-caption"><span class="login-bars"><i></i><i></i><i></i><i></i></span> EVERY STAGE. ONE WORKSPACE.</div>
+    <div class="login-hero-top"><div class="login-hero-copy-col">
+      <div class="login-kicker"><span class="login-live-dot"></span><span>AI-POWERED HIRING PLATFORM</span></div>
+      <h2>From Talent <span>to Tomorrow</span></h2>
+      <p class="login-hero-copy">HirePath ATS helps teams hire faster with a modern, intelligent and collaborative recruitment platform.</p>
     </div>
-    <p class="login-hero-note"><span>↗</span> From job post to final decision</p>
+    <div class="login-globe-scene" aria-label="Animated recruitment workflow preview">
+      <div class="login-globe-halo"></div>
+      <svg class="login-globe" viewBox="0 0 480 320" role="img" aria-label="Animated connected globe illustrating recruitment">
+        <defs>
+          <radialGradient id="hpGlobeSurface" cx="34%" cy="26%" r="82%"><stop stop-color="#285fbe" stop-opacity=".98"/><stop offset=".4" stop-color="#16245b" stop-opacity=".94"/><stop offset=".78" stop-color="#101235" stop-opacity=".98"/><stop offset="1" stop-color="#050a1b"/></radialGradient>
+          <linearGradient id="hpGlobeEdge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5ee8ff"/><stop offset=".48" stop-color="#536cff"/><stop offset="1" stop-color="#d14cff"/></linearGradient>
+          <linearGradient id="hpLand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5fc5ff" stop-opacity=".8"/><stop offset=".55" stop-color="#7d72ff" stop-opacity=".5"/><stop offset="1" stop-color="#e06bff" stop-opacity=".36"/></linearGradient>
+          <filter id="hpGlobeGlow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <clipPath id="hpGlobeClip"><circle cx="240" cy="160" r="103"/></clipPath>
+        </defs>
+        <ellipse cx="240" cy="160" rx="166" ry="71" transform="rotate(-22 240 160)" fill="none" stroke="#625eff" stroke-opacity=".37" stroke-width="1.2"/>
+        <ellipse cx="240" cy="160" rx="147" ry="91" transform="rotate(36 240 160)" fill="none" stroke="#358fff" stroke-opacity=".5" stroke-width="1.3"/>
+        <ellipse cx="240" cy="160" rx="129" ry="111" transform="rotate(-62 240 160)" fill="none" stroke="#9e59ff" stroke-opacity=".42" stroke-width="1"/>
+        <circle cx="240" cy="160" r="108" fill="url(#hpGlobeSurface)" stroke="url(#hpGlobeEdge)" stroke-width="2.8" class="login-globe-rim"/><circle cx="240" cy="160" r="102" fill="none" stroke="#6ebfff" stroke-opacity=".28"/>
+        <g clip-path="url(#hpGlobeClip)"><g class="login-globe-rotate">
+          <ellipse cx="240" cy="160" rx="56" ry="103" fill="none" stroke="#6b9fff" stroke-opacity=".35" stroke-width="1.1"/><ellipse cx="240" cy="160" rx="81" ry="103" fill="none" stroke="#6b9fff" stroke-opacity=".23" stroke-width="1"/><ellipse cx="240" cy="160" rx="101" ry="35" fill="none" stroke="#65bfff" stroke-opacity=".34" stroke-width="1"/><ellipse cx="240" cy="160" rx="101" ry="67" fill="none" stroke="#65bfff" stroke-opacity=".27" stroke-width="1"/>
+          <path d="M139 160H341M147 122Q240 151 333 122M147 198Q240 169 333 198" stroke="#72b5ff" stroke-opacity=".2" fill="none"/>
+          <path d="M173 93l17-13 22 4 8 14 19 6 1 13-15 12-4 14-18 7-14-18-20-8-7-17-11-5z" fill="url(#hpLand)" opacity=".85"/><path d="M231 157l16 4 13 16-4 17 12 16-7 31-11 12-10-25-6-19-16-21 1-19z" fill="url(#hpLand)" opacity=".8"/><path d="M266 96l17-12 23 3 15 13 19 7 7 20-13 12-9 17-17-4-8 14-13-3-13-18-20-3-8-17 10-11-2-12z" fill="url(#hpLand)" opacity=".77"/><path d="M284 186l17-5 15 12-5 13 10 13-13 10-14-8-10-17z" fill="url(#hpLand)" opacity=".64"/>
+          <path d="M160 151l34-17 28 14 11 17-21 14-26-6-26-9z" fill="none" stroke="#69cdfa" stroke-opacity=".4" stroke-width="1"/><path d="M256 112l29 9 18 23-5 23-23 7-15-17-19-11 4-22z" fill="none" stroke="#a37dff" stroke-opacity=".48" stroke-width="1"/>
+        </g><g fill="none" stroke="#74c9ff" stroke-opacity=".24"><path d="M145 129Q237 74 335 128"/><path d="M143 192Q240 246 337 190"/></g><g fill="#75eaff" opacity=".85"><circle cx="177" cy="128" r="2"/><circle cx="216" cy="96" r="1.4"/><circle cx="286" cy="127" r="2"/><circle cx="305" cy="174" r="1.6"/><circle cx="216" cy="204" r="1.7"/><circle cx="265" cy="218" r="1.2"/></g></g>
+        <circle cx="240" cy="160" r="108" fill="none" stroke="#57baff" stroke-opacity=".2" stroke-width="10" filter="url(#hpGlobeGlow)"/>
+        <g class="login-globe-particle"><circle cx="77" cy="131" r="3" fill="#b99aff"/><circle cx="402" cy="209" r="3.5" fill="#5ae9ff"/><circle cx="342" cy="32" r="2.4" fill="#8a7dff"/><circle cx="119" cy="239" r="2.6" fill="#ffbd77"/></g>
+        <circle class="login-globe-dot" cx="112" cy="94" r="4.2" fill="#a884ff" filter="url(#hpGlobeGlow)"/><circle class="login-globe-dot d2" cx="376" cy="129" r="4.3" fill="#51cfff" filter="url(#hpGlobeGlow)"/><circle class="login-globe-dot d3" cx="317" cy="264" r="3.6" fill="#9f8cff" filter="url(#hpGlobeGlow)"/><circle class="login-globe-dot d4" cx="191" cy="46" r="3.2" fill="#77e9ff" filter="url(#hpGlobeGlow)"/>
+      </svg>
+      <div class="login-candidate-card application"><span class="login-candidate-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c.7-4.1 3.1-6.2 7-6.2s6.3 2.1 7 6.2"/></svg></span><span class="login-candidate-info"><b>New application</b><small>Frontend Developer</small></span><span class="login-candidate-right"><span>Demo</span><i class="login-candidate-dot"></i></span></div>
+      <div class="login-candidate-card interview"><span class="login-candidate-avatar"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3"/></svg></span><span class="login-candidate-info"><b>Interview scheduled</b><small>Backend Developer</small></span><span class="login-candidate-right"><span>Demo</span><i class="login-candidate-dot orange"></i></span></div>
+      <div class="login-candidate-card offer"><span class="login-candidate-avatar"><svg viewBox="0 0 24 24"><path d="M4 8.5h16v11H4zM8 8.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2.5M4 13h16M10 13v2h4v-2"/></svg></span><span class="login-candidate-info"><b>Offer stage</b><small>Full Stack Developer</small></span><span class="login-candidate-right"><span>Preview</span><i class="login-candidate-dot cyan"></i></span></div>
+    </div></div>
+    <div class="login-feature-row" id="login-features"><span><i>▣</i>Manage Jobs</span><span><i>♙</i>Track Candidates</span><span><i>♧</i>Team Collaboration</span><span><i>↗</i>Data Insights</span></div>
+    <div class="login-metric-row" id="login-why">
+      <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM8 7V4h8v3M4 12h16M10 12v2h4v-2"/></svg></span><div><b class="login-metric-title">Manage roles</b><small class="login-metric-copy">One clear workspace</small></div></div><div class="login-metric-spark"><i style="height:30%"></i><i style="height:55%"></i><i style="height:42%"></i><i style="height:76%"></i><i style="height:60%"></i><i style="height:92%"></i><i style="height:72%"></i><i style="height:100%"></i></div><div class="login-metric-tail"><span>Organize hiring</span><b>↗</b></div></div>
+      <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c.5-3.5 2.6-5.3 6-5.3s5.5 1.8 6 5.3M16 5.5a3 3 0 0 1 0 5.7M17 14c2.4.5 3.6 2.2 4 5"/></svg></span><div><b class="login-metric-title">Candidate pipeline</b><small class="login-metric-copy">Every stage connected</small></div></div><div class="login-metric-spark"><i style="height:42%"></i><i style="height:36%"></i><i style="height:60%"></i><i style="height:50%"></i><i style="height:76%"></i><i style="height:67%"></i><i style="height:100%"></i><i style="height:86%"></i></div><div class="login-metric-tail"><span>Follow each journey</span><b>↗</b></div></div>
+      <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V4M16 19v-7M22 19V7"/></svg></span><div><b class="login-metric-title">Team insights</b><small class="login-metric-copy">Make informed decisions</small></div></div><div class="login-metric-spark"><i style="height:23%"></i><i style="height:48%"></i><i style="height:38%"></i><i style="height:70%"></i><i style="height:56%"></i><i style="height:83%"></i><i style="height:75%"></i><i style="height:100%"></i></div><div class="login-metric-tail"><span>See the big picture</span><b>↗</b></div></div>
+    </div>
+    <div class="login-workflow" id="login-workflow"><svg class="login-workflow-path" viewBox="0 0 760 83" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="hpWorkflowGrad" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3289ff"/><stop offset=".42" stop-color="#8758ff"/><stop offset=".76" stop-color="#e553d0"/><stop offset="1" stop-color="#ff9d91"/></linearGradient></defs><path d="M12 42C75 4 102 82 188 42S308 8 380 42 500 80 570 42 685 8 748 42" stroke="url(#hpWorkflowGrad)" opacity=".82"/><path d="M12 42C75 4 102 82 188 42S308 8 380 42 500 80 570 42 685 8 748 42" stroke="#9d8dff" opacity=".2" stroke-width="9"/></svg>
+      <div class="login-workflow-steps">
+        <div class="login-workflow-step"><span class="login-workflow-icon"><svg viewBox="0 0 24 24"><path d="M4 9h16v11H4zM8 9V6h8v3M4 13h16"/></svg></span><b>Post a Job</b><small>Reach top talent</small></div>
+        <div class="login-workflow-step"><span class="login-workflow-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM4 7l8 6 8-6"/></svg></span><b>Receive Applications</b><small>All in one place</small></div>
+        <div class="login-workflow-step"><span class="login-workflow-icon"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M2 20c.4-3.5 2.4-5.3 6-5.3s5.6 1.8 6 5.3M16 12l2 2 4-5"/></svg></span><b>Evaluate &amp; Collaborate</b><small>With your team</small></div>
+        <div class="login-workflow-step"><span class="login-workflow-icon"><svg viewBox="0 0 24 24"><path d="M4 20V7l8-4 8 4v13M9 20v-6h6v6M2 20h20"/></svg></span><b>Hire the Best</b><small>Build your team</small></div>
+      </div>
+    </div>
   </section>`;
 }
 function loginFrameMarkup(authMarkup){
-  return `<div class="login login-experience clerk-mode"><div class="login-shell">
-    <header class="login-topbar"><div class="login-brand"><span class="login-brand-mark"><svg class="i" style="stroke:#06202c;width:24px;height:24px;stroke-width:2.4" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></span><div><div class="login-brand-name">HirePath <span>ATS</span></div><div class="login-brand-sub">RECRUITMENT WORKSPACE</div></div></div><div class="login-secure-pill"><span>✦</span> SECURE WORKSPACE</div></header>
-    <div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>
-    <footer class="login-footer"><span>HIRING FLOW, SIMPLIFIED</span><span>Secure authentication · Candidate-first workflow</span></footer>
-  </div></div>`;
+  const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
+    <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
+    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-scroll="login-features">Features</button><button type="button" data-scroll="login-why">Why HirePath</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
+    </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div><footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
+  $("#root").innerHTML=frame;
+  document.querySelectorAll(".login-nav [data-scroll]").forEach(button=>button.addEventListener("click",()=>document.getElementById(button.dataset.scroll)?.scrollIntoView({behavior:"smooth",block:"center"})));
 }
 function renderPasswordLogin(config, initialError="") {
-  const auth=`<section class="login-auth-panel" aria-label="Sign in"><p class="auth-eyebrow">WELCOME BACK</p><h3>Continue to <span>HirePath ATS</span></h3><p class="auth-subtitle">Sign in to continue to your hiring workspace.</p>
-    <form class="password-login-form" id="lf"><label for="em">Email address</label><input class="in" id="em" type="email" required autocomplete="username" placeholder="you@company.com"><label for="pw">Password</label><input class="in" id="pw" type="password" required autocomplete="current-password" placeholder="Enter your password">
-    <div class="err" id="er" role="alert">${esc(initialError || (config.clerkPartiallyConfigured ? "Clerk is partially configured. Add both Clerk API keys in Vercel to enable Clerk sign-in." : ""))}</div><button class="btn pri" style="width:100%;justify-content:center;padding:12px;margin-top:5px">Sign in securely →</button>
-    <p class="mut" style="font-size:12px;margin:15px 0 0">Use the account provided by your HirePath administrator.</p></form></section>`;
+  const auth=`<section class="login-auth-panel" aria-label="Sign in">
+    <div class="login-auth-logo"><span class="login-brand-mark">${loginLogoSvg("password")}</span></div>
+    <p class="auth-eyebrow">WELCOME BACK</p><h3 class="login-auth-title">HirePath <span>ATS</span></h3>
+    <p class="auth-subtitle">Sign in to continue to your workspace.</p>
+    <form class="password-login-form" id="lf"><label for="em">Email address</label><input class="in" id="em" type="email" required autocomplete="username" placeholder="Enter your email address"><label for="pw">Password</label><input class="in" id="pw" type="password" required autocomplete="current-password" placeholder="Enter your password">
+    <div class="err" id="er" role="alert">${esc(initialError || (config.clerkPartiallyConfigured ? "Clerk is partially configured. Add both Clerk API keys in Vercel to enable Clerk sign-in." : ""))}</div><button class="btn pri" style="width:100%;justify-content:center;padding:12px;margin-top:6px">Continue&nbsp; →</button>
+    <p class="mut" style="font-size:12px;margin:15px 0 0;text-align:center">Use the account provided by your HirePath administrator.</p></form>
+    <div class="login-security-note"><span class="login-security-shield">✓</span><span>Secure sign-in · Your workspace stays protected</span></div>
+  </section>`;
   $("#root").innerHTML=loginFrameMarkup(auth);
   $("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);await boot()}catch(x){$("#er").textContent=x.message}};
 }
@@ -336,11 +371,14 @@ async function exchangeClerkSession(clerk) {
 async function loginView(initialError="") {
   const config=await getAuthConfig();
   if(config.provider!=="clerk"||!config.publishableKey) return renderPasswordLogin(config,initialError);
-  const auth=`<section class="login-auth-panel" aria-label="Sign in"><p class="auth-eyebrow">WELCOME BACK</p><h3>Continue to <span>HirePath ATS</span></h3><p class="auth-subtitle">Securely access your candidates, jobs, and hiring pipeline.</p>
-    <div id="clerk-sign-in" class="clerk-widget"></div>
-    <div class="clerk-footnote">Secure authentication powered by Clerk</div>
-    <div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div>
-    <button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button></section>`;
+  const auth=`<section class="login-auth-panel" aria-label="Sign in">
+    <div class="login-auth-logo"><span class="login-brand-mark">${loginLogoSvg("clerk")}</span></div>
+    <p class="auth-eyebrow">WELCOME BACK</p><h3 class="login-auth-title">HirePath <span>ATS</span></h3>
+    <p class="auth-subtitle">Sign in to continue to your workspace.</p>
+    <div id="clerk-sign-in" class="clerk-widget"></div><div class="clerk-footnote">Secure authentication powered by Clerk</div>
+    <div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div><button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button>
+    <div class="login-security-note"><span class="login-security-shield">✓</span><span>Enterprise-grade authentication and security</span></div>
+  </section>`;
   $("#root").innerHTML=loginFrameMarkup(auth);
   try {
     const clerk=await loadClerk(config.publishableKey);
@@ -374,11 +412,11 @@ async function loginView(initialError="") {
         oauthFlow: "redirect",
         appearance: {
           variables: {
-            colorPrimary: "#55dccc",
+            colorPrimary: "#795bff",
             colorText: "#f4f7ff",
             colorTextSecondary: "#9fb2cc",
-            colorBackground: "#111e34",
-            colorInputBackground: "#0a172a",
+            colorBackground: "#0b1021",
+            colorInputBackground: "#090d1c",
             colorInputText: "#f4f7ff",
             colorNeutral: "#b2c4dc",
             borderRadius: "12px",
