@@ -10,7 +10,7 @@ Full stack ATS. TypeScript Express REST API, PostgreSQL via Prisma, and a vanill
 - Resume upload (PDF/TXT/MD, 5 MB): text extracted, known skills merged into profile, file stored in Postgres (so any instance can serve it) and downloadable
 - Role match score 0–100 with strengths and gaps. Uses Claude API when `ANTHROPIC_API_KEY` set, else offline keyword engine. Candidate name and protected traits never sent to the model. Result is advisory only
 - Interviewer scorecards: 4 criteria (1–5), recommendation, comment. One review per interviewer per candidate (edit replaces). Average shown in table, sortable
-- Email templates (invite, received, offer, rejection) with merge fields, editable before send. Supports Plunk (hosted API; requires a verified sending domain), Gmail SMTP, and Resend; without a working provider, delivery is not completed. Every email is recorded in the timeline. UI asks confirmation before sending.
+- Email templates (invite, received, offer, rejection) with merge fields, editable before send. Supports Plunk (hosted API; requires a verified sending domain), Gmail SMTP, and Resend; without a working provider, delivery is not completed. Manual candidate emails can be sent by admins only; recruiters cannot trigger sends. Every email is recorded in the timeline. UI asks confirmation before sending.
 - Public careers page at `/careers`: lists open roles, apply form with optional resume and cover note. Applicants land in Applied with source "Careers page", get an acknowledgement email (logged in the timeline), and are rate limited (5 per IP per 10 min), honeypot protected and de-duplicated per role + email (a repeat gets the same success reply, so the form cannot reveal who applied)
 - Realtime board: WebSocket at `/ws`. First message must be `{type:"auth",token}` (5 s deadline, closed when the token expires). Every successful candidate create, update or delete, plus new careers-page applications, is broadcast to all signed-in recruiters; the pipeline, dashboard and candidate list refresh themselves, and a toast announces new candidates. Your own tab ignores its own echo (`x-client` header). Clients reconnect with backoff and resync on reconnect. Works across multiple instances: events go through Postgres `LISTEN/NOTIFY`, so a change made on one instance reaches recruiters connected to any other
 - Privacy: the apply form has a mandatory consent checkbox (stored as `consent_at`). Admins can **anonymise** a candidate (name, email, phone, skills, resume, notes, emails erased; stage history kept so reports stay right). `RETENTION_DAYS=N` anonymises rejected candidates automatically N days after rejection
@@ -68,7 +68,7 @@ Copies users, roles, candidates, timelines, scorecards, emails and resume files 
 | POST | /api/candidates/:id/match | score candidate against assigned role |
 | POST | /api/candidates/:id/scorecards | upsert caller's review |
 | GET | /api/candidates/:id/email-draft?template= | rendered draft |
-| POST | /api/candidates/:id/email | send + log |
+| POST | /api/candidates/:id/email | **admin only:** send + log |
 | POST | /api/candidates/:id/anonymise | **admin only.** Erase personal data, keep stage history |
 | GET | /api/public/jobs | **no auth.** Open roles, public fields only |
 | POST | /api/public/apply | **no auth.** JSON: job_id, name, email, phone, cover, resume_name, resume_b64 (max 5 MB decoded), `consent: true` (required) |
