@@ -86,6 +86,18 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .empty{padding:40px;text-align:center;color:var(--mute)}
 .login{min-height:100%;display:grid;place-items:center;padding:20px}.login .card{width:min(400px,100%);padding:32px}.login h1{font:400 40px/1.05 var(--serif);margin:14px 0 6px}
 .login label{display:block;margin:14px 0 5px;font-weight:600;font-size:13px}.err{color:var(--bad);margin:10px 0 0;min-height:20px}
+#root{min-height:100vh}
+.login.clerk-mode{min-height:100vh;width:100%;display:grid;place-items:center;align-content:center;padding:28px 16px}
+.login.clerk-mode .clerk-shell{width:min(440px,100%);display:flex;flex-direction:column;align-items:center;gap:12px;margin:auto}
+.login.clerk-mode .clerk-header{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-bottom:6px}
+.login.clerk-mode .clerk-heading h1{font:400 32px/1.05 var(--serif);margin:0 0 5px;letter-spacing:-.02em}
+.login.clerk-mode .clerk-heading p{margin:0;color:var(--mute);font-size:13px}
+.login.clerk-mode .clerk-widget{width:100%;display:flex;align-items:center;justify-content:center}
+.login.clerk-mode .clerk-widget>*{width:100%;max-width:430px}
+.login.clerk-mode .clerk-footnote{font-size:12px;color:var(--mute);text-align:center;margin-top:2px}
+.login.clerk-mode .err{width:100%;text-align:center;overflow-wrap:anywhere}
+.login.clerk-mode #clerk-signout{align-self:center}
+@media(max-width:480px){.login.clerk-mode{padding:20px 10px}.login.clerk-mode .clerk-heading h1{font-size:28px}}
 @media(max-width:900px){.app{grid-template-columns:1fr}aside.nav{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;border-top:1px solid var(--line);border-right:0;justify-content:space-around}
 .brand,.me,.nav .grow,.nav a span{display:none}.nav a{padding:10px 16px}main{padding-bottom:70px}.g2,.g3{grid-template-columns:1fr}.top,.body{padding-left:14px;padding-right:14px}.top h1{font-size:28px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -182,6 +194,8 @@ async function exchangeClerkSession(clerk) {
     const result=await response.json().catch(()=>({}));
     if(!response.ok){clerkFailedSessionId=sid;throw new Error(result.error||"Clerk sign-in could not be linked to a HirePath account.");}
     clerkFailedSessionId=null;S.token=result.token;S.user=result.user;ls.set("ats_token",result.token);
+    // Normalize the post-auth landing page and immediately enter the HirePath dashboard.
+    history.replaceState(null,"",location.pathname+location.search+"#/dashboard");
     await boot();return true;
   })();
   try{return await clerkExchangePromise}finally{clerkExchangePromise=null}
@@ -189,7 +203,7 @@ async function exchangeClerkSession(clerk) {
 async function loginView(initialError="") {
   const config=await getAuthConfig();
   if(config.provider!=="clerk"||!config.publishableKey) return renderPasswordLogin(config,initialError);
-  $("#root").innerHTML=`<div class="login"><div class="card"><div class="logo" style="width:40px;height:40px;border-radius:12px"><svg class="i" style="stroke:#fff;width:22px;height:22px" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></div><h1>Hirepath</h1><p class="mut" style="margin:0 0 20px">Secure sign-in, powered by Clerk.</p><div id="clerk-sign-in"></div><div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div><button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button></div></div>`;
+  $("#root").innerHTML=`<div class="login clerk-mode"><div class="clerk-shell"><div class="clerk-header"><span class="logo" style="width:40px;height:40px;border-radius:12px;flex:none"><svg class="i" style="stroke:#fff;width:22px;height:22px" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></span><div class="clerk-heading"><h1>HirePath ATS</h1><p>Sign in securely to continue to your workspace.</p></div></div><div id="clerk-sign-in" class="clerk-widget"></div><div class="clerk-footnote">Secure authentication powered by Clerk</div><div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div><button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button></div></div>`;
   try {
     const clerk=await loadClerk(config.publishableKey);
     if(!clerkListenerBound && typeof clerk.addListener==="function") {
@@ -206,7 +220,7 @@ async function loginView(initialError="") {
       if(clerkFailedSessionId) { showClerkError("Your Clerk identity is signed in, but this account is not approved for HirePath. Ask the administrator to approve the account in Clerk Dashboard.",true); return; }
     }
     const mount=$("#clerk-sign-in");
-    if(mount)clerk.mountSignIn(mount,{signInFallbackRedirectUrl:location.origin+"/",signUpFallbackRedirectUrl:location.origin+"/"});
+    if(mount)clerk.mountSignIn(mount,{forceRedirectUrl:location.origin+"/",fallbackRedirectUrl:location.origin+"/",signUpForceRedirectUrl:location.origin+"/",signUpFallbackRedirectUrl:location.origin+"/",oauthFlow:"redirect"});
   } catch(error) { showClerkError(error.message,false); }
 }
 function logout(signOutClerk=true) {
