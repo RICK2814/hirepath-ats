@@ -406,12 +406,43 @@ async function processEmails(limit = 5) {
 // returns {state:"sent"|"failed"|"simulated", err?}
 async function deliver(to: string, subject: string, body: string, replyTo = ""): Promise<{ state: "sent" | "failed" | "simulated"; err?: string }> {
   if (!process.env.RESEND_API_KEY) return { state: "simulated" };
+  const from = str(process.env.EMAIL_FROM, 254);
+  if (!from && process.env.NODE_ENV === "production") {
+    return { state: "failed", err: "EMAIL_FROM is not configured. Set it to a sender address on a verified domain in Resend, for example HirePath <notifications@your-domain.com>." };
+  }
   try {
-    const r = await fetch("https://api.resend.com/emails", { method: "POST", signal: AbortSignal.timeout(15000), headers: { Authorization: "Bearer " + process.env.RESEND_API_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ from: process.env.EMAIL_FROM || "Hirepath <onboarding@resend.dev>", to: [to], subject, text: body, ...(replyTo ? { reply_to: replyTo } : {}) }) });
-    if (!r.ok) throw new Error("provider " + r.status);
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      signal: AbortSignal.timeout(15000),
+      headers: { Authorization: "Bearer " + process.env.RESEND_API_KEY, "content-type": "application/json" },
+      body: JSON.stringify({
+        from: from || "Hirepath <onboarding@resend.dev>",
+        to: [to],
+        subject,
+        text: body,
+        ...(replyTo ? { reply_to: replyTo } : {})
+      })
+    });
+    const payload: any = await r.json().catch(() => null);
+    if (!r.ok) {
+      // Keep provider details so UI and timeline can explain 4xx validation errors;
+      // never expose the API key or raw request headers.
+      const providerMessage = typeof payload?.message === "string"
+        ? payload.message
+        : typeof payload?.error === "string"
+          ? payload.error
+          : "No detailed error message was returned.";
+      const safeMessage = providerMessage
+        .replace(/re_[A-Za-z0-9_-]{8,}/g, "[redacted]")
+        .slice(0, 500);
+      console.error("Resend rejected email", JSON.stringify({ status: r.status, name: payload?.name || null, message: safeMessage }));
+      return { state: "failed", err: `Resend rejected email (HTTP ${r.status}): ${safeMessage}` };
+    }
     return { state: "sent" };
-  } catch (e) { return { state: "failed", err: e.message }; }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Unknown email delivery error";
+    return { state: "failed", err: message.slice(0, 300) };
+  }
 }
 app.get("/careers", (_q, res) => res.sendFile(path.join(__dirname, "public", "careers.html")));
 app.get("/api/public/jobs", async (_q, res) => res.json(await prisma.job.findMany({ where: { status: "open" }, orderBy: { created_at: "desc" }, select: { id: true, title: true, department: true, location: true, description: true } })));
