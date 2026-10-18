@@ -152,8 +152,11 @@ const json100 = express.json({ limit: "100kb" });
 app.use((q, r, n) => (q.path === "/api/public/apply" ? n() : json100(q, r, n)));
 // CSP: inline <script> blocks in public/*.html are allowed by hash, so injected scripts cannot run.
 const fs = require("fs");
-const scriptHashes = fs.readdirSync(path.join(__dirname, "public")).filter(f => f.endsWith(".html"))
-  .flatMap(f => [...fs.readFileSync(path.join(__dirname, "public", f), "utf8").matchAll(/<script>([\s\S]*?)<\/script>/g)])
+const publicDir = path.join(__dirname, "public");
+// Vercel serves public assets separately; the directory may not be present in the function bundle.
+const publicFiles = fs.existsSync(publicDir) ? fs.readdirSync(publicDir) : [];
+const scriptHashes = publicFiles.filter(f => f.endsWith(".html"))
+  .flatMap(f => [...fs.readFileSync(path.join(publicDir, f), "utf8").matchAll(/<script>([\\s\\S]*?)<\\/script>/g)])
   .map(m => `'sha256-${crypto.createHash("sha256").update(m[1]).digest("base64")}'`).join(" ");
 app.use((req, res, next) => {
   const host = /^[\w.\-:[\]]+$/.test(req.get("host") || "") ? req.get("host") : "";
