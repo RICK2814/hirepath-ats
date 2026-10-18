@@ -18,6 +18,7 @@ Manage job openings, candidates, hiring stages, interview feedback, resumes, and
 
 - [Overview](#overview)
 - [Features](#features)
+- [Using the public Careers Page](#using-the-public-careers-page)
 - [Technology stack](#technology-stack)
 - [Architecture](#architecture)
 - [Repository structure](#repository-structure)
@@ -71,6 +72,30 @@ The frontend is served from `public/`; it does not need a separate React or fron
 - Security headers, request IDs, rate limiting, session revocation, and graceful shutdown are implemented.
 - Candidate anonymisation removes personal information and associated derived data while preserving stage history for reporting.
 - PostgreSQL `LISTEN/NOTIFY` distributes candidate changes between application instances in long-running deployments.
+
+## Using the public Careers Page
+
+**Production page:** [https://hirepath-ats.vercel.app/careers](https://hirepath-ats.vercel.app/careers)
+
+Share this URL with applicants. It is a separate public-facing page, not a menu inside the recruiter dashboard.
+
+### Recruiter workflow
+
+1. Sign in to HirePath ATS and open **Jobs**.
+2. Create the role with its title, department, location, and description. Make sure the role is marked **Open**.
+3. Share the Careers Page URL above with candidates.
+4. When a candidate submits the application form, HirePath validates the submission and saves the application to the PostgreSQL database. The candidate should then appear in the ATS candidate list/pipeline with the `Applied` stage. **You do not need to manually add candidates who applied through this form.**
+5. Review the application in **Candidates** or **Pipeline** and continue the hiring process there.
+
+The public form collects the applicant's name and email, with optional phone number, resume, and additional message. Applicants must accept the data-consent checkbox to submit.
+
+### When manual entry is needed
+
+Candidates who contact you through email, referrals, LinkedIn, or another job portal will not automatically appear in HirePath unless a separate integration/import flow is configured. Add those records manually using the dashboard's candidate form. Avoid creating a duplicate record for someone who has already applied through the Careers Page.
+
+### Public-access deployment check
+
+Before sharing the URL, open it in a private/incognito browser window where you are **not** signed in to Vercel. The Careers Page and its public application endpoint must be reachable without recruiter login. If Vercel Deployment Protection or SSO blocks the page, adjust the deployment's public-access configuration before sharing it; keep recruiter dashboard and protected APIs secured. The `/careers` page and `/api/public/jobs` and `/api/public/apply` endpoints are the public application flow.
 
 ## Technology stack
 
