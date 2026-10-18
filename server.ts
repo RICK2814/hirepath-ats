@@ -46,7 +46,7 @@ const bootstrapAdmin = () => prisma.$transaction(async tx => {
   await tx.$queryRaw`SELECT pg_advisory_xact_lock(727274)::text`;
   if (await tx.user.count()) return;
   const email = str(process.env.ADMIN_EMAIL).toLowerCase(), pw = process.env.ADMIN_PASSWORD || "";
-  if (!email || pw.length < 10) throw new Error("No users exist. Set ADMIN_EMAIL and ADMIN_PASSWORD (minimum 10 characters) in the Vercel Production environment to create the first admin.");
+  if (!email || pw.length < 10) throw Object.assign(new Error("No admin account exists. Set ADMIN_EMAIL and ADMIN_PASSWORD (minimum 10 characters) in Vercel Production environment variables."), { status: 503 });
   await tx.user.create({ data: { email, name: str(process.env.ADMIN_NAME) || "Admin", pass: hashPw(pw), role: "admin" } });
   console.log("Created first admin " + email);
 }, { timeout: 60000, maxWait: 60000 });
@@ -159,7 +159,10 @@ const ensureInitialized = (): Promise<unknown> => {
   return initializationPromise;
 };
 if (process.env.VERCEL_ENV === "production") {
-  app.use((_req, _res, next) => {
+  // Serve public pages and public APIs even if first-admin setup is incomplete.
+  // Bootstrap the first account immediately before the first login request only.
+  app.use((req, _res, next) => {
+    if (req.method !== "POST" || req.path !== "/api/auth/login") return next();
     ensureInitialized().then(() => next(), (error) => next(error));
   });
 }
