@@ -548,7 +548,7 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
   }
 }
 app.get("/careers", (_q, res) => res.sendFile(path.join(__dirname, "public", "careers.html")));
-app.get("/api/public/jobs", async (_q, res) => res.json(await prisma.job.findMany({ where: { status: "open" }, orderBy: { created_at: "desc" }, select: { id: true, title: true, department: true, location: true, description: true } })));
+app.get("/api/public/jobs", async (_q, res) => res.json(await prisma.job.findMany({ where: { status: "open" }, orderBy: { created_at: "desc" }, select: { id: true, title: true, department: true, location: true, job_type: true, stipend: true, description: true, requirements: true, created_at: true } })));
 // limiter runs before the 8 MB body parser so floods cannot force big parses
 const applyLimit = async (req, _res, next) => { if ((await hit("apply:" + req.ip, 6e5)) > (+process.env.APPLY_LIMIT || 5)) throw fail(429, "Too many applications. Please try again later."); next(); };
 app.post("/api/public/apply", applyLimit, express.json({ limit: "8mb" }), async (req, res) => {
@@ -635,12 +635,12 @@ app.get("/api/jobs", async (_q, res) => {
 });
 app.post("/api/jobs", async (req, res) => {
   const b = parseOrThrow(jobCreateSchema, req.body);
-  res.status(201).json(await prisma.job.create({ data: { title: b.title, department: b.department || "", location: b.location || "", description: b.description || "" } }));
+  res.status(201).json(await prisma.job.create({ data: { title: b.title, department: b.department || "", location: b.location || "", job_type: b.job_type || "Internship", stipend: b.stipend || "", description: b.description || "", requirements: b.requirements || "" } }));
 });
 app.put("/api/jobs/:id", async (req, res) => {
   const b = parseOrThrow(jobUpdateSchema, req.body);
   const j = await prisma.job.findUnique({ where: { id: toInt(req.params.id) || -1 } }); if (!j) throw fail(404, "job not found");
-  res.json(await prisma.job.update({ where: { id: j.id }, data: { title: b.title ?? j.title, department: b.department ?? j.department, location: b.location ?? j.location, description: b.description ?? j.description, status: b.status ?? j.status } }));
+  res.json(await prisma.job.update({ where: { id: j.id }, data: { title: b.title ?? j.title, department: b.department ?? j.department, location: b.location ?? j.location, job_type: b.job_type ?? j.job_type, stipend: b.stipend ?? j.stipend, description: b.description ?? j.description, requirements: b.requirements ?? j.requirements, status: b.status ?? j.status } }));
 });
 
 /* candidates */
