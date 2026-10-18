@@ -22,7 +22,7 @@ model Job {
   title        String
   department   String      @default("")
   location     String      @default("")
-  job_type     String      @default("Internship")
+  job_type     String      @default("")
   stipend      String      @default("")
   description  String      @default("")
   requirements String      @default("")
