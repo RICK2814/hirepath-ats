@@ -408,10 +408,11 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
   const gmailUser = str(process.env.GMAIL_USER, 254).toLowerCase();
   const gmailAppPassword = (process.env.GMAIL_APP_PASSWORD || "").replace(/\s+/g, "");
 
-  // Optional free Gmail SMTP path. Gmail is separate from Clerk sign-in.
-  if (gmailUser || gmailAppPassword) {
+  // Gmail is used only when explicitly selected. Otherwise keep Resend test mode
+  // as the default, even if old Gmail environment variables happen to remain in Vercel.
+  if (process.env.EMAIL_PROVIDER === "gmail") {
     if (!gmailUser || !gmailAppPassword) {
-      return { state: "failed", err: "Gmail sender is only partially configured. Set both GMAIL_USER and GMAIL_APP_PASSWORD, or remove both to use Resend." };
+      return { state: "failed", err: "Gmail sender is only partially configured. Set both GMAIL_USER and GMAIL_APP_PASSWORD in Vercel Production." };
     }
     let transporter: any;
     try {
