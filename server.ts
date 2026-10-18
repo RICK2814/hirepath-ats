@@ -635,7 +635,7 @@ app.get("/api/jobs", async (_q, res) => {
 });
 app.post("/api/jobs", async (req, res) => {
   const b = parseOrThrow(jobCreateSchema, req.body);
-  res.status(201).json(await prisma.job.create({ data: { title: b.title, department: b.department || "", location: b.location || "", job_type: b.job_type || "Internship", stipend: b.stipend || "", description: b.description || "", requirements: b.requirements || "" } }));
+  res.status(201).json(await prisma.job.create({ data: { title: b.title, department: b.department || "", location: b.location || "", job_type: b.job_type || "", stipend: b.stipend || "", description: b.description || "", requirements: b.requirements || "" } }));
 });
 app.put("/api/jobs/:id", async (req, res) => {
   const b = parseOrThrow(jobUpdateSchema, req.body);
