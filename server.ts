@@ -444,11 +444,11 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     const brevoFrom = str(process.env.BREVO_FROM_EMAIL, 254).toLowerCase();
     const brevoName = str(process.env.BREVO_FROM_NAME, 100) || "HirePath ATS";
     if (!brevoKey) return { state: "failed", err: "Brevo is selected but BREVO_API_KEY is missing. Add your Brevo API key in Vercel." };
-    if (!/^[^<>\\s@]+@[^<>\\s@]+\\.[^<>\\s@]+$/.test(brevoFrom)) {
+    if (!/^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/.test(brevoFrom)) {
       return { state: "failed", err: "Invalid BREVO_FROM_EMAIL. Set it to a sender address verified in Brevo on an authenticated domain." };
     }
     const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    const htmlContent = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\\r?\\n/g, "<br>") + "</div>";
+    const htmlContent = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\r?\n/g, "<br>") + "</div>";
     try {
       const r = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST", signal: AbortSignal.timeout(15000),
