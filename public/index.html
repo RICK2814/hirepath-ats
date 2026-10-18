@@ -11,8 +11,8 @@
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
-*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:auto;overscroll-behavior-y:auto;overflow-anchor:auto}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}html,body{height:auto;min-height:100%}html{min-height:100%;overflow-x:clip;scroll-padding-top:24px;scroll-behavior:auto;overscroll-behavior-y:auto;overflow-anchor:auto}
+body{min-height:100vh;margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y;overflow-anchor:auto}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
@@ -175,7 +175,7 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 @media(max-width:600px){.login-info-panel{padding:21px 15px;border-radius:18px}.login-info-grid,.login-why-points{grid-template-columns:1fr;gap:10px}.login-info-card{padding:16px}.login-info-lead{font-size:13px;margin-bottom:19px}.login-info-bottom{align-items:flex-start;flex-direction:column}.login-info-cta{width:100%;justify-content:center}.login-info-panel h2{letter-spacing:-.8px}}
 @media(prefers-reduced-motion:reduce){.login-info-panel,.login-info-panel:before,.login-info-card,.login-info-cta{animation:none!important;transition:none!important}}
 
-body.login-page-active{height:auto;min-height:100vh;overflow-x:hidden;overflow-y:auto}
+body.login-page-active{height:auto;min-height:100vh;overflow-x:clip;overflow-y:visible}
 .login-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(410px,.88fr);align-items:center;gap:clamp(26px,4vw,64px);flex:0 0 auto;padding:22px 0 19px}
 .login-hero{position:relative;min-width:0;padding:8px 0 0;animation:loginEnter .7s both}
 .login-hero-top{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(240px,.96fr);align-items:center;gap:2px;min-height:300px}
@@ -329,7 +329,7 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
 :root{--sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--ease-premium:cubic-bezier(.22,.8,.25,1)}
 html{scroll-behavior:smooth;scroll-padding-top:24px;overscroll-behavior-y:auto;overflow-anchor:auto}
 body{font-family:var(--sans);letter-spacing:-.012em}
-body.login-page-active{overflow-x:clip;overflow-y:auto;overscroll-behavior-y:auto;touch-action:pan-y;min-height:100vh}
+body.login-page-active{height:auto;min-height:100vh;overflow-x:clip;overflow-y:visible;overscroll-behavior-y:auto;touch-action:auto}
 .login-shell{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}
 .login-info-panel,.login-auth-panel{scroll-margin-top:24px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .login-info-panel{background:linear-gradient(135deg,rgba(15,21,49,.91),rgba(9,13,31,.88) 56%,rgba(27,14,47,.88));border-color:rgba(143,157,255,.28)}
@@ -720,10 +720,19 @@ function logout(signOutClerk=true) {
     clerk.signOut().catch(()=>{}).finally(()=>loginView());
   } else loginView();
 }
-async function boot(){
+async function boot(trustFreshSession=false){
   if(!S.token)return loginView();
-  try{S.user=await api("/auth/me");S.jobs=await api("/jobs")}
-  catch(e){S.token=null;S.user=null;ls.set("ats_token",null);return loginView()}
+  // A just-issued token and user came directly from our own verified login/exchange endpoint.
+  // Render the app shell immediately, then load dashboard data concurrently in route().
+  if(trustFreshSession&&S.user){
+    S.jobs=[];S.stats=null;
+    shell();route();
+    return;
+  }
+  try{
+    const [user,jobs]=await Promise.all([api("/auth/me"),api("/jobs")]);
+    S.user=user;S.jobs=jobs;
+  }catch(e){S.token=null;S.user=null;ls.set("ats_token",null);return loginView()}
   shell();route()
 }
 async function startAuthBootstrap() {
@@ -760,10 +769,22 @@ document.querySelectorAll(".nav a[data-v]").forEach(a=>a.setAttribute("aria-curr
 $("#ttl").textContent=S.view=="dashboard"?`${new Date().getHours()<12?"Good morning":new Date().getHours()<18?"Good afternoon":"Good evening"}, ${S.user.name.split(" ")[0]}`:TITLES[S.view];
 $("#main").innerHTML='<div class="kpis"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>';refresh(true);connectWs()}
 window.addEventListener("hashchange",()=>S.token&&route());
-const refresh=guard(async(frame)=>{S.jobs=await api("/jobs");({dashboard:dash,pipeline:pipe,candidates:cands,jobs:jobsV})[S.view](frame)});
+const refresh=guard(async(frame)=>{
+  const view=S.view;
+  if(view==="dashboard"){
+    // Fetch dashboard dependencies concurrently instead of serially delaying first paint.
+    const [jobs,stats]=await Promise.all([api("/jobs"),api("/stats")]);
+    if(S.view!=="dashboard")return;
+    S.jobs=jobs;S.stats=stats;
+    return dash(frame);
+  }
+  S.jobs=await api("/jobs");
+  if(S.view!==view)return;
+  return ({dashboard:dash,pipeline:pipe,candidates:cands,jobs:jobsV})[view](frame);
+});
 
 /* ---------- dashboard ---------- */
-async function dash(){const s=S.stats=await api("/stats"),mx=Math.max(1,...s.weekly.map(w=>w.n)),pts=s.weekly.map((w,i)=>`${i*(100/7)},${26-w.n/mx*22}`).join(" ");
+async function dash(){const s=S.stats||await api("/stats");S.stats=s;const mx=Math.max(1,...s.weekly.map(w=>w.n)),pts=s.weekly.map((w,i)=>`${i*(100/7)},${26-w.n/mx*22}`).join(" ");
 const kp=(l,v,sp)=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div>${sp?`<svg class="sp" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--acc)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`:""}</div>`;
 const bw=520/8;
 $("#main").innerHTML=`<div class="kpis">${kp("Candidates",s.total,1)}${kp("In pipeline",s.active)}${kp("Open roles",s.openJobs)}${kp("Hire rate",s.hireRate==null?"–":s.hireRate+"%")}${kp("Days to hire",s.avgDaysToHire??"–")}${kp("Avg rating",s.avgRating+" ★")}</div>
