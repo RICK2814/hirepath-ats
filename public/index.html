@@ -112,19 +112,125 @@ const mb=s=>s==null?'<span class="mut">–</span>':`<span class="pill" style="co
 function toast(msg,undo){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span>${esc(msg)}</span>`;if(undo){const b=document.createElement("button");b.textContent="Undo";b.onclick=()=>{undo();t.remove()};t.append(b)}$("#toasts").append(t);setTimeout(()=>t.remove(),5000)}
 const CID=Math.random().toString(36).slice(2);
 async function api(p,o={}){const r=await fetch("/api"+p,{method:o.method||"GET",headers:{"Content-Type":"application/json","x-client":CID,...(S.token?{Authorization:"Bearer "+S.token}:{})},body:o.body&&JSON.stringify(o.body)});
-if(r.status==401&&!p.startsWith("/auth")){logout();throw new Error("Session expired")}if(r.status==204)return null;
+if(r.status==401&&!p.startsWith("/auth")){logout(false);throw new Error("Session expired")}if(r.status==204)return null;
 if(o.raw)return r;const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||"Request failed");return j}
 const guard=fn=>async(...a)=>{try{return await fn(...a)}catch(e){toast(e.message)}};
 
-/* ---------- auth ---------- */
-function loginView(){$("#root").innerHTML=`<div class="login"><form class="card" id="lf"><div class="logo" style="width:40px;height:40px;border-radius:12px"><svg class="i" style="stroke:#fff;width:22px;height:22px" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></div>
+/* ---------- auth: Clerk + backwards-compatible password fallback ---------- */
+let authConfigCache = null, clerkInstance = null, clerkLoadPromise = null, clerkListenerBound = false;
+let clerkExchangePromise = null, clerkFailedSessionId = null;
+async function getAuthConfig() {
+  if (!authConfigCache) authConfigCache = fetch("/api/auth/config", { cache: "no-store" })
+    .then(async r => { const j = await r.json(); if (!r.ok) throw new Error(j.error || "Could not load auth configuration"); return j; })
+    .catch(() => ({ provider: "password", publishableKey: null, clerkPartiallyConfigured: false }));
+  return authConfigCache;
+}
+function loadClerkScript(id, src, attrs={}) {
+  const found = document.getElementById(id);
+  if (found && found.dataset.loadState === "loaded") return Promise.resolve();
+  if (found) return new Promise((resolve,reject) => {
+    found.addEventListener("load",resolve,{once:true}); found.addEventListener("error",()=>reject(new Error("Clerk sign-in assets could not be loaded.")),{once:true});
+  });
+  return new Promise((resolve,reject) => {
+    const s = document.createElement("script"); s.id=id; s.src=src; s.async=true; s.crossOrigin="anonymous";
+    Object.entries(attrs).forEach(([k,v])=>s.setAttribute(k,v));
+    s.onload=()=>{s.dataset.loadState="loaded";resolve()};
+    s.onerror=()=>{s.remove();reject(new Error("Clerk sign-in assets could not be loaded. Check the Clerk publishable key and allowed domain."))};
+    document.head.appendChild(s);
+  });
+}
+async function loadClerk(publishableKey) {
+  if (clerkLoadPromise) return clerkLoadPromise;
+  clerkLoadPromise = (async()=>{
+    const encoded = publishableKey.split("_")[2];
+    if (!encoded) throw new Error("Clerk publishable key is invalid.");
+    let domain;
+    try { domain = atob(encoded).replace(/\$/,""); } catch { throw new Error("Could not read the Clerk frontend domain from the publishable key."); }
+    if (!/^[a-z0-9.-]+$/i.test(domain)) throw new Error("Clerk frontend domain is invalid.");
+    await loadClerkScript("clerk-ui-sdk", "https://" + domain + "/npm/@clerk/ui@1/dist/ui.browser.js");
+    await loadClerkScript("clerk-js-sdk", "https://" + domain + "/npm/@clerk/clerk-js@6/dist/clerk.browser.js", {"data-clerk-publishable-key":publishableKey});
+    const clerk = window.Clerk;
+    if (!clerk || typeof clerk.load !== "function") throw new Error("Clerk JavaScript SDK did not initialize.");
+    await clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
+    clerkInstance = clerk;
+    return clerk;
+  })().catch(error=>{clerkLoadPromise=null;throw error});
+  return clerkLoadPromise;
+}
+function renderPasswordLogin(config, initialError="") {
+  $("#root").innerHTML=`<div class="login"><form class="card" id="lf"><div class="logo" style="width:40px;height:40px;border-radius:12px"><svg class="i" style="stroke:#fff;width:22px;height:22px" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></div>
 <h1>Hirepath</h1><p class="mut" style="margin:0">Sign in to manage candidates, pipelines and hiring metrics.</p>
-<label for="em">Email</label><input class="in" id="em" type="email" value="admin@ats.dev" required autocomplete="username"><label for="pw">Password</label><input class="in" id="pw" type="password" value="admin123" required autocomplete="current-password">
-<div class="err" id="er" role="alert"></div><button class="btn pri" style="width:100%;justify-content:center;padding:11px">Sign in</button>
-<p class="mut" style="font-size:12px;margin:14px 0 0">Demo: admin@ats.dev / admin123 (can delete) · recruiter@ats.dev / recruit123</p></form></div>`;
-$("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);boot()}catch(x){$("#er").textContent=x.message}}}
-function logout(){S.token=null;closeWs();S.user=null;ls.set("ats_token",null);closeDrawer();loginView()}
-async function boot(){if(!S.token)return loginView();try{S.user=await api("/auth/me");S.jobs=await api("/jobs")}catch(e){return loginView()}shell();route()}
+<label for="em">Email</label><input class="in" id="em" type="email" required autocomplete="username"><label for="pw">Password</label><input class="in" id="pw" type="password" required autocomplete="current-password">
+<div class="err" id="er" role="alert">${esc(initialError || (config.clerkPartiallyConfigured ? "Clerk is partially configured. Add both Clerk API keys in Vercel to enable Clerk sign-in." : ""))}</div><button class="btn pri" style="width:100%;justify-content:center;padding:11px">Sign in</button>
+<p class="mut" style="font-size:12px;margin:14px 0 0">Use the account provided by your HirePath administrator.</p></form></div>`;
+  $("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);await boot()}catch(x){$("#er").textContent=x.message}};
+}
+function showClerkError(message, signedIn=false) {
+  const node=$("#clerk-auth-error"); if(node)node.textContent=message;
+  const button=$("#clerk-signout"); if(button)button.style.display=signedIn?"inline-flex":"none";
+  if(button)button.onclick=async()=>{try{if(clerkInstance)await clerkInstance.signOut()}catch{};clerkFailedSessionId=null;S.token=null;S.user=null;ls.set("ats_token",null);loginView()};
+}
+async function exchangeClerkSession(clerk) {
+  if (!clerk || !clerk.isSignedIn || !clerk.session) return false;
+  const sid=clerk.session.id || clerk.user?.id || "current-session";
+  if (clerkFailedSessionId===sid) return false;
+  if (clerkExchangePromise) return clerkExchangePromise;
+  clerkExchangePromise=(async()=>{
+    const jwt=await clerk.session.getToken();
+    if(!jwt)throw new Error("Clerk did not provide a session token. Please sign in again.");
+    const response=await fetch("/api/auth/clerk",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+jwt},body:"{}"});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok){clerkFailedSessionId=sid;throw new Error(result.error||"Clerk sign-in could not be linked to a HirePath account.");}
+    clerkFailedSessionId=null;S.token=result.token;S.user=result.user;ls.set("ats_token",result.token);
+    await boot();return true;
+  })();
+  try{return await clerkExchangePromise}finally{clerkExchangePromise=null}
+}
+async function loginView(initialError="") {
+  const config=await getAuthConfig();
+  if(config.provider!=="clerk"||!config.publishableKey) return renderPasswordLogin(config,initialError);
+  $("#root").innerHTML=`<div class="login"><div class="card"><div class="logo" style="width:40px;height:40px;border-radius:12px"><svg class="i" style="stroke:#fff;width:22px;height:22px" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></div><h1>Hirepath</h1><p class="mut" style="margin:0 0 20px">Secure sign-in, powered by Clerk.</p><div id="clerk-sign-in"></div><div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div><button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button></div></div>`;
+  try {
+    const clerk=await loadClerk(config.publishableKey);
+    if(!clerkListenerBound && typeof clerk.addListener==="function") {
+      clerk.addListener(()=> {
+        if(clerk.isSignedIn&&clerk.session&&!S.token) {
+          exchangeClerkSession(clerk).catch(error=>showClerkError(error.message,true));
+        } else if(!clerk.isSignedIn) clerkFailedSessionId=null;
+      });
+      clerkListenerBound=true;
+    }
+    if(clerk.isSignedIn&&clerk.session) {
+      try { if(await exchangeClerkSession(clerk))return; }
+      catch(error){showClerkError(error.message,true);return}
+      if(clerkFailedSessionId) { showClerkError("Your Clerk identity is signed in, but this account is not approved for HirePath. Ask the administrator to approve the account in Clerk Dashboard.",true); return; }
+    }
+    const mount=$("#clerk-sign-in");
+    if(mount)clerk.mountSignIn(mount,{signInFallbackRedirectUrl:location.origin+"/",signUpFallbackRedirectUrl:location.origin+"/"});
+  } catch(error) { showClerkError(error.message,false); }
+}
+function logout(signOutClerk=true) {
+  S.token=null;closeWs();S.user=null;ls.set("ats_token",null);closeDrawer();
+  const clerk=clerkInstance;
+  if(signOutClerk&&clerk&&clerk.isSignedIn) {
+    clerkFailedSessionId=null;
+    clerk.signOut().catch(()=>{}).finally(()=>loginView());
+  } else loginView();
+}
+async function boot(){
+  if(!S.token)return loginView();
+  try{S.user=await api("/auth/me");S.jobs=await api("/jobs")}
+  catch(e){S.token=null;S.user=null;ls.set("ats_token",null);return loginView()}
+  shell();route()
+}
+async function startAuthBootstrap() {
+  const config=await getAuthConfig();
+  if(config.provider==="clerk"&&config.publishableKey) {
+    S.token=null;S.user=null;ls.set("ats_token",null);
+    return loginView();
+  }
+  return boot();
+}
 
 /* ---------- realtime ---------- */
 let ws,wsT,wsTry=0,liveT;
@@ -268,5 +374,5 @@ const jt=e.target.closest("[data-jt]");if(jt)return guard(async()=>{await api("/
 const jb=e.target.closest("[data-job]");if(jb)S.f.job=jb.dataset.job;
 if(e.target.closest("[data-rate]")&&!e.target.closest("#drawer")){const c=e.target.closest("[data-id]");if(c){e.stopPropagation()}return}
 const o=e.target.closest("[data-open],.kc[data-id]");if(o)openCand(o.dataset.open||o.dataset.id)});
-boot();
+startAuthBootstrap();
 </script></body></html>
