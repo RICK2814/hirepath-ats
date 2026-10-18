@@ -624,7 +624,7 @@ function renderPasswordLogin(config, initialError="") {
     <div class="login-security-note"><span class="login-security-shield">✓</span><span>Secure sign-in · Your workspace stays protected</span></div>
   </section>`;
   loginFrameMarkup(auth);
-  $("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);await boot()}catch(x){$("#er").textContent=x.message}};
+  $("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);await boot(true)}catch(x){$("#er").textContent=x.message}};
 }
 function showClerkError(message, signedIn=false) {
   const node=$("#clerk-auth-error"); if(node)node.textContent=message;
@@ -645,7 +645,7 @@ async function exchangeClerkSession(clerk) {
     clerkFailedSessionId=null;S.token=result.token;S.user=result.user;ls.set("ats_token",result.token);
     // Normalize the post-auth landing page and immediately enter the HirePath dashboard.
     history.replaceState(null,"",location.pathname+location.search+"#/dashboard");
-    await boot();return true;
+    await boot(true);return true;
   })();
   try{return await clerkExchangePromise}finally{clerkExchangePromise=null}
 }
