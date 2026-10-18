@@ -312,6 +312,11 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
   .login-auth-panel{backdrop-filter:blur(20px)}
   .password-login-form .btn.pri{min-height:48px}
 }
+.hirepath-clerk-primary{font-family:var(--sans)!important;font-weight:800!important;letter-spacing:.005em!important;background:linear-gradient(105deg,#397aff 0%,#7353ff 47%,#d750d9 77%,#ff907e 100%)!important;background-size:180% 100%!important;color:#fff!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:12px!important;box-shadow:0 12px 31px rgba(93,78,255,.28),inset 0 1px 0 rgba(255,255,255,.18)!important;transition:background-position .8s ease,transform .22s var(--ease-premium),box-shadow .22s ease,filter .22s ease!important}
+.hirepath-clerk-primary:hover{background-position:100% 50%!important;box-shadow:0 15px 37px rgba(93,78,255,.38),0 0 0 1px rgba(190,167,255,.22)!important;filter:saturate(1.08)!important;transform:translateY(-2px)!important}
+.hirepath-clerk-primary:active{transform:translateY(0) scale(.99)!important}
+.hirepath-clerk-primary:focus-visible{outline:2px solid #c5bcff!important;outline-offset:4px!important}
+.hirepath-clerk-input{font-family:var(--sans)!important;border-radius:11px!important}
 @media(prefers-reduced-motion:reduce){
   .login-hero-copy-col,.login-hero-top .login-globe-scene,.login-feature-row,.login-workflow-step,.login-info-panel,.login-info-card,.login-why-point,.login-info-bottom,
   body:not(.login-page-active) .kpi,body:not(.login-page-active) .grid>.card,body:not(.login-page-active) .jobs>.job{animation:none!important}
@@ -625,6 +630,10 @@ async function loginView(initialError="") {
         withSignUp: true,
         oauthFlow: "redirect",
         appearance: {
+          elements: {
+            formButtonPrimary: "hirepath-clerk-primary",
+            formFieldInput: "hirepath-clerk-input"
+          },
           variables: {
             colorPrimary: "#795bff",
             colorText: "#f4f7ff",
@@ -634,7 +643,7 @@ async function loginView(initialError="") {
             colorInputText: "#f4f7ff",
             colorNeutral: "#b2c4dc",
             borderRadius: "12px",
-            fontFamily: "Inter, system-ui, sans-serif"
+            fontFamily: "Manrope, system-ui, sans-serif"
           }
         }
       });
