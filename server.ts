@@ -737,7 +737,7 @@ app.get("/api/candidates/:id/email-draft", async (req, res) => {
   const d = { name: c.name, job_title: c.job?.title };
   res.json({ subject: fill(t[1], d, req.user), body: fill(t[2], d, req.user) });
 });
-app.post("/api/candidates/:id/email", async (req, res) => {
+app.post("/api/candidates/:id/email", adminOnly, async (req, res) => {
   const id = cid(req), c = await prisma.candidate.findUnique({ where: { id }, select: { id: true, email: true } }); if (!c) throw fail(404, "candidate not found");
   const input = parseOrThrow(emailSendSchema, req.body);
   const subject = input.subject.replace(/[\r\n]+/g, " "), body = input.body;
