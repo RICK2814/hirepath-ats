@@ -3,81 +3,200 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Careers · Hirepath</title>
+<meta name="theme-color" content="#080c1b">
+<title>Careers · HirePath ATS</title>
 <style>
-:root{--bg:#f1f4f3;--surf:#fff;--ink:#10181a;--mute:#5c6b6e;--line:#dce3e2;--acc:#0e7c86;--acc-ink:#fff;--bad:#c0392b;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--acc:#3cc4cf;--acc-ink:#06161a;--bad:#ff8a7a;color-scheme:dark}}
+:root{color-scheme:dark;--bg:#070b18;--panel:#10172b;--panel2:#0c1224;--text:#f5f7ff;--muted:#a1adc8;--soft:#7483a3;--line:rgba(154,170,218,.18);--blue:#5b9dff;--violet:#9c78ff;--pink:#e67bd4;--mint:#70e7d2}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
-h1{font:400 38px/1.15 Georgia,serif;margin:0 0 8px}
-.sub{color:var(--mute);margin:0 0 32px}
-.job{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:12px}
-.job h2{font-size:17px;margin:0}
-.meta{color:var(--mute);font-size:13px;margin:2px 0 0}
-.desc{white-space:pre-line;margin:12px 0 0}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,rgba(44,89,197,.24),transparent 32%),radial-gradient(ellipse at 94% 14%,rgba(126,65,199,.16),transparent 30%),linear-gradient(140deg,#070b18,#090d1d 55%,#0b0c20);color:var(--text);font:15px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit}
+main{width:min(1080px,100%);margin:0 auto;padding:25px clamp(16px,4vw,42px) 42px}
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:48px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand-mark{width:41px;height:41px;display:grid;place-items:center;filter:drop-shadow(0 0 14px rgba(103,116,255,.26))}
+.brand-mark svg{width:100%;height:100%;display:block}
+.brand-name{font-size:19px;font-weight:780;letter-spacing:-.6px;line-height:1.15}
+.brand-name span{color:#9b8aff}
+.brand-sub{margin-top:4px;color:#7584a5;font-size:9px;font-weight:750;letter-spacing:1.4px}
+.header-link{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(148,135,255,.31);border-radius:999px;padding:9px 14px;color:#e7e7ff;text-decoration:none;background:rgba(50,43,108,.18);font-size:12px;font-weight:700;transition:background .2s,border-color .2s}
+.header-link:hover{background:rgba(99,84,215,.2);border-color:rgba(171,153,255,.7)}
+.hero{position:relative;overflow:hidden;padding:clamp(25px,4.3vw,48px);border:1px solid rgba(142,157,221,.22);border-radius:27px;background:linear-gradient(125deg,rgba(20,34,70,.9),rgba(14,17,44,.93) 56%,rgba(44,18,62,.72));box-shadow:0 27px 90px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)}
+.hero:after{content:"";position:absolute;right:-110px;top:-170px;width:370px;height:370px;border:1px solid rgba(123,130,255,.16);border-radius:50%;box-shadow:0 0 0 35px rgba(123,130,255,.025),0 0 0 75px rgba(123,130,255,.018);pointer-events:none}
+.kicker{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(127,151,255,.28);border-radius:999px;padding:7px 10px;background:rgba(58,77,160,.12);color:#c7ccff;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#6de5cf;box-shadow:0 0 0 4px rgba(109,229,207,.09),0 0 14px rgba(109,229,207,.45);animation:pulse 1.9s ease-in-out infinite}
+h1{max-width:730px;margin:21px 0 12px;font-size:clamp(35px,5vw,58px);font-weight:780;line-height:1.03;letter-spacing:-2.6px}
+h1 span{display:block;color:transparent;background:linear-gradient(95deg,#62b1ff,#9982ff 48%,#e47dcf);background-clip:text;-webkit-background-clip:text}
+.hero-copy{max-width:680px;margin:0;color:#b2bed8;font-size:15px;line-height:1.8}
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:23px}
+.hero-stats span{border:1px solid rgba(159,174,225,.15);border-radius:9px;padding:7px 10px;color:#d6dcef;background:rgba(9,17,39,.33);font-size:11px;font-weight:600}
+.jobs-section{margin-top:34px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:15px}
+.section-head h2{margin:0;font-size:23px;letter-spacing:-.65px}
+.section-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+#jobs{display:grid;grid-template-columns:1fr;gap:14px}
+.loading,.empty{border:1px dashed rgba(145,161,211,.24);border-radius:17px;padding:28px;text-align:center;color:var(--muted);background:rgba(14,21,41,.47)}
+.job-card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:19px;padding:clamp(19px,3vw,27px);background:linear-gradient(145deg,rgba(19,28,51,.9),rgba(12,18,35,.93));box-shadow:0 15px 45px rgba(0,0,0,.13);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.job-card:hover{transform:translateY(-2px);border-color:rgba(139,135,255,.42);box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.job-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.job-type{display:inline-flex;align-items:center;border:1px solid rgba(139,130,255,.28);border-radius:999px;padding:5px 9px;color:#d6d2ff;background:rgba(99,79,200,.12);font-size:10px;font-weight:800;letter-spacing:.5px}
+.posted{display:inline-flex;align-items:center;gap:7px;color:#8795b4;font-size:11px}
+.posted:before{content:"";width:5px;height:5px;border-radius:50%;background:#7f8eac}
+.job-card h3{margin:13px 0 4px;font-size:22px;font-weight:750;line-height:1.25;letter-spacing:-.6px;overflow-wrap:anywhere}
+.job-meta{display:flex;flex-wrap:wrap;gap:7px 15px;margin-top:7px;color:#a8b5d0;font-size:12px}
+.job-meta span{display:inline-flex;align-items:center;gap:6px}
+.job-highlights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 0}
+.highlight{min-width:0;padding:13px 15px;border:1px solid rgba(143,158,214,.14);border-radius:12px;background:rgba(5,12,28,.34)}
+.highlight-label{display:block;margin-bottom:5px;color:#8795b4;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.highlight-value{display:block;color:#f4f4ff;font-size:14px;font-weight:730;line-height:1.45;overflow-wrap:anywhere}
+.highlight.stipend .highlight-value{color:#8cebd9}
+.job-details{display:grid;grid-template-columns:1fr;gap:13px;margin-top:19px}
+.job-detail-section h4{margin:0 0 4px;color:#e8ebfa;font-size:12px;font-weight:750}
+.job-detail-section p{margin:0;color:#aab6cf;font-size:12px;line-height:1.75;white-space:pre-line;overflow-wrap:anywhere}
+.job-detail-section.empty-detail p{color:#7f8da9;font-style:italic}
+.job-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px;padding-top:17px;border-top:1px solid rgba(145,160,213,.12)}
+.job-card-bottom p{margin:0;color:#8392b0;font-size:11px}
 button,input,textarea{font:inherit;color:inherit}
-.btn{background:var(--acc);color:var(--acc-ink);border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer}
-.btn:disabled{opacity:.6;cursor:wait}
-.link{background:none;border:0;color:var(--acc);cursor:pointer;padding:0;font-weight:600}
-.row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:12px}
-form{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:28px}
-form[hidden]{display:none}
-label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px}
-input,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-input:focus-visible,textarea:focus-visible,.btn:focus-visible,.link:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:9px;border:1px solid transparent;border-radius:11px;padding:10px 16px;background:linear-gradient(105deg,#478dff,#8062ff 57%,#b857d6);color:#fff;font-size:12px;font-weight:750;cursor:pointer;box-shadow:0 8px 23px rgba(84,81,227,.18);transition:filter .2s,transform .2s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.link{border:0;background:none;color:#b6b6ff;cursor:pointer;font-size:12px;font-weight:700}
+form#f{margin-top:25px;border:1px solid rgba(147,159,219,.22);border-radius:20px;padding:clamp(20px,3vw,30px);background:linear-gradient(145deg,rgba(17,25,47,.95),rgba(11,17,33,.97));box-shadow:0 18px 55px rgba(0,0,0,.2)}
+form[hidden]{display:none!important}
+.form-eyebrow{margin:0 0 7px;color:#9f9bff;font-size:10px;font-weight:800;letter-spacing:1.5px}
+form h2{margin:0;font-size:24px;letter-spacing:-.6px}
+.form-note{margin:8px 0 18px;color:#a0adc8;font-size:12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 13px}
+label{display:block;margin:13px 0 5px;color:#c6cee0;font-size:11px;font-weight:700}
+input,textarea{width:100%;min-width:0;border:1px solid rgba(145,160,208,.22);border-radius:10px;padding:10px 12px;background:rgba(5,12,26,.57);color:#f4f6ff;outline:none}
+input::placeholder,textarea::placeholder{color:#6f7d9a}
+input:focus-visible,textarea:focus-visible,.btn:focus-visible,.link:focus-visible{outline:2px solid #8b82ff;outline-offset:2px}
+.form-wide{grid-column:1/-1}
+.consent-row{display:flex;gap:9px;align-items:flex-start;margin-top:18px;color:#a9b5cf;font-size:11px;line-height:1.6}
+.consent-row input{width:auto;margin-top:3px;flex:none}
+.form-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+#msg{margin-top:12px;min-height:1.4em;color:#a6b5d0;font-size:12px}
+#msg.err{color:#ff9a9a}#msg.ok{color:#80ebcc;font-weight:700}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-#msg{margin-top:14px;min-height:1.4em}
-.err{color:var(--bad)}
-.ok{font-weight:600}
+.site-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:32px;padding-top:17px;border-top:1px solid rgba(145,160,213,.12);color:#6f7e9e;font-size:10px}
+@keyframes pulse{0%,100%{opacity:.7;box-shadow:0 0 0 4px rgba(109,229,207,.09),0 0 14px rgba(109,229,207,.45)}50%{opacity:1;box-shadow:0 0 0 8px rgba(109,229,207,.02),0 0 18px rgba(109,229,207,.7)}}
+@media(max-width:600px){main{padding:16px 13px 30px}.site-header{margin-bottom:24px}.brand-mark{width:35px;height:35px}.brand-name{font-size:17px}.brand-sub{font-size:8px}.header-link{padding:8px 10px;font-size:10px}.hero{padding:24px 19px;border-radius:20px}h1{font-size:39px;letter-spacing:-1.8px}.hero-copy{font-size:13px}.hero-stats{gap:6px}.hero-stats span{font-size:10px;padding:6px 8px}.section-head h2{font-size:20px}.job-card{padding:18px 15px;border-radius:16px}.job-card h3{font-size:20px}.job-highlights{gap:7px}.highlight{padding:11px 10px}.highlight-value{font-size:12px}.job-card-bottom .btn{width:100%}.form-grid{grid-template-columns:1fr}.form-wide{grid-column:1}.site-footer{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <main>
-  <h1>Join the team</h1>
-  <p class="sub">Open roles at Hirepath. Pick one and apply in a minute.</p>
-  <div id="jobs" aria-live="polite">Loading roles…</div>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="HirePath ATS home">
+      <span class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fbff"/><stop offset=".42" stop-color="#a6c8ff"/><stop offset="1" stop-color="#566cff"/></linearGradient><linearGradient id="lgB" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c6a0ff"/><stop offset=".52" stop-color="#7962ff"/><stop offset="1" stop-color="#4a6eff"/></linearGradient></defs><path d="M14 10h12c2 0 3.2 1.9 2.4 3.7L15.6 49.8A5 5 0 0 1 10.9 53H7.8c-2 0-3.3-2-2.5-3.8L17 17.1c.9-2.2-.4-7.1-3-7.1Z" fill="url(#lgA)"/><path d="M37 10h12c2 0 3.2 1.9 2.4 3.7L38.6 49.8a5 5 0 0 1-4.7 3.2h-3.1c-2 0-3.3-2-2.5-3.8L40 17.1c.9-2.2-.4-7.1-3-7.1Z" fill="url(#lgB)"/></svg></span>
+      <span><span class="brand-name">HirePath <span>ATS</span></span><span class="brand-sub">CAREERS & OPPORTUNITIES</span></span>
+    </a>
+    <a class="header-link" href="/">Recruiter workspace <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <section class="hero">
+    <div class="kicker"><span class="live-dot"></span> OPEN OPPORTUNITIES</div>
+    <h1>Find your next <span>opportunity.</span></h1>
+    <p class="hero-copy">Explore open roles, review compensation and requirements, and submit your application directly to the HirePath recruitment team.</p>
+    <div class="hero-stats"><span>Clear job details</span><span>Direct applications</span><span>One simple process</span></div>
+  </section>
+
+  <section class="jobs-section" aria-labelledby="jobs-title">
+    <div class="section-head"><div><h2 id="jobs-title">Open positions</h2><p>Review the details before applying.</p></div></div>
+    <div id="jobs" aria-live="polite"><div class="loading">Loading open roles…</div></div>
+  </section>
 
   <form id="f" hidden>
-    <h2 style="margin:0;font-size:19px">Apply for <span id="role"></span></h2>
-    <label for="name">Full name</label><input id="name" required maxlength="200" autocomplete="name">
-    <label for="email">Email</label><input id="email" type="email" required maxlength="200" autocomplete="email">
-    <label for="phone">Phone (optional)</label><input id="phone" type="tel" maxlength="40" autocomplete="tel">
-    <label for="resume">Resume (PDF, TXT or MD, up to 5 MB)</label><input id="resume" type="file" accept=".pdf,.txt,.md">
-    <label for="cover">Anything you'd like us to know (optional)</label><textarea id="cover" rows="4" maxlength="2000"></textarea>
-    <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400"><input id="consent" type="checkbox" required style="width:auto;margin-top:3px"><span>I agree that Hirepath stores my details and resume to process this application, and may keep them for a limited period afterwards. I can ask for deletion at any time by replying to any email from us.</span></label>
+    <p class="form-eyebrow">YOUR APPLICATION</p>
+    <h2>Apply for <span id="role"></span></h2>
+    <p class="form-note">Share your details with the hiring team. Fields marked required must be completed.</p>
+    <div class="form-grid">
+      <div><label for="name">Full name *</label><input id="name" required maxlength="200" autocomplete="name" placeholder="Your full name"></div>
+      <div><label for="email">Email address *</label><input id="email" type="email" required maxlength="200" autocomplete="email" placeholder="you@example.com"></div>
+      <div class="form-wide"><label for="phone">Phone number (optional)</label><input id="phone" type="tel" maxlength="40" autocomplete="tel" placeholder="Your phone number"></div>
+      <div class="form-wide"><label for="resume">Resume (PDF, TXT or MD, up to 5 MB)</label><input id="resume" type="file" accept=".pdf,.txt,.md"></div>
+      <div class="form-wide"><label for="cover">Anything you'd like us to know (optional)</label><textarea id="cover" rows="4" maxlength="2000" placeholder="Relevant experience, skills, or a short note"></textarea></div>
+    </div>
+    <label class="consent-row" for="consent"><input id="consent" type="checkbox" required><span>I agree that HirePath stores my details and resume to process this application, and may keep them for a limited period afterwards. I can ask for deletion at any time by replying to any email from us.</span></label>
     <div class="hp" aria-hidden="true"><label for="website">Leave empty</label><input id="website" tabindex="-1" autocomplete="off"></div>
-    <div class="row"><button class="btn" id="send">Submit application</button><button type="button" class="link" id="cancel">Cancel</button></div>
+    <div class="form-actions"><button class="btn" id="send">Submit application <span aria-hidden="true">→</span></button><button type="button" class="link" id="cancel">Cancel</button></div>
     <div id="msg" role="status"></div>
   </form>
+  <footer class="site-footer"><span>© HirePath ATS · Hiring, connected.</span><span>Applications are submitted securely through the public careers workflow.</span></footer>
 </main>
+
 <script>
 const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let jobId = null;
+let jobsCache = [];
 
-fetch("/api/public/jobs").then(r => r.json()).then(jobs => {
+function relativeTime(value) {
+  if (!value) return "Recently posted";
+  const stamp = new Date(value).getTime();
+  if (!Number.isFinite(stamp)) return "Recently posted";
+  const seconds = Math.max(0, (Date.now() - stamp) / 1000);
+  if (seconds < 45) return "Just now";
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "always" });
+  if (seconds < 3600) return rtf.format(-Math.round(seconds / 60), "minute");
+  if (seconds < 86400) return rtf.format(-Math.round(seconds / 3600), "hour");
+  if (seconds < 2592000) return rtf.format(-Math.round(seconds / 86400), "day");
+  if (seconds < 31536000) return rtf.format(-Math.round(seconds / 2592000), "month");
+  return rtf.format(-Math.round(seconds / 31536000), "year");
+}
+
+function renderJobs(jobs) {
+  jobsCache = jobs;
   $("jobs").innerHTML = jobs.length ? jobs.map(j => `
-    <article class="job">
-      <h2>${esc(j.title)}</h2>
-      <p class="meta">${[j.department, j.location].filter(Boolean).map(esc).join(" · ")}</p>
-      ${j.description ? `<p class="desc">${esc(j.description)}</p>` : ""}
-      <div class="row"><span></span><button class="btn" data-id="${j.id}" data-title="${esc(j.title)}">Apply</button></div>
-    </article>`).join("") : "<p class='sub'>No open roles right now. Check back soon.</p>";
-}).catch(() => { $("jobs").textContent = "Could not load roles. Please refresh."; });
+    <article class="job-card">
+      <div class="job-card-top">
+        <span class="job-type">${esc(j.job_type || "Internship")}</span>
+        <span class="posted">Posted <time datetime="${esc(j.created_at || "")}" data-posted-at="${esc(j.created_at || "")}">${esc(relativeTime(j.created_at))}</time></span>
+      </div>
+      <h3>${esc(j.title)}</h3>
+      <div class="job-meta">
+        ${j.department ? `<span>▦ ${esc(j.department)}</span>` : ""}
+        ${j.location ? `<span>⌖ ${esc(j.location)}</span>` : ""}
+      </div>
+      <div class="job-highlights">
+        <div class="highlight stipend"><span class="highlight-label">Stipend / salary</span><strong class="highlight-value">${esc(j.stipend || "Not disclosed")}</strong></div>
+        <div class="highlight"><span class="highlight-label">Job type</span><strong class="highlight-value">${esc(j.job_type || "Not specified")}</strong></div>
+      </div>
+      <div class="job-details">
+        <section class="job-detail-section ${j.description ? "" : "empty-detail"}"><h4>Role overview & responsibilities</h4><p>${esc(j.description || "Role details have not been specified yet.")}</p></section>
+        <section class="job-detail-section ${j.requirements ? "" : "empty-detail"}"><h4>Requirements & skills</h4><p>${esc(j.requirements || "Requirements have not been specified by the recruiter yet.")}</p></section>
+      </div>
+      <div class="job-card-bottom"><p>Review the role details, requirements and compensation before applying.</p><button class="btn" data-id="${esc(j.id)}" data-title="${esc(j.title)}">Apply for this role <span aria-hidden="true">→</span></button></div>
+    </article>`).join("") : '<div class="empty"><strong>No open roles right now.</strong><br>Check back soon for new opportunities.</div>';
+}
+fetch("/api/public/jobs").then(async r => {
+  if (!r.ok) throw new Error("Could not load open roles.");
+  return r.json();
+}).then(renderJobs).catch(() => { $("jobs").textContent = "Could not load roles. Please refresh the page."; });
+
+setInterval(() => {
+  document.querySelectorAll("[data-posted-at]").forEach(node => { node.textContent = relativeTime(node.dataset.postedAt); });
+}, 30000);
 
 $("jobs").addEventListener("click", e => {
-  const b = e.target.closest("button[data-id]"); if (!b) return;
-  jobId = b.dataset.id; $("role").textContent = b.dataset.title; $("msg").textContent = "";
-  $("f").hidden = false; $("name").focus(); $("f").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth" });
+  const b = e.target.closest("button[data-id]");
+  if (!b) return;
+  jobId = b.dataset.id;
+  $("role").textContent = b.dataset.title;
+  $("msg").textContent = "";
+  $("msg").className = "";
+  $("f").hidden = false;
+  $("name").focus();
+  $("f").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth", block: "start" });
 });
-$("cancel").onclick = () => { $("f").hidden = true; };
+$("cancel").onclick = () => { $("f").hidden = true; jobId = null; };
 
 const toB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(f); });
 $("f").addEventListener("submit", async e => {
   e.preventDefault();
   const msg = $("msg"), btn = $("send"), file = $("resume").files[0];
   msg.className = ""; msg.textContent = "";
+  if (!jobId) { msg.className = "err"; msg.textContent = "Select an open role before applying."; return; }
   if (file && file.size > 5 * 1024 * 1024) { msg.className = "err"; msg.textContent = "Resume must be under 5 MB."; return; }
   btn.disabled = true;
   try {
