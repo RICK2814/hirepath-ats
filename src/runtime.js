@@ -7,8 +7,8 @@ const emailSchema = z.string().trim().email().max(254).transform((v) => v.toLowe
 // Browser select/data attributes submit IDs as strings; accept only positive, safe PostgreSQL integer IDs.
 const positiveIdSchema = z.union([
   z.number().int().min(1).max(2147483647),
-  z.string().trim().regex(/^[1-9]\d*$/.transform(Number)
   z.string().trim().regex(/^[1-9]\d*$/).transform(Number)
+]).pipe(z.number().int().min(1).max(2147483647));
 
 const loginSchema = z.object({
   email: emailSchema,
@@ -28,17 +28,20 @@ const candidateCreateSchema = z.object({
 
 const candidateUpdateSchema = candidateCreateSchema.partial().strict();
 
-// Job types are free-form text in the database to remain forward-compatible with new categories.
+// Keep in sync with src/runtime.ts. Job fields are intentionally permissive about new job type labels.
 const jobTypeSchema = z.string().trim().max(80).optional();
 const jobTextSchema = (max) => z.string().trim().max(max).optional();
+const stipendSchema = z.union([
+  z.string(),
+  z.number().finite().transform((value) => String(value))
+]).pipe(z.string().trim().max(120)).optional();
 
 const jobCreateSchema = z.object({
   title: z.string().trim().min(1).max(200),
   department: jobTextSchema(160),
   location: jobTextSchema(160),
   job_type: jobTypeSchema,
-  // The form and older clients may send stipend as either a number or a formatted text amount.
-  stipend: z.union([z.string(), z.number().finite().transform(String)]).pipe(z.string().trim().max(120)).optional(),
+  stipend: stipendSchema,
   description: jobTextSchema(3000),
   requirements: jobTextSchema(3000)
 }).strict();
@@ -48,7 +51,7 @@ const jobUpdateSchema = z.object({
   department: jobTextSchema(160),
   location: jobTextSchema(160),
   job_type: jobTypeSchema,
-  stipend: z.union([z.string(), z.number().finite().transform(String)]).pipe(z.string().trim().max(120)).optional(),
+  stipend: stipendSchema,
   description: jobTextSchema(3000),
   requirements: jobTextSchema(3000),
   status: z.enum(["open", "closed"]).optional()
