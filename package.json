@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.ts",
     "test": "node test.js",
-    "postinstall": "prisma generate && node scripts/postgenerate.js",
+    "postinstall": "prisma generate",
     "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate dev",
     "db:import-sqlite": "node scripts/import-sqlite.js",
