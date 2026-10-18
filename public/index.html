@@ -3,11 +3,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hirepath · Applicant tracking</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230e7c86'/><path d='M9 22V10m0 6h14m0-6v12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f1f4f3;--surf:#fff;--ink:#10181a;--mute:#5c6b6e;--line:#dce3e2;--soft:#e8eeed;--acc:#0e7c86;--acc-ink:#fff;--amb:#e0a030;--bad:#c0392b;
 --s0:#7a8a94;--s1:#3b82c4;--s2:#8a5cc8;--s3:#e0a030;--s4:#2e9e6b;--s5:#c0463a;--sh:0 1px 2px rgba(16,24,26,.06),0 8px 24px -12px rgba(16,24,26,.18);
---serif:"Instrument Serif",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+--serif:"Instrument Serif",Georgia,serif;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
@@ -251,6 +251,73 @@ body.login-page-active{height:auto;min-height:100vh;overflow-x:hidden;overflow-y
 @media(max-width:900px){.app{grid-template-columns:1fr}aside.nav{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;border-top:1px solid var(--line);border-right:0;justify-content:space-around}
 .brand,.me,.nav .grow,.nav a span{display:none}.nav a{padding:10px 16px}main{padding-bottom:70px}.g2,.g3{grid-template-columns:1fr}.top,.body{padding-left:14px;padding-right:14px}.top h1{font-size:28px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Premium interaction layer — restrained motion, stronger typography, no scroll hijacking. */
+:root{--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;--ease-premium:cubic-bezier(.22,.8,.25,1)}
+body{font-family:var(--sans);letter-spacing:-.012em}
+h1,h2,h3{letter-spacing:-.025em}
+input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 13%,transparent)}
+.btn{position:relative;isolation:isolate;overflow:hidden;transition:transform .22s var(--ease-premium),box-shadow .22s ease,border-color .22s ease,background .22s ease}
+.btn:before{content:"";position:absolute;inset:0 auto 0 -65%;z-index:-1;width:42%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.23),transparent);transform:skewX(-18deg);transition:transform .75s var(--ease-premium);pointer-events:none}
+.btn:hover:before{transform:translateX(390%) skewX(-18deg)}
+.btn.pri:hover{box-shadow:0 9px 24px color-mix(in srgb,var(--acc) 24%,transparent);transform:translateY(-1px)}
+.btn.pri:active{transform:translateY(0) scale(.985)}
+.card{transition:border-color .22s ease,box-shadow .22s ease,background .22s ease}
+body:not(.login-page-active) .kpi,
+body:not(.login-page-active) .grid>.card,
+body:not(.login-page-active) .jobs>.job{animation:premiumRise .48s var(--ease-premium) both}
+body:not(.login-page-active) .kpis>.kpi:nth-child(2){animation-delay:35ms}
+body:not(.login-page-active) .kpis>.kpi:nth-child(3){animation-delay:70ms}
+body:not(.login-page-active) .kpis>.kpi:nth-child(4){animation-delay:105ms}
+body:not(.login-page-active) .kpis>.kpi:nth-child(5){animation-delay:140ms}
+body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
+.job{transition:transform .24s var(--ease-premium),border-color .24s ease,box-shadow .24s ease}
+.job:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--acc) 42%,var(--line));box-shadow:0 14px 36px color-mix(in srgb,var(--ink) 9%,transparent)}
+.board{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.board,.tbl,.db,.pal ul{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.board::-webkit-scrollbar,.tbl::-webkit-scrollbar,.db::-webkit-scrollbar{height:8px;width:8px}
+.board::-webkit-scrollbar-thumb,.tbl::-webkit-scrollbar-thumb,.db::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+.kc{touch-action:pan-y}
+.login-nav button,.login-nav a,.login-info-cta{transition:color .2s ease,background .22s ease,border-color .22s ease,transform .22s var(--ease-premium),box-shadow .22s ease}
+.login-nav button:active,.login-nav a:active,.login-info-cta:active{transform:scale(.98)}
+.login-hero-copy-col{animation:premiumRise .7s .06s var(--ease-premium) both}
+.login-hero-top .login-globe-scene{animation:premiumRise .8s .14s var(--ease-premium) both}
+.login-feature-row{animation:premiumRise .55s .16s var(--ease-premium) both}
+.login-metric-card{transition:transform .28s var(--ease-premium),border-color .28s ease,box-shadow .28s ease}
+.login-metric-card:hover{transform:translateY(-3px);border-color:rgba(146,133,255,.45);box-shadow:0 12px 35px rgba(53,65,160,.14)}
+.login-workflow-step{animation:premiumRise .55s var(--ease-premium) both}
+.login-workflow-step:nth-child(2){animation-delay:70ms}.login-workflow-step:nth-child(3){animation-delay:130ms}.login-workflow-step:nth-child(4){animation-delay:190ms}
+.login-info-panel{animation:premiumRise .62s var(--ease-premium) both}
+.login-info-card,.login-why-point{animation:premiumRise .58s var(--ease-premium) both}
+.login-info-card:before{content:"";position:absolute;left:14%;right:14%;top:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(123,159,255,.6),rgba(203,116,244,.55),transparent);opacity:.58}
+.login-info-card:nth-child(2),.login-why-point:nth-child(2){animation-delay:55ms}
+.login-info-card:nth-child(3),.login-why-point:nth-child(3){animation-delay:100ms}
+.login-info-card:nth-child(4),.login-why-point:nth-child(4){animation-delay:145ms}
+.login-info-card:nth-child(5),.login-why-point:nth-child(5){animation-delay:190ms}
+.login-info-card:nth-child(6),.login-why-point:nth-child(6){animation-delay:235ms}
+.login-info-bottom{animation:premiumRise .6s .18s var(--ease-premium) both}
+.login-auth-panel{transition:box-shadow .3s ease,border-color .3s ease}
+.login-auth-panel:hover{border-color:rgba(174,155,255,.43);box-shadow:0 32px 110px rgba(0,0,0,.42),0 0 55px rgba(99,66,255,.15),inset 0 1px 0 rgba(255,255,255,.08)}
+.password-login-form .btn.pri{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(105deg,#397aff 0%,#7353ff 47%,#d750d9 77%,#ff907e 100%);background-size:180% 100%;box-shadow:0 12px 31px rgba(93,78,255,.28),inset 0 1px 0 rgba(255,255,255,.18);font-weight:800;letter-spacing:.005em;transition:background-position .8s ease,transform .22s var(--ease-premium),box-shadow .22s ease,filter .22s ease}
+.password-login-form .btn.pri:before{z-index:1;opacity:.75}
+.password-login-form .btn.pri:hover{background-position:100% 50%;box-shadow:0 15px 37px rgba(93,78,255,.38),0 0 0 1px rgba(190,167,255,.22);filter:saturate(1.08);transform:translateY(-2px)}
+.password-login-form .btn.pri:active{transform:translateY(0) scale(.99)}
+.password-login-form .btn.pri:focus-visible{outline:2px solid #c5bcff;outline-offset:4px}
+.login-info-panel,.login-auth-panel,.login-info-card,.login-why-point{overflow-anchor:none}
+@keyframes premiumRise{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@media(max-width:600px){
+  body{font-size:14px}
+  .login-info-panel h2{line-height:1.16}
+  .login-auth-panel{backdrop-filter:blur(20px)}
+  .password-login-form .btn.pri{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+  .login-hero-copy-col,.login-hero-top .login-globe-scene,.login-feature-row,.login-workflow-step,.login-info-panel,.login-info-card,.login-why-point,.login-info-bottom,
+  body:not(.login-page-active) .kpi,body:not(.login-page-active) .grid>.card,body:not(.login-page-active) .jobs>.job{animation:none!important}
+  .btn:before{display:none}
+}
+
 </style></head><body>
 <div id="root"></div><div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Candidate details"></aside>
@@ -409,6 +476,8 @@ function loginInfoPanelsMarkup(){
     </section>
   </div>`;
 }
+let loginScrollFrame=0;
+let loginMotionController=null;
 function loginFrameMarkup(authMarkup){
   const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
@@ -416,7 +485,10 @@ function loginFrameMarkup(authMarkup){
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
-  let loginScrollFrame=0;
+  if(loginMotionController)loginMotionController.abort();
+  if(loginScrollFrame)cancelAnimationFrame(loginScrollFrame);
+  loginScrollFrame=0;
+  loginMotionController=new AbortController();
   const cancelLoginAutoScroll=()=>{
     if(loginScrollFrame){cancelAnimationFrame(loginScrollFrame);loginScrollFrame=0;}
   };
@@ -425,7 +497,7 @@ function loginFrameMarkup(authMarkup){
     window.addEventListener(type,event=>{
       if(type==="keydown"&&!["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(event.key))return;
       cancelLoginAutoScroll();
-    },{passive:true,capture:true});
+    },{passive:true,capture:true,signal:loginMotionController.signal});
   });
   const scrollLoginTo=(getDestination,duration=1050)=>{
     cancelLoginAutoScroll();
