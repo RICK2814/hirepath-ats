@@ -6,7 +6,7 @@ const { Client: PgClient } = require("pg");
 const { Prisma, PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
-const { loginSchema, candidateCreateSchema, candidateUpdateSchema, jobCreateSchema, jobUpdateSchema, noteSchema, scorecardSchema, emailSendSchema, publicApplicationSchema, interviewScheduleSchema, semanticSearchSchema, parseOrThrow } = require("./src/runtime.ts");
+const { loginSchema, candidateCreateSchema, candidateUpdateSchema, jobCreateSchema, jobUpdateSchema, noteSchema, scorecardSchema, emailSendSchema, publicApplicationSchema, interviewScheduleSchema, semanticSearchSchema, parseOrThrow } = require("./src/runtime");
 
 type CandidateStage = "Applied" | "Screening" | "Interview" | "Offer" | "Hired" | "Rejected";
 type CandidateSource = "LinkedIn" | "Referral" | "Careers page" | "Agency" | "Job board";
