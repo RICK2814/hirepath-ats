@@ -1,0 +1,4 @@
+ALTER TABLE "jobs"
+  ADD COLUMN "job_type" TEXT NOT NULL DEFAULT 'Internship',
+  ADD COLUMN "stipend" TEXT NOT NULL DEFAULT '',
+  ADD COLUMN "requirements" TEXT NOT NULL DEFAULT '';
