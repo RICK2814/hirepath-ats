@@ -418,6 +418,36 @@ body:not(.login-page-active) .col:after{animation-duration:11s;animation-delay:2
   body:not(.login-page-active) #main>:not(.board):not(.job-detail-overlay){animation:none!important}
 }
 
+
+/* Kanban drag only: pointer-driven ghost, gentle landing, and clear drop targets. */
+body:not(.login-page-active) .kc{
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:pan-x pan-y;
+  transition:border-color .2s ease,box-shadow .2s ease,translate .3s cubic-bezier(.16,1,.3,1)
+}
+body:not(.login-page-active) .kc:hover{translate:0 -2px}
+body:not(.login-page-active) .kc.drag{
+  opacity:.36;border-style:dashed;box-shadow:none;background-image:none;translate:none
+}
+.kc-ghost{
+  position:fixed!important;left:0;top:0;margin:0!important;z-index:120;pointer-events:none;cursor:grabbing;
+  will-change:transform;transform-origin:center center;translate:none!important;opacity:.98;
+  background-color:var(--surf)!important;background-image:none!important;
+  box-shadow:0 34px 60px -24px rgba(0,0,0,.5),0 0 0 1.5px var(--acc),0 0 34px color-mix(in srgb,var(--acc) 35%,transparent)!important
+}
+.is-dragging,.is-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+.is-dragging .kc:hover{translate:none}
+body:not(.login-page-active) .col{transition:box-shadow .25s ease,background-color .25s ease}
+body:not(.login-page-active) .col.over{
+  outline:0;background-color:color-mix(in srgb,var(--soft) 82%,var(--acc) 18%);
+  box-shadow:inset 0 0 0 2px var(--acc),0 0 0 6px color-mix(in srgb,var(--acc) 14%,transparent),0 24px 50px -30px color-mix(in srgb,var(--acc) 60%,transparent)
+}
+.kc.landed{animation:kcLand .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes kcLand{0%{scale:1.06;box-shadow:0 0 0 2px var(--acc),0 18px 36px -16px color-mix(in srgb,var(--acc) 60%,transparent)}100%{scale:1}}
+@media(prefers-reduced-motion:reduce){
+  body:not(.login-page-active) .kc,body:not(.login-page-active) .col{transition:none!important}
+  .kc.landed{animation:none!important}
+}
+
 </style></head><body>
 <div id="root"></div><div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Candidate details"></aside>
@@ -799,13 +829,134 @@ function pipe(frame){if(frame)$("#main").innerHTML=`<div class="tools"><div clas
 <select class="in" id="bj" aria-label="Role"><option value="">All roles</option>${S.jobs.map(j=>`<option value="${j.id}" ${S.f.job==j.id?"selected":""}>${esc(j.title)}</option>`).join("")}</select></div><div class="board" id="bd"></div>`;
 if(frame){let t;$("#bq").oninput=e=>{clearTimeout(t);t=setTimeout(()=>{S.f.q=e.target.value;pipe()},180)};$("#bj").onchange=e=>{S.f.job=e.target.value;pipe()}}return loadBoard()}
 const loadBoard=guard(async()=>{const p=new URLSearchParams({limit:200,q:S.f.q,job:S.f.job}),r=await api("/candidates?"+p);S.items=r.items;drawBoard()});
-function drawBoard(){$("#bd").innerHTML=ST.map((s,i)=>{const it=S.items.filter(c=>c.stage==s);return`<section class="col" data-stage="${s}"><h3><i class="dot" style="background:${SC(i)}"></i>${s}<span class="n">${it.length}</span></h3>${it.map(c=>`<article class="kc" draggable="true" data-id="${c.id}" tabindex="0"><div class="who">${av(c.name)}<div><b>${esc(c.name)}</b><small>${esc(c.job_title||"No role")}</small></div></div><div class="meta">${stars(c.rating)}${c.match_score!=null?mb(c.match_score):""}<span>${Math.max(0,Math.floor((Date.now()-new Date(c.stage_at))/864e5))}d in stage</span></div></article>`).join("")||'<div class="mut" style="padding:8px 6px;font-size:13px">Drop a candidate here.</div>'}</section>`}).join("")}
+function drawBoard(){$("#bd").innerHTML=ST.map((s,i)=>{const it=S.items.filter(c=>c.stage==s);return`<section class="col" data-stage="${s}"><h3><i class="dot" style="background:${SC(i)}"></i>${s}<span class="n">${it.length}</span></h3>${it.map(c=>`<article class="kc" data-id="${c.id}" tabindex="0"><div class="who">${av(c.name)}<div><b>${esc(c.name)}</b><small>${esc(c.job_title||"No role")}</small></div></div><div class="meta">${stars(c.rating)}${c.match_score!=null?mb(c.match_score):""}<span>${Math.max(0,Math.floor((Date.now()-new Date(c.stage_at))/864e5))}d in stage</span></div></article>`).join("")||'<div class="mut" style="padding:8px 6px;font-size:13px">Drop a candidate here.</div>'}</section>`}).join("")}
 const move=guard(async(id,to)=>{const c=(S.items||[]).find(x=>x.id==id),from=c?.stage;if(c){if(from==to)return;c.stage=to;c.stage_at=new Date().toISOString();drawBoard()}
 await api("/candidates/"+id,{method:"PUT",body:{stage:to}});toast(`${c?c.name:"Candidate"} moved to ${to}`,from&&guard(async()=>{await api("/candidates/"+id,{method:"PUT",body:{stage:from}});refresh()}));if(!c)refresh()});
-document.addEventListener("dragstart",e=>{const k=e.target.closest?.(".kc");if(k){e.dataTransfer.setData("text/plain",k.dataset.id);k.classList.add("drag")}});
-document.addEventListener("dragend",e=>{e.target.closest?.(".kc")?.classList.remove("drag");document.querySelectorAll(".col.over").forEach(c=>c.classList.remove("over"))});
-document.addEventListener("dragover",e=>{const c=e.target.closest?.(".col");if(c){e.preventDefault();document.querySelectorAll(".col.over").forEach(x=>x!=c&&x.classList.remove("over"));c.classList.add("over")}});
-document.addEventListener("drop",e=>{const c=e.target.closest?.(".col");if(c){e.preventDefault();c.classList.remove("over");move(e.dataTransfer.getData("text/plain"),c.dataset.stage)}});
+/* ---------- kanban drag: Claude pointer-driven interaction only ---------- */
+(()=>{
+  "use strict";
+  const RM=matchMedia("(prefers-reduced-motion: reduce)");
+  const $=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
+  const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+  let D=null,suppressClick=false;
+
+  function colAt(x,y){
+    const bounds=D.board.getBoundingClientRect();
+    if(y<bounds.top-40||y>bounds.bottom+40)return null;
+    let best=null,distance=1e9;
+    for(const col of $(".col",D.board)){
+      const r=col.getBoundingClientRect();
+      const dx=x<r.left?r.left-x:x>r.right?x-r.right:0;
+      if(dx<distance){distance=dx;best=col}
+    }
+    return distance<24?best:null;
+  }
+  function setOver(col){
+    if(D.over===col)return;
+    D.over?.classList.remove("over");
+    D.over=col;
+    col?.classList.add("over");
+  }
+  function paint(){D.ghost.style.transform=`translate3d(${D.gx}px,${D.gy}px,0) scale(${D.s}) rotate(${D.rot}deg)`}
+  function begin(){
+    const card=D.card,r=card.getBoundingClientRect();
+    D.active=true;D.ox=D.sx-r.left;D.oy=D.sy-r.top;
+    const ghost=card.cloneNode(true);
+    ghost.classList.add("kc-ghost");
+    ghost.removeAttribute("tabindex");
+    ghost.setAttribute("aria-hidden","true");
+    ghost.style.width=r.width+"px";
+    ghost.style.height=r.height+"px";
+    document.body.appendChild(ghost);
+    D.ghost=ghost;D.gx=r.left;D.gy=r.top;D.s=1;D.rot=0;
+    card.classList.add("drag");
+    document.body.classList.add("is-dragging");
+    if(D.type==="touch"&&navigator.vibrate)navigator.vibrate(8);
+    paint();
+    D.raf=requestAnimationFrame(tick);
+  }
+  function tick(){
+    if(!D||!D.active)return;
+    const easing=RM.matches?1:.38,previousX=D.gx;
+    D.gx+=(D.x-D.ox-D.gx)*easing;
+    D.gy+=(D.y-D.oy-D.gy)*easing;
+    D.rot+=(clamp((D.gx-previousX)*.45,-9,9)-D.rot)*.2;
+    D.s+=((RM.matches?1:1.045)-D.s)*.25;
+    paint();
+    const bounds=D.board.getBoundingClientRect(),edge=84;
+    let dx=0,dy=0;
+    if(D.x<bounds.left+edge)dx=-(bounds.left+edge-D.x)/edge;
+    else if(D.x>bounds.right-edge)dx=(D.x-(bounds.right-edge))/edge;
+    if(D.y<edge)dy=-(edge-D.y)/edge;
+    else if(D.y>innerHeight-edge)dy=(D.y-(innerHeight-edge))/edge;
+    if(dx)D.board.scrollLeft+=Math.sign(dx)*Math.pow(Math.min(1,Math.abs(dx)),2)*26;
+    if(dy)scrollBy(0,Math.sign(dy)*Math.pow(Math.min(1,Math.abs(dy)),2)*26);
+    setOver(colAt(D.x,D.y));
+    D.raf=requestAnimationFrame(tick);
+  }
+  function land(id,focus){
+    requestAnimationFrame(()=>{
+      const selector=`.kc[data-id="${CSS.escape(String(id))}"]:not(.kc-ghost)`;
+      const el=document.querySelector(selector);
+      if(el){el.classList.add("landed");if(focus)el.focus({preventScroll:true})}
+    });
+  }
+  function finish(commit){
+    if(!D)return;
+    const d=D;D=null;clearTimeout(d.timer);
+    if(!d.active)return;
+    cancelAnimationFrame(d.raf);
+    suppressClick=true;
+    setTimeout(()=>{suppressClick=false},80);
+    document.body.classList.remove("is-dragging");
+    d.over?.classList.remove("over");
+    const ghost=d.ghost;
+    const targetStage=commit&&d.over&&d.over!==d.from?d.over.dataset.stage:null;
+    if(targetStage){
+      const base=`translate3d(${d.gx}px,${d.gy}px,0)`;
+      ghost.animate([{transform:ghost.style.transform,opacity:.98},{transform:`${base} scale(.9)`,opacity:0}],{duration:200,easing:"ease-out"}).onfinish=()=>ghost.remove();
+      d.card.classList.remove("drag");
+      move(d.id,targetStage);
+      land(d.id,false);
+    }else{
+      const r=d.card.getBoundingClientRect();
+      ghost.animate([{transform:ghost.style.transform},{transform:`translate3d(${r.left}px,${r.top}px,0) scale(1)`}],{duration:300,easing:"cubic-bezier(.16,1,.3,1)"}).onfinish=()=>{ghost.remove();d.card.classList.remove("drag")};
+    }
+  }
+  document.addEventListener("pointerdown",e=>{
+    if(D||(e.pointerType==="mouse"&&e.button!==0))return;
+    const card=e.target.closest?.(".kc");
+    if(!card||e.target.closest("button,a,input,select,textarea,[data-rate]"))return;
+    const board=card.closest(".board");
+    if(!board)return;
+    D={card,board,id:card.dataset.id,pid:e.pointerId,type:e.pointerType,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,active:false,from:card.closest(".col"),over:null};
+    if(e.pointerType!=="mouse")D.timer=setTimeout(()=>{if(D&&!D.active)begin()},230);
+  });
+  addEventListener("pointermove",e=>{
+    if(!D||e.pointerId!==D.pid)return;
+    D.x=e.clientX;D.y=e.clientY;
+    if(D.active)return;
+    const distance=Math.hypot(D.x-D.sx,D.y-D.sy);
+    if(D.type==="mouse"){if(distance>5)begin()}
+    else if(distance>9){clearTimeout(D.timer);D=null}
+  },{passive:true});
+  addEventListener("pointerup",e=>{if(D&&e.pointerId===D.pid)finish(true)});
+  addEventListener("pointercancel",e=>{if(D&&e.pointerId===D.pid)finish(false)});
+  addEventListener("blur",()=>finish(false));
+  document.addEventListener("touchmove",e=>{if(D&&D.active&&e.cancelable)e.preventDefault()},{passive:false});
+  document.addEventListener("contextmenu",e=>{if(D&&D.type!=="mouse")e.preventDefault()});
+  document.addEventListener("click",e=>{if(suppressClick){e.stopPropagation();e.preventDefault()}},true);
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&D?.active){finish(false);return}
+    const card=e.target.closest?.(".kc");
+    if(!card)return;
+    if(e.key==="Enter"&&e.target===card){e.preventDefault();openCand(card.dataset.id);return}
+    if(!e.altKey||(e.key!=="ArrowLeft"&&e.key!=="ArrowRight"))return;
+    const cols=$(".board .col"),next=cols[cols.indexOf(card.closest(".col"))+(e.key==="ArrowRight"?1:-1)];
+    if(!next)return;
+    e.preventDefault();move(card.dataset.id,next.dataset.stage);land(card.dataset.id,true);
+  });
+})();
 
 /* ---------- candidates table ---------- */
 async function cands(frame){const f=S.f;if(frame){const s=S.stats||await api("/stats");S.stats=s;
