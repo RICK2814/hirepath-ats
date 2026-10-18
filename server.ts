@@ -437,7 +437,7 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     }
   }
 
-  // Brevo hosted transactional email API. Sender must be verified and its domain authenticated.
+  // Brevo hosted transactional email API. Verify the sender address in Brevo. If using a free-email domain, Brevo may replace the From domain automatically.
   // This uses the HirePath-owned Brevo sender, not the signed-in recruiter's personal email.
   if (process.env.EMAIL_PROVIDER === "brevo") {
     const brevoKey = process.env.BREVO_API_KEY || "";
@@ -445,7 +445,7 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     const brevoName = str(process.env.BREVO_FROM_NAME, 100) || "HirePath ATS";
     if (!brevoKey) return { state: "failed", err: "Brevo is selected but BREVO_API_KEY is missing. Add your Brevo API key in Vercel." };
     if (!/^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/.test(brevoFrom)) {
-      return { state: "failed", err: "Invalid BREVO_FROM_EMAIL. Set it to a sender address verified in Brevo on an authenticated domain." };
+      return { state: "failed", err: "Invalid BREVO_FROM_EMAIL. Set it to a valid email address that you have added and verified as a sender in Brevo. If it uses Gmail or another free-email domain, Brevo may automatically replace the From domain." };
     }
     const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     const htmlContent = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\r?\n/g, "<br>") + "</div>";
