@@ -11,7 +11,7 @@ const CLERK_ENABLED = Boolean(CLERK_PUBLISHABLE_KEY && CLERK_SECRET_KEY);
 const CLERK_FRONTEND_HOST = (() => {
   try {
     const encoded = CLERK_PUBLISHABLE_KEY.split("_")[2];
-    const decoded = Buffer.from(encoded || "", "base64").toString("utf8").replace(/\$/, "");
+    const decoded = Buffer.from(encoded || "", "base64").toString("utf8").replace(/\$$/, "");
     return /^[a-z0-9.-]+$/i.test(decoded) ? decoded : "";
   } catch { return ""; }
 })();
