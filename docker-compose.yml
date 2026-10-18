@@ -1,0 +1,36 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ats
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ats}
+      POSTGRES_DB: ats
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./scripts/db-init.sql:/docker-entrypoint-initdb.d/10-shadow.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ats -d ats"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  ats:
+    build: .
+    ports: ["3000:3000"]
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET (16+ chars)}
+      SEED_DEMO: ${SEED_DEMO:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      TRUST_PROXY: ${TRUST_PROXY:-}
+      RETENTION_DAYS: ${RETENTION_DAYS:-}
+      DATABASE_URL: postgresql://ats:${POSTGRES_PASSWORD:-ats}@db:5432/ats
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+volumes:
+  pg-data:

@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  name  String
+  pass  String
+  role  String @default("recruiter")
+  token_version Int @default(0)
+
+  @@map("users")
+}
+
+model Job {
+  id          Int         @id @default(autoincrement())
+  title       String
+  department  String      @default("")
+  location    String      @default("")
+  description String      @default("")
+  status      String      @default("open")
+  created_at  DateTime    @default(now()) @db.Timestamptz(3)
+  candidates  Candidate[]
+
+  @@map("jobs")
+}
+
+model Candidate {
+  id          Int         @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String      @default("")
+  job_id      Int?
+  skills      String      @default("")
+  source      String      @default("Careers page")
+  rating      Int         @default(0)
+  stage       String      @default("Applied")
+  stage_at    DateTime    @default(now()) @db.Timestamptz(3)
+  interview_at DateTime? @db.Timestamptz(3)
+  interview_duration_minutes Int @default(45)
+  created_at  DateTime    @default(now()) @db.Timestamptz(3)
+  resume_name String?
+  resume_text String      @default("")
+  resume_ext  String?
+  resume_data Bytes?
+  match_score Int?
+  match_json  String?
+  embedding Unsupported("vector(384)")?
+  consent_at    DateTime? @db.Timestamptz(3)
+  anonymised_at DateTime? @db.Timestamptz(3)
+  job         Job?        @relation(fields: [job_id], references: [id], onDelete: SetNull)
+  events      Event[]
+  scorecards  Scorecard[]
+  emails      Email[]
+
+  @@unique([job_id, email])
+  @@index([stage])
+  @@index([job_id])
+  @@index([email])
+  @@map("candidates")
+}
+
+model Event {
+  id           Int       @id @default(autoincrement())
+  candidate_id Int
+  type         String
+  stage        String?
+  body         String    @default("")
+  user_name    String    @default("System")
+  at           DateTime  @default(now()) @db.Timestamptz(3)
+  candidate    Candidate @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@index([candidate_id])
+  @@index([at])
+  @@map("events")
+}
+
+model Scorecard {
+  id             Int       @id @default(autoincrement())
+  candidate_id   Int
+  user_id        Int
+  user_name      String
+  recommendation String
+  scores         Json
+  overall        Float
+  comment        String    @default("")
+  created_at     DateTime  @default(now()) @db.Timestamptz(3)
+  candidate      Candidate @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@unique([candidate_id, user_id])
+  @@map("scorecards")
+}
+
+model RateLimit {
+  key      String   @id
+  n        Int
+  reset_at DateTime @db.Timestamptz(3)
+
+  @@map("rate_limits")
+}
+
+model Email {
+  id           Int       @id @default(autoincrement())
+  candidate_id Int
+  to_addr      String
+  subject      String
+  body         String
+  status       String
+  user_name    String
+  at           DateTime  @default(now()) @db.Timestamptz(3)
+  attempts     Int       @default(0)
+  next_at      DateTime? @db.Timestamptz(3)
+  last_error   String?
+  candidate    Candidate @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@index([candidate_id])
+  @@index([status, next_at])
+  @@map("emails")
+}

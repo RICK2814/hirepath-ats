@@ -1,0 +1,39 @@
+{
+  "name": "hirepath-ats",
+  "version": "1.0.0",
+  "description": "Applicant tracking system: TypeScript + Express + PostgreSQL (Prisma)",
+  "main": "server.ts",
+  "scripts": {
+    "start": "node server.ts",
+    "test": "node test.js",
+    "postinstall": "prisma generate && node scripts/postgenerate.js",
+    "db:deploy": "prisma migrate deploy",
+    "db:migrate": "prisma migrate dev",
+    "db:import-sqlite": "node scripts/import-sqlite.js",
+    "dev": "tsx watch server.ts",
+    "build": "tsc --noEmit -p tsconfig.json",
+    "test:e2e": "playwright test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "express": "^5.3.0",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.23.1",
+    "prisma": "7.10.1",
+    "ws": "^8.18.3",
+    "zod": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "tsx": "^4.20.6",
+    "@types/node": "^22.19.0",
+    "@types/express": "^5.0.5",
+    "@playwright/test": "^1.56.1"
+  }
+}

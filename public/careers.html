@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Careers · Hirepath</title>
+<style>
+:root{--bg:#f1f4f3;--surf:#fff;--ink:#10181a;--mute:#5c6b6e;--line:#dce3e2;--acc:#0e7c86;--acc-ink:#fff;--bad:#c0392b;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--acc:#3cc4cf;--acc-ink:#06161a;--bad:#ff8a7a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font:400 38px/1.15 Georgia,serif;margin:0 0 8px}
+.sub{color:var(--mute);margin:0 0 32px}
+.job{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:12px}
+.job h2{font-size:17px;margin:0}
+.meta{color:var(--mute);font-size:13px;margin:2px 0 0}
+.desc{white-space:pre-line;margin:12px 0 0}
+button,input,textarea{font:inherit;color:inherit}
+.btn{background:var(--acc);color:var(--acc-ink);border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.link{background:none;border:0;color:var(--acc);cursor:pointer;padding:0;font-weight:600}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:12px}
+form{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:28px}
+form[hidden]{display:none}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px}
+input,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+input:focus-visible,textarea:focus-visible,.btn:focus-visible,.link:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+#msg{margin-top:14px;min-height:1.4em}
+.err{color:var(--bad)}
+.ok{font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>Join the team</h1>
+  <p class="sub">Open roles at Hirepath. Pick one and apply in a minute.</p>
+  <div id="jobs" aria-live="polite">Loading roles…</div>
+
+  <form id="f" hidden>
+    <h2 style="margin:0;font-size:19px">Apply for <span id="role"></span></h2>
+    <label for="name">Full name</label><input id="name" required maxlength="200" autocomplete="name">
+    <label for="email">Email</label><input id="email" type="email" required maxlength="200" autocomplete="email">
+    <label for="phone">Phone (optional)</label><input id="phone" type="tel" maxlength="40" autocomplete="tel">
+    <label for="resume">Resume (PDF, TXT or MD, up to 5 MB)</label><input id="resume" type="file" accept=".pdf,.txt,.md">
+    <label for="cover">Anything you'd like us to know (optional)</label><textarea id="cover" rows="4" maxlength="2000"></textarea>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400"><input id="consent" type="checkbox" required style="width:auto;margin-top:3px"><span>I agree that Hirepath stores my details and resume to process this application, and may keep them for a limited period afterwards. I can ask for deletion at any time by replying to any email from us.</span></label>
+    <div class="hp" aria-hidden="true"><label for="website">Leave empty</label><input id="website" tabindex="-1" autocomplete="off"></div>
+    <div class="row"><button class="btn" id="send">Submit application</button><button type="button" class="link" id="cancel">Cancel</button></div>
+    <div id="msg" role="status"></div>
+  </form>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let jobId = null;
+
+fetch("/api/public/jobs").then(r => r.json()).then(jobs => {
+  $("jobs").innerHTML = jobs.length ? jobs.map(j => `
+    <article class="job">
+      <h2>${esc(j.title)}</h2>
+      <p class="meta">${[j.department, j.location].filter(Boolean).map(esc).join(" · ")}</p>
+      ${j.description ? `<p class="desc">${esc(j.description)}</p>` : ""}
+      <div class="row"><span></span><button class="btn" data-id="${j.id}" data-title="${esc(j.title)}">Apply</button></div>
+    </article>`).join("") : "<p class='sub'>No open roles right now. Check back soon.</p>";
+}).catch(() => { $("jobs").textContent = "Could not load roles. Please refresh."; });
+
+$("jobs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-id]"); if (!b) return;
+  jobId = b.dataset.id; $("role").textContent = b.dataset.title; $("msg").textContent = "";
+  $("f").hidden = false; $("name").focus(); $("f").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth" });
+});
+$("cancel").onclick = () => { $("f").hidden = true; };
+
+const toB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(f); });
+$("f").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("msg"), btn = $("send"), file = $("resume").files[0];
+  msg.className = ""; msg.textContent = "";
+  if (file && file.size > 5 * 1024 * 1024) { msg.className = "err"; msg.textContent = "Resume must be under 5 MB."; return; }
+  btn.disabled = true;
+  try {
+    const body = { job_id: jobId, name: $("name").value, email: $("email").value, phone: $("phone").value, cover: $("cover").value, website: $("website").value, consent: $("consent").checked };
+    if (file) { body.resume_name = file.name; body.resume_b64 = await toB64(file); }
+    const r = await fetch("/api/public/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || "Something went wrong. Please try again.");
+    $("f").reset(); msg.className = "ok"; msg.textContent = "Thanks! Your application is in. We'll email you within a week.";
+  } catch (er) { msg.className = "err"; msg.textContent = er.message; }
+  finally { btn.disabled = false; }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmitOnError": true,
+    "moduleDetection": "force"
+  },
+  "include": [
+    "server.ts",
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "e2e",
+    "playwright.config.ts",
+    "node_modules",
+    "dist"
+  ]
+}
