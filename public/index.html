@@ -390,10 +390,31 @@ body:not(.login-page-active) .drawer{backdrop-filter:blur(22px);-webkit-backdrop
 body:not(.login-page-active) .btn{font-weight:700;letter-spacing:-.01em}
 body:not(.login-page-active) .btn.pri{box-shadow:0 8px 20px -13px color-mix(in srgb,var(--acc) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.22)}
 @keyframes glassEdgeTravel{0%,14%{transform:translateX(0);opacity:0}24%{opacity:.85}72%{opacity:.7}90%,100%{transform:translateX(330%);opacity:0}}
+
+/* Moving glass edge across inner workspace cards. Decorative only; pointer events remain untouched. */
+body:not(.login-page-active) .card:not(.kpi),
+body:not(.login-page-active) .job,
+body:not(.login-page-active) .semitem,
+body:not(.login-page-active) .col{position:relative}
+body:not(.login-page-active) .card:not(.kpi):after,
+body:not(.login-page-active) .job:after,
+body:not(.login-page-active) .semitem:after,
+body:not(.login-page-active) .col:after{
+  content:"";position:absolute;top:0;left:-58%;width:40%;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--acc) 65%,white),transparent);
+  opacity:0;animation:glassEdgeTravel 9s ease-in-out infinite
+}
+body:not(.login-page-active) .grid>.card:nth-child(2):after,
+body:not(.login-page-active) .jobs>.job:nth-child(2):after{animation-delay:1.6s}
+body:not(.login-page-active) .grid>.card:nth-child(3):after,
+body:not(.login-page-active) .jobs>.job:nth-child(3):after{animation-delay:3.2s}
+body:not(.login-page-active) .col:after{animation-duration:11s;animation-delay:2.4s}
+
 @keyframes premiumSectionIn{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .login-info-card:after,.login-why-point:after,body:not(.login-page-active) .kpi:after{animation:none!important}
+  body:not(.login-page-active) .card:not(.kpi):after,body:not(.login-page-active) .job:after,body:not(.login-page-active) .semitem:after,body:not(.login-page-active) .col:after{animation:none!important}
   body:not(.login-page-active) #main>:not(.board):not(.job-detail-overlay){animation:none!important}
 }
 
