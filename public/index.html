@@ -123,7 +123,40 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login-nav button:hover,.login-nav a:hover{color:#fff}
 .login-nav .login-careers-link{display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border:1px solid rgba(149,125,255,.42);border-radius:999px;color:#f6f3ff;background:rgba(34,24,73,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:background .2s,border-color .2s,transform .2s}
 .login-nav .login-careers-link:hover{background:rgba(111,84,255,.14);border-color:rgba(174,147,255,.72);transform:translateY(-1px)}
-.login-nav [data-scroll]{position:relative}
+.login-nav [data-panel]{position:relative}
+.login-nav [data-panel]:after{content:"";position:absolute;left:0;right:100%;bottom:1px;height:2px;border-radius:2px;background:linear-gradient(90deg,#5da7ff,#a36aff,#ef73bf);transition:right .22s ease}
+.login-nav [data-panel]:hover:after,.login-nav [data-panel].is-active:after{right:0}
+.login-nav [data-panel].is-active{color:#fff}
+.login-info-panels{display:flex;flex-direction:column;gap:18px;margin:0 0 22px}
+.login-info-panel[hidden]{display:none!important}
+.login-info-panel{position:relative;overflow:hidden;padding:clamp(22px,3.5vw,38px);border:1px solid rgba(143,143,255,.24);border-radius:23px;background:linear-gradient(135deg,rgba(14,20,46,.94),rgba(9,13,31,.94) 56%,rgba(27,14,47,.91));box-shadow:0 20px 68px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045);animation:loginPanelReveal .48s cubic-bezier(.2,.8,.2,1) both;scroll-margin-top:22px}
+.login-info-panel:before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(96,161,255,.7),rgba(200,87,255,.7),transparent);animation:loginMetricShine 4s ease-in-out infinite}
+.login-info-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#aaa7ff;font-size:10px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
+.login-info-eyebrow i{width:6px;height:6px;border-radius:50%;background:#79dfff;box-shadow:0 0 12px rgba(121,223,255,.8)}
+.login-info-panel h2{margin:0;color:#fbfbff;font-size:clamp(27px,3vw,39px);font-weight:750;letter-spacing:-1.5px;line-height:1.1}
+.login-info-panel h2 span{color:transparent;background:linear-gradient(95deg,#5ba9ff,#9c6cff,#e984d9);background-clip:text;-webkit-background-clip:text}
+.login-info-lead{max-width:740px;margin:12px 0 25px;color:#aeb9d3;font-size:14px;line-height:1.75}
+.login-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.login-info-card{position:relative;min-width:0;padding:20px 19px 18px;border:1px solid rgba(145,158,221,.16);border-radius:16px;background:linear-gradient(150deg,rgba(25,31,67,.7),rgba(12,17,37,.76));transition:transform .22s ease,border-color .22s ease,background .22s ease}
+.login-info-card:hover{transform:translateY(-3px);border-color:rgba(152,128,255,.46);background:linear-gradient(150deg,rgba(34,42,86,.8),rgba(16,20,45,.82))}
+.login-info-icon{display:grid;place-items:center;width:39px;height:39px;margin-bottom:14px;border:1px solid rgba(129,123,255,.35);border-radius:12px;color:#e9e6ff;background:linear-gradient(145deg,rgba(49,92,204,.65),rgba(124,54,184,.52));box-shadow:0 6px 20px rgba(73,70,232,.12)}
+.login-info-icon svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.login-info-card h3{margin:0 0 8px;color:#f6f7ff;font-size:15px;font-weight:730;letter-spacing:-.25px}
+.login-info-card p{margin:0;color:#a4afcb;font-size:12px;line-height:1.7}
+.login-info-tag{display:inline-flex;align-items:center;gap:6px;margin-top:13px;padding:5px 8px;border:1px solid rgba(117,125,236,.2);border-radius:7px;color:#c8c9ff;background:rgba(81,75,182,.1);font-size:10px;font-weight:650}
+.login-info-bottom{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid rgba(143,153,210,.14)}
+.login-info-bottom p{margin:0;color:#8f9dbc;font-size:12px;line-height:1.6}
+.login-info-cta{display:inline-flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid rgba(150,122,255,.38);border-radius:11px;color:#fff;background:linear-gradient(105deg,rgba(60,104,255,.28),rgba(171,67,211,.22));text-decoration:none;font-size:12px;font-weight:700;transition:transform .2s,border-color .2s}
+.login-info-cta:hover{transform:translateY(-1px);border-color:rgba(184,157,255,.7)}
+.login-why-points{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}
+.login-why-point{display:flex;align-items:flex-start;gap:12px;padding:16px;border:1px solid rgba(139,153,219,.15);border-radius:14px;background:rgba(16,22,47,.57)}
+.login-why-check{display:grid;place-items:center;width:25px;height:25px;flex:none;border:1px solid rgba(103,224,198,.25);border-radius:8px;color:#79eed4;background:rgba(49,175,166,.1);font-size:12px}
+.login-why-point b{display:block;margin:1px 0 5px;color:#f4f5ff;font-size:13px}
+.login-why-point p{margin:0;color:#a5b0cb;font-size:12px;line-height:1.65}
+@keyframes loginPanelReveal{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:920px){.login-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.login-info-panel{padding:21px 15px;border-radius:18px}.login-info-grid,.login-why-points{grid-template-columns:1fr;gap:10px}.login-info-card{padding:16px}.login-info-lead{font-size:13px;margin-bottom:19px}.login-info-bottom{align-items:flex-start;flex-direction:column}.login-info-cta{width:100%;justify-content:center}.login-info-panel h2{letter-spacing:-.8px}}
+@media(prefers-reduced-motion:reduce){.login-info-panel,.login-info-panel:before,.login-info-card,.login-info-cta{animation:none!important;transition:none!important}}
 .login-nav [data-scroll]:after{content:"";position:absolute;left:0;right:100%;bottom:1px;height:2px;border-radius:2px;background:linear-gradient(90deg,#5da7ff,#a36aff,#ef73bf);transition:right .22s ease}
 .login-nav [data-scroll]:hover:after{right:0}
 .login-section-flash{animation:loginSectionFlash 1.35s ease both;scroll-margin-top:34px}
@@ -314,8 +347,8 @@ function loginHeroMarkup(){
       <div class="login-candidate-card interview"><span class="login-candidate-avatar"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3"/></svg></span><span class="login-candidate-info"><b>Interview scheduled</b><small>Backend Developer</small></span><span class="login-candidate-right"><span>Demo</span><i class="login-candidate-dot orange"></i></span></div>
       <div class="login-candidate-card offer"><span class="login-candidate-avatar"><svg viewBox="0 0 24 24"><path d="M4 8.5h16v11H4zM8 8.5V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2.5M4 13h16M10 13v2h4v-2"/></svg></span><span class="login-candidate-info"><b>Offer stage</b><small>Full Stack Developer</small></span><span class="login-candidate-right"><span>Preview</span><i class="login-candidate-dot cyan"></i></span></div>
     </div></div>
-    <div class="login-feature-row" id="login-features"><span><i>▣</i>Manage Jobs</span><span><i>♙</i>Track Candidates</span><span><i>♧</i>Team Collaboration</span><span><i>↗</i>Data Insights</span></div>
-    <div class="login-metric-row" id="login-why">
+    <div class="login-feature-row" id="login-feature-strip"><span><i>▣</i>Manage Jobs</span><span><i>♙</i>Track Candidates</span><span><i>♧</i>Team Collaboration</span><span><i>↗</i>Data Insights</span></div>
+    <div class="login-metric-row" id="login-metric-preview">
       <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM8 7V4h8v3M4 12h16M10 12v2h4v-2"/></svg></span><div><b class="login-metric-title">Manage roles</b><small class="login-metric-copy">One clear workspace</small></div></div><div class="login-metric-spark"><i style="height:30%"></i><i style="height:55%"></i><i style="height:42%"></i><i style="height:76%"></i><i style="height:60%"></i><i style="height:92%"></i><i style="height:72%"></i><i style="height:100%"></i></div><div class="login-metric-tail"><span>Organize hiring</span><b>↗</b></div></div>
       <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c.5-3.5 2.6-5.3 6-5.3s5.5 1.8 6 5.3M16 5.5a3 3 0 0 1 0 5.7M17 14c2.4.5 3.6 2.2 4 5"/></svg></span><div><b class="login-metric-title">Candidate pipeline</b><small class="login-metric-copy">Every stage connected</small></div></div><div class="login-metric-spark"><i style="height:42%"></i><i style="height:36%"></i><i style="height:60%"></i><i style="height:50%"></i><i style="height:76%"></i><i style="height:67%"></i><i style="height:100%"></i><i style="height:86%"></i></div><div class="login-metric-tail"><span>Follow each journey</span><b>↗</b></div></div>
       <div class="login-metric-card"><div class="login-metric-head"><span class="login-metric-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V4M16 19v-7M22 19V7"/></svg></span><div><b class="login-metric-title">Team insights</b><small class="login-metric-copy">Make informed decisions</small></div></div><div class="login-metric-spark"><i style="height:23%"></i><i style="height:48%"></i><i style="height:38%"></i><i style="height:70%"></i><i style="height:56%"></i><i style="height:83%"></i><i style="height:75%"></i><i style="height:100%"></i></div><div class="login-metric-tail"><span>See the big picture</span><b>↗</b></div></div>
@@ -330,24 +363,57 @@ function loginHeroMarkup(){
     </div>
   </section>`;
 }
+function loginInfoPanelsMarkup(){
+  return `<div class="login-info-panels" aria-live="polite">
+    <section class="login-info-panel" id="login-panel-features" data-info-panel="features" aria-labelledby="login-features-title" hidden>
+      <p class="login-info-eyebrow"><i></i> HIREPATH CAPABILITIES</p>
+      <h2 id="login-features-title">Everything your hiring flow needs.<br><span>All in one workspace.</span></h2>
+      <p class="login-info-lead">From publishing a role to evaluating a candidate, HirePath ATS brings the key steps of recruiting into one connected place—so your team can spend less time switching tools and more time making thoughtful hiring decisions.</p>
+      <div class="login-info-grid">
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2"/></svg></span><h3>Job Management</h3><p>Create and maintain open roles with titles, departments, locations, and complete job descriptions. Review every role's status and application count from the Jobs workspace.</p><span class="login-info-tag">Roles &amp; descriptions</span></article>
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg></span><h3>Public Careers Page</h3><p>Give candidates a public place to explore open jobs and submit their information, contact details, resume, and a message through an application form.</p><span class="login-info-tag">Candidate applications</span></article>
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><path d="M4 5h4v14H4zM10 5h4v10h-4zM16 5h4v6h-4z"/></svg></span><h3>Visual Hiring Pipeline</h3><p>Track candidates as they move through Applied, Screening, Interview, Offer, Hired, and Rejected. Keep each candidate's current stage visible to the recruiting team.</p><span class="login-info-tag">Stage tracking</span></article>
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-3.5 2.6-5.3 6-5.3s5.5 1.8 6 5.3M17 8h4M19 6v4M17 15h4M19 13v4"/></svg></span><h3>Candidate Profiles &amp; Search</h3><p>Keep candidate details, sources, skills, notes, and stage history together. Use search and filters to find the right profile without hunting through separate lists.</p><span class="login-info-tag">Profiles &amp; filtering</span></article>
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14l2 2 5-5"/></svg></span><h3>Interview Evaluation</h3><p>Record interview times and feedback with scorecards covering technical skills, communication, problem solving, and culture add. Download interview calendar details when needed.</p><span class="login-info-tag">Scheduling &amp; reviews</span></article>
+        <article class="login-info-card"><span class="login-info-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V4M16 19v-7M22 19V6"/></svg></span><h3>Hiring Overview &amp; Resume Insights</h3><p>Review dashboard metrics, manage resumes, and generate role-match signals where available. Match scores are supporting information for human review—not automatic hiring decisions.</p><span class="login-info-tag">Metrics &amp; review signals</span></article>
+      </div>
+      <div class="login-info-bottom"><p>Want to see the candidate side of the workflow?<br>Open the public Careers Page to explore how applicants find open roles.</p><a class="login-info-cta" href="/careers" target="_blank" rel="noopener noreferrer">Explore Careers Page <span aria-hidden="true">↗</span></a></div>
+    </section>
+    <section class="login-info-panel" id="login-panel-why" data-info-panel="why" aria-labelledby="login-why-title" hidden>
+      <p class="login-info-eyebrow"><i></i> WHY HIREPATH</p>
+      <h2 id="login-why-title">Hiring deserves more than<br><span>scattered spreadsheets.</span></h2>
+      <p class="login-info-lead">HirePath ATS is designed to help recruiters organise the work around a hiring decision. It connects the job, the application, the evaluation, and the candidate's progress—while keeping the recruiter in control.</p>
+      <div class="login-why-points">
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>One connected candidate journey</b><p>Applications submitted through the Careers Page can flow into the recruitment workspace, reducing re-entry of the same candidate details.</p></div></article>
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>Clear progress, fewer blind spots</b><p>Visible hiring stages and candidate timelines make it easier to understand what has happened and what the next step should be.</p></div></article>
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>Evidence alongside evaluation</b><p>Resume information, interview scorecards, notes, and role-match signals help bring relevant context together for a more informed review.</p></div></article>
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>Recruiters stay in control</b><p>Candidate matching is a review signal—not an automated hiring decision. People remain responsible for assessing applicants and deciding who progresses.</p></div></article>
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>Designed for day-to-day use</b><p>Job management, candidate search, communications, and interview planning are available in the same recruitment workspace.</p></div></article>
+        <article class="login-why-point"><span class="login-why-check">✓</span><div><b>A candidate-facing front door</b><p>A separate public Careers Page provides applicants with a direct route to open roles, while recruiters manage applications from the ATS.</p></div></article>
+      </div>
+      <div class="login-info-bottom"><p>Explore the end-to-end workflow—from an open job to a candidate application.<br>Use the public page to see the applicant experience.</p><a class="login-info-cta" href="/careers" target="_blank" rel="noopener noreferrer">View open roles <span aria-hidden="true">↗</span></a></div>
+    </section>
+  </div>`;
+}
 function loginFrameMarkup(authMarkup){
   const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
-    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-scroll="login-features">Features</button><button type="button" data-scroll="login-why">Why HirePath</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
-    </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div><footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
+    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-panel="features" aria-controls="login-panel-features" aria-expanded="false">Features</button><button type="button" data-panel="why" aria-controls="login-panel-why" aria-expanded="false">Why HirePath</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
+    </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
-  document.querySelectorAll(".login-nav [data-scroll]").forEach(button=>button.addEventListener("click",event=>{
+  document.querySelectorAll(".login-nav [data-panel]").forEach(button=>button.addEventListener("click",event=>{
     event.preventDefault();
-    const target=document.getElementById(button.dataset.scroll);
+    const key=button.dataset.panel;
+    const target=document.getElementById("login-panel-"+key);
     if(!target)return;
+    const willOpen=target.hidden;
+    target.hidden=!willOpen;
+    button.setAttribute("aria-expanded",String(willOpen));
+    button.classList.toggle("is-active",willOpen);
+    if(!willOpen)return;
     const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-34);
-    window.scrollTo({top,behavior:reduced?"auto":"smooth"});
-    target.classList.remove("login-section-flash");
-    void target.offsetWidth;
-    target.classList.add("login-section-flash");
-    window.setTimeout(()=>target.classList.remove("login-section-flash"),1500);
+    window.requestAnimationFrame(()=>target.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"}));
   }));
 }
 function renderPasswordLogin(config, initialError="") {
