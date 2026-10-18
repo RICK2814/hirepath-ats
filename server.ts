@@ -406,7 +406,7 @@ async function processEmails(limit = 5) {
 // returns {state:"sent"|"failed"|"simulated", err?}
 async function deliver(to: string, subject: string, body: string, replyTo = ""): Promise<{ state: "sent" | "failed" | "simulated"; err?: string }> {
   const gmailUser = str(process.env.GMAIL_USER, 254).toLowerCase();
-  const gmailAppPassword = (process.env.GMAIL_APP_PASSWORD || "").replace(/\\s+/g, "");
+  const gmailAppPassword = (process.env.GMAIL_APP_PASSWORD || "").replace(/\s+/g, "");
   const from = str(process.env.EMAIL_FROM, 254);
 
   // Free Gmail delivery path: use a Google-generated App Password, never the normal
