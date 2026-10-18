@@ -17,6 +17,7 @@ Manage job openings, candidates, hiring stages, interview feedback, resumes, and
 ## Contents
 
 - [Overview](#overview)
+- [Animated workflow demo](#animated-workflow-demo)
 - [Features](#features)
 - [Using the public Careers Page](#using-the-public-careers-page)
 - [Technology stack](#technology-stack)
@@ -42,6 +43,18 @@ Manage job openings, candidates, hiring stages, interview feedback, resumes, and
 HirePath ATS is a full-stack applicant tracking system built with **Node.js, TypeScript, Express, PostgreSQL, Prisma, and a lightweight browser frontend**. It provides a hiring pipeline for recruiters and admins, from publishing open roles and capturing applications to reviewing candidates and coordinating interviews.
 
 The frontend is served from `public/`; it does not need a separate React or frontend build step. The Express API and browser interface share the same application.
+
+## Animated workflow demo
+
+The animation below illustrates the end-to-end hiring flow in HirePath ATS. It loops automatically on GitHub—no setup or playback button needed.
+
+<p align="center">
+  <img src="assets/hirepath-workflow.svg" alt="Animated HirePath ATS workflow: publish a job, receive an application through the public Careers Page, and see the candidate automatically appear in the ATS pipeline." width="100%" />
+</p>
+
+<p align="center"><sub><a href="assets/hirepath-workflow.svg">Open the animation asset</a> · Illustration of the product workflow, not a live feed of production data.</sub></p>
+
+**Workflow at a glance:** publish an open role in **Jobs** → share the [public Careers Page](https://hirepath-ats.vercel.app/careers) → a candidate submits the form → their application is saved to the ATS and can be reviewed under **Candidates** or **Pipeline**.
 
 ## Features
 
