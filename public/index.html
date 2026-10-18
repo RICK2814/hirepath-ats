@@ -108,7 +108,7 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login label{display:block;margin:14px 0 5px;font-weight:600;font-size:13px}
 .err{color:var(--bad);margin:10px 0 0;min-height:20px}
 #root{min-height:100vh}
-.login.login-experience{--lx-text:#f7f8ff;position:relative;isolation:isolate;display:block;min-height:100vh;width:100%;overflow:hidden;padding:0;color:var(--lx-text);background:radial-gradient(ellipse at 16% 24%,rgba(34,76,173,.22),transparent 34%),radial-gradient(ellipse at 65% 16%,rgba(117,43,208,.21),transparent 31%),radial-gradient(ellipse at 87% 76%,rgba(38,87,192,.18),transparent 34%),linear-gradient(123deg,#040713 0%,#070b1b 44%,#08081a 100%)}
+.login.login-experience{--lx-text:#f7f8ff;position:relative;isolation:isolate;display:block;min-height:100vh;width:100%;overflow-x:clip;overflow-y:visible;padding:0;color:var(--lx-text);background:radial-gradient(ellipse at 16% 24%,rgba(34,76,173,.22),transparent 34%),radial-gradient(ellipse at 65% 16%,rgba(117,43,208,.21),transparent 31%),radial-gradient(ellipse at 87% 76%,rgba(38,87,192,.18),transparent 34%),linear-gradient(123deg,#040713 0%,#070b1b 44%,#08081a 100%)}
 .login.login-experience:before{content:"";position:absolute;inset:0;z-index:-3;pointer-events:none;background-image:linear-gradient(rgba(147,162,222,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(147,162,222,.04) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 94%);animation:loginGridDrift 22s linear infinite}
 .login.login-experience:after{content:"";position:absolute;z-index:-2;inset:-42%;pointer-events:none;background:conic-gradient(from 180deg at 50% 50%,transparent 0deg,rgba(82,67,255,.12) 38deg,transparent 100deg,rgba(217,56,204,.075) 185deg,transparent 235deg,rgba(40,116,255,.09) 290deg,transparent 340deg);filter:blur(58px);animation:loginAurora 32s linear infinite}
 .login-shell{position:relative;z-index:1;display:flex;flex-direction:column;max-width:1600px;min-height:100vh;margin:0 auto;padding:18px clamp(20px,4.8vw,76px) 15px}
@@ -123,6 +123,12 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login-nav button:hover,.login-nav a:hover{color:#fff}
 .login-nav .login-careers-link{display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border:1px solid rgba(149,125,255,.42);border-radius:999px;color:#f6f3ff;background:rgba(34,24,73,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:background .2s,border-color .2s,transform .2s}
 .login-nav .login-careers-link:hover{background:rgba(111,84,255,.14);border-color:rgba(174,147,255,.72);transform:translateY(-1px)}
+.login-nav [data-scroll]{position:relative}
+.login-nav [data-scroll]:after{content:"";position:absolute;left:0;right:100%;bottom:1px;height:2px;border-radius:2px;background:linear-gradient(90deg,#5da7ff,#a36aff,#ef73bf);transition:right .22s ease}
+.login-nav [data-scroll]:hover:after{right:0}
+.login-section-flash{animation:loginSectionFlash 1.35s ease both;scroll-margin-top:34px}
+@keyframes loginSectionFlash{0%,100%{filter:none}18%,62%{filter:drop-shadow(0 0 12px rgba(122,98,255,.38))}}
+body.login-page-active{height:auto;min-height:100vh;overflow-x:hidden;overflow-y:auto}
 .login-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(410px,.88fr);align-items:center;gap:clamp(26px,4vw,64px);flex:1;padding:22px 0 19px}
 .login-hero{position:relative;min-width:0;padding:8px 0 0;animation:loginEnter .7s both}
 .login-hero-top{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(240px,.96fr);align-items:center;gap:2px;min-height:300px}
@@ -329,8 +335,20 @@ function loginFrameMarkup(authMarkup){
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
     <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-scroll="login-features">Features</button><button type="button" data-scroll="login-why">Why HirePath</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div><footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
+  document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
-  document.querySelectorAll(".login-nav [data-scroll]").forEach(button=>button.addEventListener("click",()=>document.getElementById(button.dataset.scroll)?.scrollIntoView({behavior:"smooth",block:"center"})));
+  document.querySelectorAll(".login-nav [data-scroll]").forEach(button=>button.addEventListener("click",event=>{
+    event.preventDefault();
+    const target=document.getElementById(button.dataset.scroll);
+    if(!target)return;
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-34);
+    window.scrollTo({top,behavior:reduced?"auto":"smooth"});
+    target.classList.remove("login-section-flash");
+    void target.offsetWidth;
+    target.classList.add("login-section-flash");
+    window.setTimeout(()=>target.classList.remove("login-section-flash"),1500);
+  }));
 }
 function renderPasswordLogin(config, initialError="") {
   const auth=`<section class="login-auth-panel" aria-label="Sign in">
@@ -462,7 +480,7 @@ function liveRefresh(){clearTimeout(liveT);liveT=setTimeout(()=>{if(document.que
 if(S.view=="pipeline")loadBoard();else if(S.view=="dashboard"||S.view=="candidates")refresh()},300)}
 /* ---------- shell + routing ---------- */
 const NAV=[["dashboard","Dashboard","dash"],["pipeline","Pipeline","pipe"],["candidates","Candidates","list"],["jobs","Jobs","jobs"]];
-function shell(){$("#root").innerHTML=`<div class="app"><aside class="nav"><div class="brand"><span class="logo"><svg class="i" style="stroke:#fff" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></span>Hirepath</div>
+function shell(){document.body.classList.remove("login-page-active");$("#root").innerHTML=`<div class="app"><aside class="nav"><div class="brand"><span class="logo"><svg class="i" style="stroke:#fff" viewBox="0 0 24 24"><path d="M7 18V6m0 6h10m0-6v12"/></svg></span>Hirepath</div>
 ${NAV.map(n=>`<a href="#/${n[0]}" data-v="${n[0]}">${ic(n[2])}<span>${n[1]}</span></a>`).join("")}<span class="grow"></span>
 <a href="#" id="theme">${ic("sun")}<span>Theme</span></a><a href="#" id="rv">${ic("key")}<span>Revoke sessions</span></a><a href="#" id="so">${ic("out")}<span>Sign out</span></a>
 <div class="me">${av(S.user.name)}<div>${esc(S.user.name)}<small>${S.user.role}</small></div></div></aside><main><div class="top"><h1 id="ttl"></h1>
