@@ -431,7 +431,9 @@ function conds(q) {
 const whereOf = w => (w.length ? Prisma.sql`WHERE ${Prisma.join(w, " AND ")}` : Prisma.empty);
 const where = q => whereOf(conds(q));
 app.get("/api/candidates", async (req, res) => {
-  const W = where(req.query), limit = Math.min(Math.max(parseInt(req.query.limit) || 20, 1), 200), page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limitParam = typeof req.query.limit === "string" ? req.query.limit : "";
+  const pageParam = typeof req.query.page === "string" ? req.query.page : "";
+  const W = where(req.query), limit = Math.min(Math.max(parseInt(limitParam, 10) || 20, 1), 200), page = Math.max(parseInt(pageParam, 10) || 1, 1);
   const sortKey = typeof req.query.sort === "string" && Object.prototype.hasOwnProperty.call(SORTS, req.query.sort) ? req.query.sort : "created";
   const order = Prisma.raw(`${SORTS[sortKey]} ${req.query.dir === "asc" ? "ASC" : "DESC"} NULLS LAST, c.id DESC`);
   const [[{ n: total }], items] = await Promise.all([prisma.$queryRaw`SELECT COUNT(*)::int AS n ${BASE} ${W}`, prisma.$queryRaw`${SEL} ${BASE} ${W} ORDER BY ${order} LIMIT ${limit} OFFSET ${(page - 1) * limit}`]);
@@ -539,7 +541,8 @@ const TEMPLATES = {
 };
 const fill = (t, c, u) => t.replace(/{{first}}/g, c.name.split(" ")[0]).replace(/{{name}}/g, c.name).replace(/{{role}}/g, c.job_title || "the role").replace(/{{sender}}/g, u.name);
 app.get("/api/candidates/:id/email-draft", async (req, res) => {
-  const c = await prisma.candidate.findUnique({ where: { id: cid(req) }, include: { job: { select: { title: true } } } }), t = TEMPLATES[req.query.template];
+  const template = typeof req.query.template === "string" && Object.prototype.hasOwnProperty.call(TEMPLATES, req.query.template) ? req.query.template : "";
+  const c = await prisma.candidate.findUnique({ where: { id: cid(req) }, include: { job: { select: { title: true } } } }), t = TEMPLATES[template];
   if (!c) throw fail(404, "candidate not found"); if (!t) throw fail(400, "unknown template");
   const d = { name: c.name, job_title: c.job?.title };
   res.json({ subject: fill(t[1], d, req.user), body: fill(t[2], d, req.user) });
