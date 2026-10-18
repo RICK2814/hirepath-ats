@@ -12,7 +12,8 @@
     "db:import-sqlite": "node scripts/import-sqlite.js",
     "dev": "tsx watch server.ts",
     "build": "tsc --noEmit -p tsconfig.json",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then npx prisma migrate deploy; fi && npm run build"
   },
   "author": "",
   "license": "ISC",
