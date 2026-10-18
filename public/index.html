@@ -66,6 +66,15 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}.job{padding:18px}.job h3{font:400 22px/1.2 var(--serif)}
 .job.closed{opacity:.6}
 .job-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.job-create-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.job-create-form #jt{grid-column:span 2}
+.job-create-form #jx,.job-create-form #jr{grid-column:1/-1;resize:vertical}
+.job-create-form #jadd{grid-column:1/-1;justify-self:start}
+.job-create-form select{min-width:0}
+.job-listing-badges{display:flex;gap:7px;flex-wrap:wrap;margin:-4px 0 12px}
+.job-listing-badges .pill{background:var(--soft);border:1px solid var(--line);max-width:100%;white-space:normal}
+.job-posted{font-size:11px;margin:0 0 10px}
+
 .job-status-btn{border:0;cursor:pointer;color:inherit;font:inherit}
 .job-status-btn:hover{outline:1px solid var(--line)}
 .job-status-btn:focus-visible,.job-detail button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
@@ -82,6 +91,8 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .job-detail-body h3{font-size:15px;margin:0 0 8px}
 .job-detail-description{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:var(--ink);padding:14px;background:var(--soft);border-radius:10px;min-height:72px}
 .job-detail-footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+@media(max-width:760px){.job-create-form{grid-template-columns:repeat(2,minmax(0,1fr))}.job-create-form #jt{grid-column:1/-1}.job-create-form #jadd{justify-self:stretch;justify-content:center}}
+@media(max-width:480px){.job-create-form{grid-template-columns:1fr}.job-create-form #jt,.job-create-form #jx,.job-create-form #jr,.job-create-form #jadd{grid-column:1}}
 @media(max-width:520px){.job-detail-overlay{padding:10px}.job-detail-head,.job-detail-body{padding:18px}.job-detail-head h2{font-size:25px}.job-detail-info{grid-template-columns:1fr 1fr}.job-actions{align-items:stretch}.job-actions .btn{flex:1}}
 .scrim{position:fixed;inset:0;background:rgba(5,10,12,.5);backdrop-filter:blur(2px);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}.scrim.on{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surf);z-index:31;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
@@ -130,7 +141,8 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login-nav [data-scroll].is-active{color:#fff}
 .login-section-flash{animation:loginSectionFlash 1.35s ease both;scroll-margin-top:22px}
 @keyframes loginSectionFlash{0%,100%{filter:none}18%,62%{filter:drop-shadow(0 0 12px rgba(122,98,255,.38))}}
-.login-info-panels{display:flex;flex-direction:column;gap:18px;margin:0 0 22px}
+.login-info-panels{display:flex;flex-direction:column;gap:18px;margin:0}
+.login-info-panels:has(.login-info-panel:not([hidden])){margin:18px 0 0}
 .login-info-panel[hidden]{display:none!important}
 .login-info-panel{position:relative;overflow:hidden;padding:clamp(22px,3.5vw,38px);border:1px solid rgba(143,143,255,.24);border-radius:23px;background:linear-gradient(135deg,rgba(14,20,46,.94),rgba(9,13,31,.94) 56%,rgba(27,14,47,.91));box-shadow:0 20px 68px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045);animation:loginPanelReveal .48s cubic-bezier(.2,.8,.2,1) both;scroll-margin-top:22px}
 .login-info-panel:before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(96,161,255,.7),rgba(200,87,255,.7),transparent);animation:loginMetricShine 4s ease-in-out infinite}
@@ -365,7 +377,7 @@ function loginHeroMarkup(){
 }
 function loginInfoPanelsMarkup(){
   return `<div class="login-info-panels" aria-live="polite">
-    <section class="login-info-panel" id="login-panel-features" data-info-panel="features" aria-labelledby="login-features-title">
+    <section class="login-info-panel" id="login-panel-features" data-info-panel="features" aria-labelledby="login-features-title" hidden>
       <p class="login-info-eyebrow"><i></i> HIREPATH CAPABILITIES</p>
       <h2 id="login-features-title">Everything your hiring flow needs.<br><span>All in one workspace.</span></h2>
       <p class="login-info-lead">From publishing a role to evaluating a candidate, HirePath ATS brings the key steps of recruiting into one connected place—so your team can spend less time switching tools and more time making thoughtful hiring decisions.</p>
@@ -379,7 +391,7 @@ function loginInfoPanelsMarkup(){
       </div>
       <div class="login-info-bottom"><p>Want to see the candidate side of the workflow?<br>Open the public Careers Page to explore how applicants find open roles.</p><a class="login-info-cta" href="/careers" target="_blank" rel="noopener noreferrer">Explore Careers Page <span aria-hidden="true">↗</span></a></div>
     </section>
-    <section class="login-info-panel" id="login-panel-why" data-info-panel="why" aria-labelledby="login-why-title">
+    <section class="login-info-panel" id="login-panel-why" data-info-panel="why" aria-labelledby="login-why-title" hidden>
       <p class="login-info-eyebrow"><i></i> WHY HIRE US</p>
       <h2 id="login-why-title">Hiring deserves more than<br><span>scattered spreadsheets.</span></h2>
       <p class="login-info-lead">HirePath ATS is designed to help recruiters organise the work around a hiring decision. It connects the job, the application, the evaluation, and the candidate's progress—while keeping the recruiter in control.</p>
@@ -398,18 +410,28 @@ function loginInfoPanelsMarkup(){
 function loginFrameMarkup(authMarkup){
   const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
-    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-scroll="login-panel-features" aria-controls="login-panel-features">Features</button><button type="button" data-scroll="login-panel-why" aria-controls="login-panel-why">Why Hire Us</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
+    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-panel="login-panel-features" aria-controls="login-panel-features" aria-expanded="false">Features</button><button type="button" data-panel="login-panel-why" aria-controls="login-panel-why" aria-expanded="false">Why Hire Us</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
-  document.querySelectorAll(".login-nav [data-scroll]").forEach(button=>button.addEventListener("click",event=>{
+  document.querySelectorAll(".login-nav [data-panel]").forEach(button=>button.addEventListener("click",event=>{
     event.preventDefault();
-    const target=document.getElementById(button.dataset.scroll);
+    const target=document.getElementById(button.dataset.panel);
     if(!target)return;
+    const opening=target.hidden;
+    target.hidden=!opening;
+    button.setAttribute("aria-expanded",String(opening));
+    button.classList.toggle("is-active",opening);
+    if(!opening){
+      if(window.scrollY>0){
+        const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
+      }
+      return;
+    }
     const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-22);
     window.scrollTo({top,behavior:reduced?"auto":"smooth"});
-    document.querySelectorAll(".login-nav [data-scroll]").forEach(item=>item.classList.toggle("is-active",item===button));
     target.classList.remove("login-section-flash");
     void target.offsetWidth;
     target.classList.add("login-section-flash");
@@ -600,6 +622,19 @@ $("#pg").innerHTML=`<span class="mut">${r.total} candidate${r.total==1?"":"s"} �
 
 /* ---------- job details modal ---------- */
 function closeJobDetails(){document.querySelector("#jobDetailOverlay")?.remove()}
+function relativeTimeLabel(value){
+  if(!value)return "Recently posted";
+  const stamp=new Date(value).getTime();
+  if(!Number.isFinite(stamp))return "Recently posted";
+  const seconds=Math.max(0,(Date.now()-stamp)/1000);
+  if(seconds<45)return "Just now";
+  const rtf=new Intl.RelativeTimeFormat("en",{numeric:"always"});
+  if(seconds<3600)return rtf.format(-Math.round(seconds/60),"minute");
+  if(seconds<86400)return rtf.format(-Math.round(seconds/3600),"hour");
+  if(seconds<2592000)return rtf.format(-Math.round(seconds/86400),"day");
+  if(seconds<31536000)return rtf.format(-Math.round(seconds/2592000),"month");
+  return rtf.format(-Math.round(seconds/31536000),"year");
+}
 function openJobDetails(id){
   const j=S.jobs.find(x=>String(x.id)===String(id));
   if(!j)return toast("Job details were not found. Refresh the page and try again.");
@@ -608,20 +643,25 @@ function openJobDetails(id){
   overlay.className="job-detail-overlay";
   overlay.id="jobDetailOverlay";
   const created=j.created_at?new Date(j.created_at).toLocaleString():null;
+  const ago=relativeTimeLabel(j.created_at);
   const applicantCount=Number.isFinite(Number(j.applicants))?Number(j.applicants):0;
   overlay.innerHTML='<section class="job-detail" role="dialog" aria-modal="true" aria-labelledby="jobDetailTitle">'+
-    '<div class="job-detail-head"><div><div class="lab">Full job details</div><h2 id="jobDetailTitle">'+esc(j.title||"Untitled role")+'</h2></div><button type="button" class="btn sm" data-close-job-details aria-label="Close job details">Close ✕</button></div>'+
+    '<div class="job-detail-head"><div><div class="lab">Full job details</div><h2 id="jobDetailTitle">'+esc(j.title||"Untitled role")+'</h2><p class="mut" style="margin-top:7px">'+esc(ago)+'</p></div><button type="button" class="btn sm" data-close-job-details aria-label="Close job details">Close ✕</button></div>'+
     '<div class="job-detail-body">'+
       '<div class="job-detail-info">'+
         '<div><small>Department</small><b>'+esc(j.department||"Not specified")+'</b></div>'+
         '<div><small>Location</small><b>'+esc(j.location||"Not specified")+'</b></div>'+
+        '<div><small>Job type</small><b>'+esc(j.job_type||"Not specified")+'</b></div>'+
+        '<div><small>Stipend / compensation</small><b>'+esc(j.stipend||"Not disclosed")+'</b></div>'+
         '<div><small>Status</small><b><span class="pill">'+esc(j.status||"Unknown")+'</span></b></div>'+
         '<div><small>Applicants</small><b>'+applicantCount+'</b></div>'+
         (created?'<div><small>Created</small><b>'+esc(created)+'</b></div>':'')+
         '<div><small>Job ID</small><b>'+esc(String(j.id))+'</b></div>'+
       '</div>'+
-      '<h3>Job description, skills and responsibilities</h3>'+
+      '<h3>Role overview & responsibilities</h3>'+
       '<div class="job-detail-description">'+esc(j.description||"No job description has been added for this role yet.")+'</div>'+
+      '<h3 style="margin-top:20px">Requirements & skills</h3>'+
+      '<div class="job-detail-description">'+esc(j.requirements||"Requirements have not been specified yet.")+'</div>'+
       '<div class="job-detail-footer">'+(j.status==="open"?'<a class="btn pri" href="/careers" target="_blank" rel="noopener noreferrer">View public Careers Page</a>':'')+
       '<button type="button" class="btn" data-close-job-details>Done</button></div>'+
     '</div></section>';
@@ -630,10 +670,25 @@ function openJobDetails(id){
   overlay.querySelector("[data-close-job-details]")?.focus();
 }
 /* ---------- jobs ---------- */
-function jobsV(){$("#main").innerHTML=`<form class="card pad" id="jf" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;margin-bottom:14px"><input class="in" id="jt" placeholder="Role title" required aria-label="Role title"><input class="in" id="jd" placeholder="Department" aria-label="Department"><input class="in" id="jl" placeholder="Location" aria-label="Location"><button class="btn pri">Add role</button><textarea class="in" id="jx" rows="2" style="grid-column:1/-1" placeholder="Job description: skills and responsibilities. Used for match scoring." aria-label="Description"></textarea></form>
-<div class="jobs">${S.jobs.map(j=>`<div class="card job ${j.status}"><h3>${esc(j.title)}</h3><p class="mut" style="margin:4px 0 14px">${esc(j.department||"No department")} · ${esc(j.location||"No location")}</p>${j.description?`<p style="margin:-6px 0 14px;font-size:13px">${esc(j.description.slice(0,110))}${j.description.length>110?"…":""}</p>`:""}<div class="job-actions"><span class="pill">${j.applicants} applicant${j.applicants==1?"":"s"}</span><button type="button" class="pill job-status-btn" data-view-job="${j.id}" title="Click to view full job details" aria-label="View details for ${esc(j.title)}">${esc(j.status)}</button><button type="button" class="btn sm" data-view-job="${j.id}">View details</button><span style="flex:1"></span>
+function jobsV(){$("#main").innerHTML=`<form class="card pad job-create-form" id="jf">
+  <input class="in" id="jt" placeholder="Role title" required aria-label="Role title">
+  <input class="in" id="jd" placeholder="Department" aria-label="Department">
+  <input class="in" id="jl" placeholder="Location (e.g. Bengaluru / Remote)" aria-label="Location">
+  <select class="in" id="jtype" aria-label="Job type"><option>Internship</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Apprenticeship</option><option>Freelance</option></select>
+  <input class="in" id="jsp" placeholder="Stipend / salary (e.g. ₹15,000–₹20,000/month)" aria-label="Stipend or salary" maxlength="120">
+  <textarea class="in" id="jx" rows="3" placeholder="Role overview and responsibilities." aria-label="Job description"></textarea>
+  <textarea class="in" id="jr" rows="3" placeholder="Requirements: skills, experience, qualifications, and what the candidate should know." aria-label="Job requirements"></textarea>
+  <button class="btn pri" id="jadd">Add role</button>
+</form>
+<div class="jobs">${S.jobs.map(j=>`<div class="card job ${j.status}"><h3>${esc(j.title)}</h3>
+<p class="mut" style="margin:4px 0 12px">${esc(j.department||"No department")} · ${esc(j.location||"No location")}</p>
+<div class="job-listing-badges"><span class="pill">${esc(j.job_type||"Internship")}</span><span class="pill">Stipend: ${esc(j.stipend||"Not disclosed")}</span></div>
+${j.description?`<p style="margin:0 0 9px;font-size:13px">${esc(j.description.slice(0,110))}${j.description.length>110?"…":""}</p>`:""}
+${j.requirements?`<p style="margin:0 0 10px;font-size:12px;color:var(--mute)"><b>Requirements:</b> ${esc(j.requirements.slice(0,90))}${j.requirements.length>90?"…":""}</p>`:""}
+<p class="mut job-posted">Posted ${esc(relativeTimeLabel(j.created_at))}</p>
+<div class="job-actions"><span class="pill">${j.applicants} applicant${j.applicants==1?"":"s"}</span><button type="button" class="pill job-status-btn" data-view-job="${j.id}" title="Click to view full job details" aria-label="View details for ${esc(j.title)}">${esc(j.status)}</button><button type="button" class="btn sm" data-view-job="${j.id}">View details</button><span style="flex:1"></span>
 <button class="btn sm" data-jt="${j.id}" data-s="${j.status=="open"?"closed":"open"}">${j.status=="open"?"Close role":"Reopen role"}</button></div></div>`).join("")}</div>`;
-$("#jf").onsubmit=guard(async e=>{e.preventDefault();await api("/jobs",{method:"POST",body:{title:$("#jt").value,department:$("#jd").value,location:$("#jl").value,description:$("#jx").value}});toast("Role added");refresh()})}
+$("#jf").onsubmit=guard(async e=>{e.preventDefault();await api("/jobs",{method:"POST",body:{title:$("#jt").value,department:$("#jd").value,location:$("#jl").value,job_type:$("#jtype").value,stipend:$("#jsp").value,description:$("#jx").value,requirements:$("#jr").value}});toast("Role added");refresh()})}
 
 /* ---------- candidate drawer ---------- */
 async function openCand(id){let c={name:"",email:"",phone:"",job_id:S.jobs.find(j=>j.status=="open")?.id||"",skills:"",source:"Careers page",rating:0,stage:"Applied",events:[]};
