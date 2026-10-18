@@ -157,10 +157,7 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 @media(max-width:920px){.login-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.login-info-panel{padding:21px 15px;border-radius:18px}.login-info-grid,.login-why-points{grid-template-columns:1fr;gap:10px}.login-info-card{padding:16px}.login-info-lead{font-size:13px;margin-bottom:19px}.login-info-bottom{align-items:flex-start;flex-direction:column}.login-info-cta{width:100%;justify-content:center}.login-info-panel h2{letter-spacing:-.8px}}
 @media(prefers-reduced-motion:reduce){.login-info-panel,.login-info-panel:before,.login-info-card,.login-info-cta{animation:none!important;transition:none!important}}
-.login-nav [data-scroll]:after{content:"";position:absolute;left:0;right:100%;bottom:1px;height:2px;border-radius:2px;background:linear-gradient(90deg,#5da7ff,#a36aff,#ef73bf);transition:right .22s ease}
-.login-nav [data-scroll]:hover:after{right:0}
-.login-section-flash{animation:loginSectionFlash 1.35s ease both;scroll-margin-top:34px}
-@keyframes loginSectionFlash{0%,100%{filter:none}18%,62%{filter:drop-shadow(0 0 12px rgba(122,98,255,.38))}}
+
 body.login-page-active{height:auto;min-height:100vh;overflow-x:hidden;overflow-y:auto}
 .login-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(410px,.88fr);align-items:center;gap:clamp(26px,4vw,64px);flex:1;padding:22px 0 19px}
 .login-hero{position:relative;min-width:0;padding:8px 0 0;animation:loginEnter .7s both}
