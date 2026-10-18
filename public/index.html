@@ -3,11 +3,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hirepath · Applicant tracking</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230e7c86'/><path d='M9 22V10m0 6h14m0-6v12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f1f4f3;--surf:#fff;--ink:#10181a;--mute:#5c6b6e;--line:#dce3e2;--soft:#e8eeed;--acc:#0e7c86;--acc-ink:#fff;--amb:#e0a030;--bad:#c0392b;
 --s0:#7a8a94;--s1:#3b82c4;--s2:#8a5cc8;--s3:#e0a030;--s4:#2e9e6b;--s5:#c0463a;--sh:0 1px 2px rgba(16,24,26,.06),0 8px 24px -12px rgba(16,24,26,.18);
---serif:"Instrument Serif",Georgia,serif;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+--serif:"Instrument Serif",Georgia,serif;--sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
@@ -324,6 +324,85 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
   .btn:before{display:none}
 }
 
+
+/* HirePath premium glass layer: calm surfaces, editorial typography, subtle live accents. */
+:root{--sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--ease-premium:cubic-bezier(.22,.8,.25,1)}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{font-family:var(--sans);letter-spacing:-.012em}
+body.login-page-active{overflow-x:clip;overflow-y:auto;overscroll-behavior-y:auto;touch-action:pan-y;min-height:100vh}
+.login-shell{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}
+.login-info-panel,.login-auth-panel{scroll-margin-top:24px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.login-info-panel{background:linear-gradient(135deg,rgba(15,21,49,.91),rgba(9,13,31,.88) 56%,rgba(27,14,47,.88));border-color:rgba(143,157,255,.28)}
+.login-info-card,.login-why-point{background:linear-gradient(145deg,rgba(29,37,76,.62),rgba(12,18,39,.76));border-color:rgba(145,158,221,.19)}
+.login-info-card{position:relative;overflow:hidden;transition:border-color .28s ease,background .28s ease,box-shadow .28s ease}
+.login-info-card:hover,.login-why-point:hover{border-color:rgba(157,139,255,.45);box-shadow:0 14px 32px rgba(48,61,145,.14)}
+.login-info-card:after,.login-why-point:after{content:"";position:absolute;left:-60%;top:0;width:42%;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(128,192,255,.85),rgba(202,130,255,.8),transparent);animation:glassEdgeTravel 7s ease-in-out infinite}
+.login-info-card:nth-child(2):after,.login-why-point:nth-child(2):after{animation-delay:.7s}
+.login-info-card:nth-child(3):after,.login-why-point:nth-child(3):after{animation-delay:1.4s}
+.login-info-card:nth-child(4):after,.login-why-point:nth-child(4):after{animation-delay:2.1s}
+.login-info-card:nth-child(5):after,.login-why-point:nth-child(5):after{animation-delay:2.8s}
+.login-info-card:nth-child(6):after,.login-why-point:nth-child(6):after{animation-delay:3.5s}
+.login-nav button,.login-nav a{touch-action:manipulation}
+.login-nav [data-panel]{padding:12px 2px}
+.login-info-panel h2,.login-auth-title,.login-hero h2{font-family:var(--sans);font-weight:800;letter-spacing:-.045em}
+.login-info-panel h2 span,.login-auth-title span,.login-hero h2 span{-webkit-background-clip:text;background-clip:text}
+.login-auth-panel{background:linear-gradient(150deg,rgba(13,17,41,.9),rgba(8,11,28,.93) 62%,rgba(18,16,45,.91));border-color:rgba(174,155,255,.35)}
+.login-auth-panel:after{content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;border:1px solid rgba(255,255,255,.035)}
+.login-auth-panel .password-login-form .in{min-height:47px;border-radius:12px;background:rgba(7,10,24,.58);border-color:rgba(143,151,211,.28)}
+.login-auth-panel .password-login-form .in:focus{outline:none;border-color:rgba(133,143,255,.8);box-shadow:0 0 0 4px rgba(118,105,255,.13)}
+/* Workspace glass treatment. No transforms on the draggable pipeline cards/drop zones. */
+body:not(.login-page-active) .card,
+body:not(.login-page-active) .kpi,
+body:not(.login-page-active) .job,
+body:not(.login-page-active) .semitem,
+body:not(.login-page-active) .drawer,
+body:not(.login-page-active) .col{
+  border-color:color-mix(in srgb,var(--line) 78%,var(--acc) 22%);
+  box-shadow:0 10px 30px -24px color-mix(in srgb,var(--ink) 24%,transparent),inset 0 1px 0 rgba(255,255,255,.28);
+}
+body:not(.login-page-active) .card,
+body:not(.login-page-active) .kpi,
+body:not(.login-page-active) .job,
+body:not(.login-page-active) .semitem{
+  background-image:linear-gradient(135deg,color-mix(in srgb,var(--surf) 96%,var(--acc) 4%),var(--surf) 70%);
+}
+body:not(.login-page-active) .pad h2,
+body:not(.login-page-active) .top h1,
+body:not(.login-page-active) .job h3{letter-spacing:-.035em}
+body:not(.login-page-active) .kpi{position:relative;overflow:hidden;isolation:isolate}
+body:not(.login-page-active) .kpi:after{
+  content:"";position:absolute;z-index:-1;top:0;left:-60%;width:45%;height:1px;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--acc) 70%,white),transparent);
+  animation:glassEdgeTravel 8s ease-in-out infinite;pointer-events:none
+}
+body:not(.login-page-active) .kpis>.kpi:nth-child(2):after{animation-delay:1s}
+body:not(.login-page-active) .kpis>.kpi:nth-child(3):after{animation-delay:2s}
+body:not(.login-page-active) .kpis>.kpi:nth-child(4):after{animation-delay:3s}
+body:not(.login-page-active) .kpis>.kpi:nth-child(5):after{animation-delay:4s}
+body:not(.login-page-active) .kpis>.kpi:nth-child(6):after{animation-delay:5s}
+body:not(.login-page-active) #main>.card,
+body:not(.login-page-active) #main>.grid,
+body:not(.login-page-active) #main>.kpis,
+body:not(.login-page-active) #main>.tools,
+body:not(.login-page-active) #main>.tbl,
+body:not(.login-page-active) #main>.board,
+body:not(.login-page-active) #main>.jobs,
+body:not(.login-page-active) #main>.chips{animation:premiumSectionIn .42s var(--ease-premium) both}
+body:not(.login-page-active) .kc{box-shadow:0 6px 16px -14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.48);border-color:color-mix(in srgb,var(--line) 80%,var(--acc) 20%)}
+body:not(.login-page-active) .kc:hover{border-color:var(--acc)}
+body:not(.login-page-active) .col.over{outline:2px dashed var(--acc);outline-offset:2px;background:color-mix(in srgb,var(--soft) 86%,var(--acc) 14%)}
+body:not(.login-page-active) .job{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+body:not(.login-page-active) .drawer{backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+body:not(.login-page-active) .btn{font-weight:700;letter-spacing:-.01em}
+body:not(.login-page-active) .btn.pri{box-shadow:0 8px 20px -13px color-mix(in srgb,var(--acc) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.22)}
+@keyframes glassEdgeTravel{0%,14%{transform:translateX(0);opacity:0}24%{opacity:.85}72%{opacity:.7}90%,100%{transform:translateX(330%);opacity:0}}
+@keyframes premiumSectionIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .login-info-card:after,.login-why-point:after,body:not(.login-page-active) .kpi:after{animation:none!important}
+  body:not(.login-page-active) #main>.card,body:not(.login-page-active) #main>.grid,body:not(.login-page-active) #main>.kpis,body:not(.login-page-active) #main>.tools,body:not(.login-page-active) #main>.tbl,body:not(.login-page-active) #main>.board,body:not(.login-page-active) #main>.jobs,body:not(.login-page-active) #main>.chips{animation:none!important}
+}
+
 </style></head><body>
 <div id="root"></div><div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Candidate details"></aside>
@@ -482,8 +561,6 @@ function loginInfoPanelsMarkup(){
     </section>
   </div>`;
 }
-let loginScrollFrame=0;
-let loginMotionController=null;
 function loginFrameMarkup(authMarkup){
   const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
@@ -491,38 +568,6 @@ function loginFrameMarkup(authMarkup){
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
-  if(loginMotionController)loginMotionController.abort();
-  if(loginScrollFrame)cancelAnimationFrame(loginScrollFrame);
-  loginScrollFrame=0;
-  loginMotionController=new AbortController();
-  const cancelLoginAutoScroll=()=>{
-    if(loginScrollFrame){cancelAnimationFrame(loginScrollFrame);loginScrollFrame=0;}
-  };
-  // User input always wins: never fight the user's wheel, touch, or keyboard scroll.
-  ["wheel","touchstart","pointerdown","keydown"].forEach(type=>{
-    window.addEventListener(type,event=>{
-      if(type==="keydown"&&!["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(event.key))return;
-      cancelLoginAutoScroll();
-    },{passive:true,capture:true,signal:loginMotionController.signal});
-  });
-  const scrollLoginTo=(getDestination,duration=1050)=>{
-    cancelLoginAutoScroll();
-    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if(reduced){window.scrollTo(0,Math.max(0,getDestination()));return;}
-    const startY=window.scrollY;
-    const startTime=performance.now();
-    const tick=now=>{
-      const progress=Math.min(1,(now-startTime)/duration);
-      // Quintic ease-in/out: starts gently, moves smoothly, then settles without a jolt.
-      const eased=progress<.5?16*Math.pow(progress,5):1-Math.pow(-2*progress+2,5)/2;
-      const destination=Math.max(0,getDestination());
-      window.scrollTo(0,startY+(destination-startY)*eased);
-      if(progress<1)loginScrollFrame=requestAnimationFrame(tick);
-      else loginScrollFrame=0;
-    };
-    loginScrollFrame=requestAnimationFrame(tick);
-  };
-
   document.querySelectorAll(".login-nav [data-panel]").forEach(button=>button.addEventListener("click",event=>{
     event.preventDefault();
     const target=document.getElementById(button.dataset.panel);
@@ -537,19 +582,20 @@ function loginFrameMarkup(authMarkup){
       navButton.classList.toggle("is-active",active);
     });
     target.hidden=!opening;
-    cancelLoginAutoScroll();
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!opening){
-      if(window.scrollY>0)scrollLoginTo(()=>0,850);
+      if(window.scrollY>0)window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
       return;
     }
 
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      scrollLoginTo(()=>window.scrollY+target.getBoundingClientRect().top-24,1150);
+    // Browser-native smooth scrolling stays interruptible by wheel, touchpad and keyboard input.
+    requestAnimationFrame(()=>{
+      target.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"});
       target.classList.remove("login-section-flash");
       void target.offsetWidth;
       target.classList.add("login-section-flash");
       window.setTimeout(()=>target.classList.remove("login-section-flash"),1350);
-    }));
+    });
   }));
 }
 function renderPasswordLogin(config, initialError="") {
@@ -644,7 +690,7 @@ async function loginView(initialError="") {
             colorInputText: "#f4f7ff",
             colorNeutral: "#b2c4dc",
             borderRadius: "12px",
-            fontFamily: "Manrope, system-ui, sans-serif"
+            fontFamily: "Plus Jakarta Sans, system-ui, sans-serif"
           }
         }
       });
