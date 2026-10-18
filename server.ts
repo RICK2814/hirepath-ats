@@ -443,11 +443,11 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     const plunkKey = process.env.PLUNK_SECRET_KEY || "";
     const plunkFrom = str(process.env.PLUNK_FROM, 254).toLowerCase();
     if (!plunkKey) return { state: "failed", err: "Plunk is selected but PLUNK_SECRET_KEY is missing. Add the Plunk secret API key in Vercel." };
-    if (!/^[^<>\\s@]+@[^<>\\s@]+\\.[^<>\\s@]+$/.test(plunkFrom)) {
+    if (!/^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/.test(plunkFrom)) {
       return { state: "failed", err: "Invalid PLUNK_FROM. Set it to an email address on a domain verified in your Plunk project." };
     }
     const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-    const htmlBody = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\\r?\\n/g, "<br>") + "</div>";
+    const htmlBody = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\r?\n/g, "<br>") + "</div>";
     try {
       const r = await fetch("https://next-api.useplunk.com/v1/send", {
         method: "POST", signal: AbortSignal.timeout(15000),
