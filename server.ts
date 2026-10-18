@@ -437,6 +437,43 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     }
   }
 
+  // Plunk hosted API. The from-address must belong to a domain verified in Plunk.
+  // This path is only selected when EMAIL_PROVIDER=plunk.
+  if (process.env.EMAIL_PROVIDER === "plunk") {
+    const plunkKey = process.env.PLUNK_SECRET_KEY || "";
+    const plunkFrom = str(process.env.PLUNK_FROM, 254).toLowerCase();
+    if (!plunkKey) return { state: "failed", err: "Plunk is selected but PLUNK_SECRET_KEY is missing. Add the Plunk secret API key in Vercel." };
+    if (!/^[^<>\\s@]+@[^<>\\s@]+\\.[^<>\\s@]+$/.test(plunkFrom)) {
+      return { state: "failed", err: "Invalid PLUNK_FROM. Set it to an email address on a domain verified in your Plunk project." };
+    }
+    const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    const htmlBody = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\\r?\\n/g, "<br>") + "</div>";
+    try {
+      const r = await fetch("https://next-api.useplunk.com/v1/send", {
+        method: "POST", signal: AbortSignal.timeout(15000),
+        headers: { Authorization: "Bearer " + plunkKey, "content-type": "application/json" },
+        body: JSON.stringify({
+          to, subject, body: htmlBody,
+          from: { name: "HirePath ATS", email: plunkFrom },
+          ...(replyTo ? { reply: replyTo } : {})
+        })
+      });
+      const payload: any = await r.json().catch(() => null);
+      if (!r.ok || payload?.success === false) {
+        const providerMessage = typeof payload?.error?.message === "string"
+          ? payload.error.message
+          : typeof payload?.message === "string" ? payload.message : "No detailed error message was returned.";
+        const safeMessage = providerMessage.replace(/sk_[A-Za-z0-9_-]{8,}/g, "[redacted]").slice(0, 400);
+        console.error("Plunk rejected email", JSON.stringify({ status: r.status, code: payload?.error?.code || null, message: safeMessage }));
+        return { state: "failed", err: `Plunk rejected email (HTTP ${r.status}): ${safeMessage}` };
+      }
+      return { state: "sent" };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown Plunk delivery error";
+      return { state: "failed", err: message.slice(0, 300) };
+    }
+  }
+
   // Resend's shared test sender is a valid sender for development/testing only.
   // Ignore stale/malformed EMAIL_FROM values when using the test sender.
   if (!process.env.RESEND_API_KEY) {
