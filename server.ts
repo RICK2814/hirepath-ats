@@ -437,6 +437,46 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     }
   }
 
+  // Brevo hosted transactional email API. Sender must be verified and its domain authenticated.
+  // This uses the HirePath-owned Brevo sender, not the signed-in recruiter's personal email.
+  if (process.env.EMAIL_PROVIDER === "brevo") {
+    const brevoKey = process.env.BREVO_API_KEY || "";
+    const brevoFrom = str(process.env.BREVO_FROM_EMAIL, 254).toLowerCase();
+    const brevoName = str(process.env.BREVO_FROM_NAME, 100) || "HirePath ATS";
+    if (!brevoKey) return { state: "failed", err: "Brevo is selected but BREVO_API_KEY is missing. Add your Brevo API key in Vercel." };
+    if (!/^[^<>\\s@]+@[^<>\\s@]+\\.[^<>\\s@]+$/.test(brevoFrom)) {
+      return { state: "failed", err: "Invalid BREVO_FROM_EMAIL. Set it to a sender address verified in Brevo on an authenticated domain." };
+    }
+    const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    const htmlContent = '<div style="font-family:Arial,sans-serif;line-height:1.6">' + escapeHtml(body).replace(/\\r?\\n/g, "<br>") + "</div>";
+    try {
+      const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST", signal: AbortSignal.timeout(15000),
+        headers: { "api-key": brevoKey, "accept": "application/json", "content-type": "application/json" },
+        body: JSON.stringify({
+          sender: { name: brevoName, email: brevoFrom },
+          to: [{ email: to }],
+          subject,
+          htmlContent,
+          textContent: body
+        })
+      });
+      const payload: any = await r.json().catch(() => null);
+      if (!r.ok) {
+        const providerMessage = typeof payload?.message === "string"
+          ? payload.message
+          : typeof payload?.code === "string" ? payload.code : "No detailed error message was returned.";
+        const safeMessage = providerMessage.replace(/xkeysib-[A-Za-z0-9_-]{8,}/g, "[redacted]").slice(0, 400);
+        console.error("Brevo rejected email", JSON.stringify({ status: r.status, code: payload?.code || null, message: safeMessage }));
+        return { state: "failed", err: `Brevo rejected email (HTTP ${r.status}): ${safeMessage}` };
+      }
+      return { state: "sent" };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown Brevo delivery error";
+      return { state: "failed", err: message.slice(0, 300) };
+    }
+  }
+
   // Plunk hosted API. The from-address must belong to a domain verified in Plunk.
   // This path is only selected when EMAIL_PROVIDER=plunk.
   if (process.env.EMAIL_PROVIDER === "plunk") {
@@ -737,7 +777,7 @@ app.get("/api/candidates/:id/email-draft", async (req, res) => {
   const d = { name: c.name, job_title: c.job?.title };
   res.json({ subject: fill(t[1], d, req.user), body: fill(t[2], d, req.user) });
 });
-app.post("/api/candidates/:id/email", adminOnly, async (req, res) => {
+app.post("/api/candidates/:id/email", async (req, res) => {
   const id = cid(req), c = await prisma.candidate.findUnique({ where: { id }, select: { id: true, email: true } }); if (!c) throw fail(404, "candidate not found");
   const input = parseOrThrow(emailSendSchema, req.body);
   const subject = input.subject.replace(/[\r\n]+/g, " "), body = input.body;
