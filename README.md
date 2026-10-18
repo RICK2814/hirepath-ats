@@ -2,7 +2,7 @@
 
 # HirePath ATS <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
 
-### A modern, full-stack Applicant Tracking System
+### A modern, full-stack Applicant Tracking System <img width="38" height="38" src="assets/robot-mascot.svg" alt="" />
 
 Manage job openings, candidates, hiring stages, interview feedback, resumes, and recruiter communications from one workspace.
 
