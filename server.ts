@@ -242,23 +242,27 @@ app.post("/api/auth/clerk", async (req, res) => {
   if (!CLERK_ENABLED) throw fail(503, "Clerk authentication is not configured yet.");
   const authState = clerkSdk.getAuth(req);
   if (!authState.isAuthenticated || !authState.userId) throw fail(401, "Please sign in with Clerk.");
-  await ensureInitialized();
 
+  // Do not call legacy bootstrapAdmin() here: Clerk users do not need
+  // ADMIN_EMAIL or ADMIN_PASSWORD just to enter the app.
   const clerkUser = await clerkSdk.clerkClient.users.getUser(authState.userId);
   const primary = (clerkUser.emailAddresses || []).find(x => x.id === clerkUser.primaryEmailAddressId);
   const email = str(primary?.emailAddress, 254).toLowerCase();
   if (!email || primary?.verification?.status !== "verified") throw fail(403, "A verified primary email address is required.");
 
   const configuredAdmin = str(process.env.ADMIN_EMAIL, 254).toLowerCase();
+  // Every verified Clerk user can enter HirePath. New users are recruiters by default.
+  // Admin privileges are only granted through server-controlled Clerk public metadata
+  // or the optional ADMIN_EMAIL override; end users cannot change publicMetadata.
+  const requestedRole =
+    (Boolean(configuredAdmin) && email === configuredAdmin) || clerkUser.publicMetadata?.role === "admin"
+      ? "admin"
+      : "recruiter";
   let localUser = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, role: true, token_version: true } });
-  if (localUser && email === configuredAdmin && localUser.role !== "admin") {
+  if (localUser && requestedRole === "admin" && localUser.role !== "admin") {
     localUser = await prisma.user.update({ where: { id: localUser.id }, data: { role: "admin" }, select: { id: true, email: true, name: true, role: true, token_version: true } });
   }
   if (!localUser) {
-    const requestedRole = email === configuredAdmin ? "admin" : clerkUser.publicMetadata?.role;
-    if (requestedRole !== "admin" && requestedRole !== "recruiter") {
-      throw fail(403, "Your Clerk account is not approved for HirePath yet. Ask the admin to set public metadata role to \"recruiter\" in Clerk Dashboard.");
-    }
     const fullName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim();
     try {
       localUser = await prisma.user.create({
