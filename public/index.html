@@ -377,7 +377,7 @@ function loginInfoPanelsMarkup(){
       <div class="login-info-bottom"><p>Want to see the candidate side of the workflow?<br>Open the public Careers Page to explore how applicants find open roles.</p><a class="login-info-cta" href="/careers" target="_blank" rel="noopener noreferrer">Explore Careers Page <span aria-hidden="true">↗</span></a></div>
     </section>
     <section class="login-info-panel" id="login-panel-why" data-info-panel="why" aria-labelledby="login-why-title" hidden>
-      <p class="login-info-eyebrow"><i></i> WHY HIREPATH</p>
+      <p class="login-info-eyebrow"><i></i> WHY HIRE US</p>
       <h2 id="login-why-title">Hiring deserves more than<br><span>scattered spreadsheets.</span></h2>
       <p class="login-info-lead">HirePath ATS is designed to help recruiters organise the work around a hiring decision. It connects the job, the application, the evaluation, and the candidate's progress—while keeping the recruiter in control.</p>
       <div class="login-why-points">
@@ -395,7 +395,7 @@ function loginInfoPanelsMarkup(){
 function loginFrameMarkup(authMarkup){
   const frame=`<div class="login login-experience clerk-mode"><div class="login-shell"><header class="login-topbar">
     <a class="login-brand" href="/" aria-label="HirePath ATS home"><span class="login-brand-mark">${loginLogoSvg("header")}</span><span class="login-brand-name">HirePath <span>ATS</span></span></a>
-    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-panel="features" aria-controls="login-panel-features" aria-expanded="false">Features</button><button type="button" data-panel="why" aria-controls="login-panel-why" aria-expanded="false">Why HirePath</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
+    <nav class="login-nav" aria-label="Introduction navigation"><button type="button" data-panel="features" aria-controls="login-panel-features" aria-expanded="false">Features</button><button type="button" data-panel="why" aria-controls="login-panel-why" aria-expanded="false">Why Hire Us</button><a class="login-careers-link" href="/careers" target="_blank" rel="noopener noreferrer">Careers <span aria-hidden="true">↗</span></a></nav>
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
