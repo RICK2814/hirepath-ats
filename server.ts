@@ -156,8 +156,8 @@ const publicDir = path.join(__dirname, "public");
 // Vercel serves public assets separately; the directory may not be present in the function bundle.
 const publicFiles = fs.existsSync(publicDir) ? fs.readdirSync(publicDir) : [];
 const scriptHashes = publicFiles.filter(f => f.endsWith(".html"))
-  .flatMap(f => [...fs.readFileSync(path.join(publicDir, f), "utf8").matchAll(/<script>([\\s\\S]*?)<\\/script>/g)])
-  .map(m => `'sha256-${crypto.createHash("sha256").update(m[1]).digest("base64")}'`).join(" ");
+  .flatMap(f => [...fs.readFileSync(path.join(publicDir, f), "utf8").matchAll(/<script>([\s\S]*?)<\/script>/g)])
+  .map(m => "'sha256-" + crypto.createHash("sha256").update(m[1]).digest("base64") + "'").join(" ");
 app.use((req, res, next) => {
   const host = /^[\w.\-:[\]]+$/.test(req.get("host") || "") ? req.get("host") : "";
   res.set({ "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer",
