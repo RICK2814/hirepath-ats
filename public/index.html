@@ -674,7 +674,7 @@ function jobsV(){$("#main").innerHTML=`<form class="card pad job-create-form" id
   <input class="in" id="jt" placeholder="Role title" required aria-label="Role title">
   <input class="in" id="jd" placeholder="Department" aria-label="Department">
   <input class="in" id="jl" placeholder="Location (e.g. Bengaluru / Remote)" aria-label="Location">
-  <select class="in" id="jtype" aria-label="Job type"><option>Internship</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Apprenticeship</option><option>Freelance</option></select>
+  <select class="in" id="jtype" aria-label="Job type" required><option value="">Select job type</option><option>Internship</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Apprenticeship</option><option>Freelance</option></select>
   <input class="in" id="jsp" placeholder="Stipend / salary (e.g. ₹15,000–₹20,000/month)" aria-label="Stipend or salary" maxlength="120">
   <textarea class="in" id="jx" rows="3" placeholder="Role overview and responsibilities." aria-label="Job description"></textarea>
   <textarea class="in" id="jr" rows="3" placeholder="Requirements: skills, experience, qualifications, and what the candidate should know." aria-label="Job requirements"></textarea>
@@ -682,7 +682,7 @@ function jobsV(){$("#main").innerHTML=`<form class="card pad job-create-form" id
 </form>
 <div class="jobs">${S.jobs.map(j=>`<div class="card job ${j.status}"><h3>${esc(j.title)}</h3>
 <p class="mut" style="margin:4px 0 12px">${esc(j.department||"No department")} · ${esc(j.location||"No location")}</p>
-<div class="job-listing-badges"><span class="pill">${esc(j.job_type||"Internship")}</span><span class="pill">Stipend: ${esc(j.stipend||"Not disclosed")}</span></div>
+<div class="job-listing-badges"><span class="pill">${esc(j.job_type||"Not specified")}</span><span class="pill">Stipend: ${esc(j.stipend||"Not disclosed")}</span></div>
 ${j.description?`<p style="margin:0 0 9px;font-size:13px">${esc(j.description.slice(0,110))}${j.description.length>110?"…":""}</p>`:""}
 ${j.requirements?`<p style="margin:0 0 10px;font-size:12px;color:var(--mute)"><b>Requirements:</b> ${esc(j.requirements.slice(0,90))}${j.requirements.length>90?"…":""}</p>`:""}
 <p class="mut job-posted">Posted ${esc(relativeTimeLabel(j.created_at))}</p>
