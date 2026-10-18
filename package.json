@@ -26,7 +26,8 @@
     "prisma": "7.10.1",
     "ws": "^8.18.3",
     "zod": "^4.1.12",
-    "@clerk/express": "^2.1.79"
+    "@clerk/express": "^2.1.79",
+    "nodemailer": "^10.1.2"
   },
   "engines": {
     "node": ">=22.18"
