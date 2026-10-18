@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080c1b">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
 <title>Careers · HirePath ATS</title>
 <style>
 :root{color-scheme:dark;--bg:#070b18;--panel:#10172b;--panel2:#0c1224;--text:#f5f7ff;--muted:#a1adc8;--soft:#7483a3;--line:rgba(154,170,218,.18);--blue:#5b9dff;--violet:#9c78ff;--pink:#e67bd4;--mint:#70e7d2}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:24px;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,rgba(44,89,197,.24),transparent 32%),radial-gradient(ellipse at 94% 14%,rgba(126,65,199,.16),transparent 30%),linear-gradient(140deg,#070b18,#090d1d 55%,#0b0c20);color:var(--text);font:15px/1.65 Manrope,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.012em}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,rgba(44,89,197,.24),transparent 32%),radial-gradient(ellipse at 94% 14%,rgba(126,65,199,.16),transparent 30%),linear-gradient(140deg,#070b18,#090d1d 55%,#0b0c20);color:var(--text);font:15px/1.65 "Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:-.012em}
 a{color:inherit}
 main{width:min(1080px,100%);margin:0 auto;padding:25px clamp(16px,4vw,42px) 42px}
 .site-header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:48px}
@@ -110,6 +110,18 @@ form#f:not([hidden]){animation:careerRise .48s var(--ease-premium) both;scroll-m
 @keyframes careerShine{0%,100%{opacity:.25}50%{opacity:.9}}
 @media(max-width:600px){.job-card:hover{transform:none}.btn{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.hero,.jobs-section,.job-card,form#f:not([hidden]),.loading,.hero:before{animation:none!important}.job-card,.btn,.header-link,.link{transition:none!important}.btn:before{display:none}}
+
+
+/* Match the recruiter's workspace with the same glass visual system. */
+:root{--ease-premium:cubic-bezier(.22,.8,.25,1)}
+.job-card{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.job-card:after{content:"";position:absolute;top:0;left:-55%;width:44%;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(112,188,255,.8),rgba(193,135,255,.72),transparent);animation:careerGlassEdge 8s ease-in-out infinite}
+.job-card:nth-child(2):after{animation-delay:1.1s}.job-card:nth-child(3):after{animation-delay:2.2s}.job-card:nth-child(4):after{animation-delay:3.3s}
+.highlight{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:border-color .24s ease,background .24s ease}
+.highlight:hover{border-color:rgba(139,135,255,.34);background:rgba(20,30,59,.5)}
+form#f:not([hidden]){backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+@keyframes careerGlassEdge{0%,12%{transform:translateX(0);opacity:0}25%{opacity:.85}76%{opacity:.7}92%,100%{transform:translateX(330%);opacity:0}}
+@media(prefers-reduced-motion:reduce){.job-card:after{animation:none!important}}
 
 </style>
 </head>
