@@ -11,9 +11,9 @@
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
-*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:smooth;overscroll-behavior-y:contain}
+*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:auto;overscroll-behavior-y:contain;overflow-anchor:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
-body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y}
+body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y;overflow-anchor:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
@@ -416,41 +416,62 @@ function loginFrameMarkup(authMarkup){
     </header><div class="login-layout">${loginHeroMarkup()}${authMarkup}</div>${loginInfoPanelsMarkup()}<footer class="login-footer"><span>HIRE BETTER. MOVE FORWARD.</span><span>Illustrative workflow preview · Secure authentication by Clerk</span></footer></div></div>`;
   document.body.classList.add("login-page-active");
   $("#root").innerHTML=frame;
+  let loginScrollFrame=0;
+  const cancelLoginAutoScroll=()=>{
+    if(loginScrollFrame){cancelAnimationFrame(loginScrollFrame);loginScrollFrame=0;}
+  };
+  // User input always wins: never fight the user's wheel, touch, or keyboard scroll.
+  ["wheel","touchstart","pointerdown","keydown"].forEach(type=>{
+    window.addEventListener(type,event=>{
+      if(type==="keydown"&&!["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(event.key))return;
+      cancelLoginAutoScroll();
+    },{passive:true,capture:true});
+  });
+  const scrollLoginTo=(getDestination,duration=1050)=>{
+    cancelLoginAutoScroll();
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduced){window.scrollTo(0,Math.max(0,getDestination()));return;}
+    const startY=window.scrollY;
+    const startTime=performance.now();
+    const tick=now=>{
+      const progress=Math.min(1,(now-startTime)/duration);
+      // Quintic ease-in/out: starts gently, moves smoothly, then settles without a jolt.
+      const eased=progress<.5?16*Math.pow(progress,5):1-Math.pow(-2*progress+2,5)/2;
+      const destination=Math.max(0,getDestination());
+      window.scrollTo(0,startY+(destination-startY)*eased);
+      if(progress<1)loginScrollFrame=requestAnimationFrame(tick);
+      else loginScrollFrame=0;
+    };
+    loginScrollFrame=requestAnimationFrame(tick);
+  };
+
   document.querySelectorAll(".login-nav [data-panel]").forEach(button=>button.addEventListener("click",event=>{
     event.preventDefault();
     const target=document.getElementById(button.dataset.panel);
     if(!target)return;
     const opening=target.hidden;
-    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Keep one information panel open at a time so the page stays predictable.
-    document.querySelectorAll(".login-info-panel").forEach(panel=>{
-      if(panel!==target)panel.hidden=true;
-    });
+    // Keep only one panel open; wait for layout before reading its final position.
+    document.querySelectorAll(".login-info-panel").forEach(panel=>{if(panel!==target)panel.hidden=true;});
     document.querySelectorAll(".login-nav [data-panel]").forEach(navButton=>{
       const active=navButton===button&&opening;
       navButton.setAttribute("aria-expanded",String(active));
       navButton.classList.toggle("is-active",active);
     });
-
     target.hidden=!opening;
+    cancelLoginAutoScroll();
     if(!opening){
-      if(window.scrollY>0)window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
+      if(window.scrollY>0)scrollLoginTo(()=>0,850);
       return;
     }
 
-    // Wait until the panel has entered layout before calculating its position;
-    // this avoids the page moving under the smooth-scroll animation.
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-24);
-        window.scrollTo({top,behavior:reduced?"auto":"smooth"});
-        target.classList.remove("login-section-flash");
-        void target.offsetWidth;
-        target.classList.add("login-section-flash");
-        window.setTimeout(()=>target.classList.remove("login-section-flash"),1350);
-      });
-    });
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      scrollLoginTo(()=>window.scrollY+target.getBoundingClientRect().top-24,1150);
+      target.classList.remove("login-section-flash");
+      void target.offsetWidth;
+      target.classList.add("login-section-flash");
+      window.setTimeout(()=>target.classList.remove("login-section-flash"),1350);
+    }));
   }));
 }
 function renderPasswordLogin(config, initialError="") {
