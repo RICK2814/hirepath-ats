@@ -89,7 +89,7 @@ input:focus-visible,textarea:focus-visible,.btn:focus-visible,.link:focus-visibl
 h1,h2,h3,h4{letter-spacing:-.03em;text-wrap:balance}
 .hero{animation:careerRise .72s var(--ease-premium) both}
 .jobs-section{animation:careerRise .6s .08s var(--ease-premium) both}
-.job-card{animation:careerRise .58s var(--ease-premium) both;transition:transform .26s var(--ease-premium),border-color .26s ease,box-shadow .26s ease,background .26s ease;overflow-anchor:none}
+.job-card{animation:careerFade .58s ease both;transition:transform .26s var(--ease-premium),border-color .26s ease,box-shadow .26s ease,background .26s ease;overflow-anchor:none}
 .job-card:nth-child(2){animation-delay:45ms}.job-card:nth-child(3){animation-delay:90ms}.job-card:nth-child(4){animation-delay:135ms}.job-card:nth-child(5){animation-delay:180ms}
 .job-card:hover{transform:translateY(-3px);border-color:rgba(139,135,255,.52);box-shadow:0 23px 58px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.035)}
 .btn{position:relative;isolation:isolate;overflow:hidden;min-height:42px;transition:filter .22s ease,transform .22s var(--ease-premium),box-shadow .22s ease,background-position .8s ease}
@@ -105,6 +105,7 @@ input:focus-visible,textarea:focus-visible{border-color:rgba(139,130,255,.78);bo
 form#f:not([hidden]){animation:careerRise .48s var(--ease-premium) both;scroll-margin-top:24px}
 .hero:before{content:"";position:absolute;left:9%;right:9%;top:0;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(105,177,255,.6),rgba(196,122,255,.7),transparent);animation:careerShine 5s ease-in-out infinite}
 @keyframes careerRise{from{opacity:0;transform:translate3d(0,13px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes careerFade{from{opacity:0}to{opacity:1}}
 @keyframes careerSoftPulse{0%,100%{border-color:rgba(145,161,211,.2)}50%{border-color:rgba(139,135,255,.45)}}
 @keyframes careerShine{0%,100%{opacity:.25}50%{opacity:.9}}
 @media(max-width:600px){.job-card:hover{transform:none}.btn{min-height:44px}}
