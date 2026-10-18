@@ -13,7 +13,7 @@
     "dev": "tsx watch server.ts",
     "build": "tsc --noEmit -p tsconfig.json",
     "test:e2e": "playwright test",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run db:deploy && npm run build"
   },
   "author": "",
   "license": "ISC",
