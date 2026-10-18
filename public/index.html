@@ -11,8 +11,10 @@
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
-*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:smooth;overscroll-behavior-y:contain}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
 h1,h2,h3{margin:0;font-weight:600}.serif{font-family:var(--serif);font-weight:400}
@@ -141,10 +143,10 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .login-nav [data-scroll].is-active{color:#fff}
 .login-section-flash{animation:loginSectionFlash 1.35s ease both;scroll-margin-top:22px}
 @keyframes loginSectionFlash{0%,100%{filter:none}18%,62%{filter:drop-shadow(0 0 12px rgba(122,98,255,.38))}}
-.login-info-panels{display:flex;flex-direction:column;gap:18px;margin:0}
+.login-info-panels{display:flex;flex-direction:column;gap:18px;margin:0;min-width:0;overflow-anchor:none}
 .login-info-panels:has(.login-info-panel:not([hidden])){margin:18px 0 0}
 .login-info-panel[hidden]{display:none!important}
-.login-info-panel{position:relative;overflow:hidden;padding:clamp(22px,3.5vw,38px);border:1px solid rgba(143,143,255,.24);border-radius:23px;background:linear-gradient(135deg,rgba(14,20,46,.94),rgba(9,13,31,.94) 56%,rgba(27,14,47,.91));box-shadow:0 20px 68px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045);animation:loginPanelReveal .48s cubic-bezier(.2,.8,.2,1) both;scroll-margin-top:22px}
+.login-info-panel{position:relative;overflow:hidden;padding:clamp(22px,3.5vw,38px);scroll-margin-block:24px;overflow-anchor:none;}border:1px solid rgba(143,143,255,.24);border-radius:23px;background:linear-gradient(135deg,rgba(14,20,46,.94),rgba(9,13,31,.94) 56%,rgba(27,14,47,.91));box-shadow:0 20px 68px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045);animation:loginPanelReveal .48s cubic-bezier(.2,.8,.2,1) both;scroll-margin-top:22px}
 .login-info-panel:before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(96,161,255,.7),rgba(200,87,255,.7),transparent);animation:loginMetricShine 4s ease-in-out infinite}
 .login-info-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#aaa7ff;font-size:10px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
 .login-info-eyebrow i{width:6px;height:6px;border-radius:50%;background:#79dfff;box-shadow:0 0 12px rgba(121,223,255,.8)}
@@ -419,23 +421,36 @@ function loginFrameMarkup(authMarkup){
     const target=document.getElementById(button.dataset.panel);
     if(!target)return;
     const opening=target.hidden;
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Keep one information panel open at a time so the page stays predictable.
+    document.querySelectorAll(".login-info-panel").forEach(panel=>{
+      if(panel!==target)panel.hidden=true;
+    });
+    document.querySelectorAll(".login-nav [data-panel]").forEach(navButton=>{
+      const active=navButton===button&&opening;
+      navButton.setAttribute("aria-expanded",String(active));
+      navButton.classList.toggle("is-active",active);
+    });
+
     target.hidden=!opening;
-    button.setAttribute("aria-expanded",String(opening));
-    button.classList.toggle("is-active",opening);
     if(!opening){
-      if(window.scrollY>0){
-        const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
-      }
+      if(window.scrollY>0)window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
       return;
     }
-    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-22);
-    window.scrollTo({top,behavior:reduced?"auto":"smooth"});
-    target.classList.remove("login-section-flash");
-    void target.offsetWidth;
-    target.classList.add("login-section-flash");
-    window.setTimeout(()=>target.classList.remove("login-section-flash"),1350);
+
+    // Wait until the panel has entered layout before calculating its position;
+    // this avoids the page moving under the smooth-scroll animation.
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-24);
+        window.scrollTo({top,behavior:reduced?"auto":"smooth"});
+        target.classList.remove("login-section-flash");
+        void target.offsetWidth;
+        target.classList.add("login-section-flash");
+        window.setTimeout(()=>target.classList.remove("login-section-flash"),1350);
+      });
+    });
   }));
 }
 function renderPasswordLogin(config, initialError="") {
