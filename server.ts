@@ -46,7 +46,7 @@ const bootstrapAdmin = () => prisma.$transaction(async tx => {
   await tx.$queryRaw`SELECT pg_advisory_xact_lock(727274)::text`;
   if (await tx.user.count()) return;
   const email = str(process.env.ADMIN_EMAIL).toLowerCase(), pw = process.env.ADMIN_PASSWORD || "";
-  if (!email || pw.length < 10) return console.warn("No users exist. Set ADMIN_EMAIL and ADMIN_PASSWORD (10+ chars) to create the first admin.");
+  if (!email || pw.length < 10) throw new Error("No users exist. Set ADMIN_EMAIL and ADMIN_PASSWORD (minimum 10 characters) in the Vercel Production environment to create the first admin.");
   await tx.user.create({ data: { email, name: str(process.env.ADMIN_NAME) || "Admin", pass: hashPw(pw), role: "admin" } });
   console.log("Created first admin " + email);
 }, { timeout: 60000, maxWait: 60000 });
@@ -145,6 +145,24 @@ type HirePathApp = import("express").Express & {
   retentionSweep: (days?: number) => Promise<number>;
 };
 const app = express() as HirePathApp;
+
+// Vercel imports the Express app as a module, so the require.main startup block below
+// does not run there. Initialize the production database/admin once before serving requests.
+let initializationPromise: Promise<unknown> | undefined;
+const ensureInitialized = (): Promise<unknown> => {
+  if (!initializationPromise) {
+    initializationPromise = initData().catch((error) => {
+      initializationPromise = undefined;
+      throw error;
+    });
+  }
+  return initializationPromise;
+};
+if (process.env.VERCEL_ENV === "production") {
+  app.use((_req, _res, next) => {
+    ensureInitialized().then(() => next(), (error) => next(error));
+  });
+}
 app.disable("x-powered-by");
 // TRUST_PROXY: number of proxy hops (1, 2), "true", or a subnet list. Unset = trust none.
 if (process.env.TRUST_PROXY) { const t = process.env.TRUST_PROXY; app.set("trust proxy", /^\d+$/.test(t) ? +t : t === "true" ? true : t); }
@@ -645,5 +663,5 @@ function start() {
   };
   for (const sig of ["SIGTERM", "SIGINT"]) process.on(sig, () => shutdown(sig));
 }
-if (require.main === module) initData().then(start).catch(e => { console.error(e); process.exit(1); });
+if (require.main === module) ensureInitialized().then(start).catch(e => { console.error(e); process.exit(1); });
 module.exports = app;
