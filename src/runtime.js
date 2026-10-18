@@ -8,7 +8,7 @@ const emailSchema = z.string().trim().email().max(254).transform((v) => v.toLowe
 const positiveIdSchema = z.union([
   z.number().int().min(1).max(2147483647),
   z.string().trim().regex(/^[1-9]\d*$/.transform(Number)
-]).pipe(z.number().int().min(1).max(2147483647));
+  z.string().trim().regex(/^[1-9]\d*$/).transform(Number)
 
 const loginSchema = z.object({
   email: emailSchema,
