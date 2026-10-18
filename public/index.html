@@ -65,6 +65,24 @@ td{padding:11px 16px;border-bottom:1px solid var(--soft)}tbody tr{cursor:pointer
 .kc:hover{border-color:var(--acc)}.kc.drag{opacity:.4}.kc .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--mute)}
 .jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}.job{padding:18px}.job h3{font:400 22px/1.2 var(--serif)}
 .job.closed{opacity:.6}
+.job-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.job-status-btn{border:0;cursor:pointer;color:inherit;font:inherit}
+.job-status-btn:hover{outline:1px solid var(--line)}
+.job-status-btn:focus-visible,.job-detail button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.job-detail-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(5,10,12,.62);backdrop-filter:blur(3px)}
+.job-detail{width:min(700px,100%);max-height:min(88vh,850px);overflow:auto;background:var(--surf);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
+.job-detail-head{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.job-detail-head h2{font:400 30px/1.15 var(--serif);margin:3px 0 0;overflow-wrap:anywhere}
+.job-detail-head .lab{margin:0}
+.job-detail-body{padding:22px 24px 26px}
+.job-detail-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.job-detail-info>div{min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px}
+.job-detail-info small{display:block;font-size:12px;color:var(--mute);margin-bottom:5px}
+.job-detail-info b{display:block;font-weight:600;overflow-wrap:anywhere}
+.job-detail-body h3{font-size:15px;margin:0 0 8px}
+.job-detail-description{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:var(--ink);padding:14px;background:var(--soft);border-radius:10px;min-height:72px}
+.job-detail-footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+@media(max-width:520px){.job-detail-overlay{padding:10px}.job-detail-head,.job-detail-body{padding:18px}.job-detail-head h2{font-size:25px}.job-detail-info{grid-template-columns:1fr 1fr}.job-actions{align-items:stretch}.job-actions .btn{flex:1}}
 .scrim{position:fixed;inset:0;background:rgba(5,10,12,.5);backdrop-filter:blur(2px);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}.scrim.on{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surf);z-index:31;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
 .drawer.on{transform:none}.dh{display:flex;gap:12px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}.dh h2{font:400 26px/1.1 var(--serif)}.dh .grow{flex:1;min-width:0}
@@ -325,9 +343,41 @@ const r=await api("/candidates?"+new URLSearchParams({...f,limit:10}));const th=
 $("#tb").innerHTML=r.items.length?`<table><thead><tr>${th("name","Candidate")}${th("job","Role")}${th("stage","Stage")}${th("rating","Rating")}${th("match","Match")}${th("review","Review")}<th>Source</th>${th("created","Applied")}</tr></thead><tbody>${r.items.map(c=>`<tr data-open="${c.id}"><td><div class="who">${av(c.name)}<div><b>${esc(c.name)}</b><small>${esc(c.email)}</small></div></div></td><td>${esc(c.job_title||"–")}</td><td>${stagePill(c.stage)}</td><td>${stars(c.rating)}</td><td>${mb(c.match_score)}</td><td>${c.score_avg!=null?`<span class="stars">${c.score_avg}★</span>`:'<span class="mut">–</span>'}</td><td>${esc(c.source)}</td><td class="mut">${rel(c.created_at)}</td></tr>`).join("")}</tbody></table>`:'<div class="empty">No candidates match these filters. Clear a filter or add a new candidate.</div>';
 $("#pg").innerHTML=`<span class="mut">${r.total} candidate${r.total==1?"":"s"} · page ${r.page} of ${r.pages}</span><span><button class="btn sm" data-pg="-1" ${r.page<2?"disabled":""}>Previous</button> <button class="btn sm" data-pg="1" ${r.page>=r.pages?"disabled":""}>Next</button></span>`}
 
+
+/* ---------- job details modal ---------- */
+function closeJobDetails(){document.querySelector("#jobDetailOverlay")?.remove()}
+function openJobDetails(id){
+  const j=S.jobs.find(x=>String(x.id)===String(id));
+  if(!j)return toast("Job details were not found. Refresh the page and try again.");
+  closeJobDetails();
+  const overlay=document.createElement("div");
+  overlay.className="job-detail-overlay";
+  overlay.id="jobDetailOverlay";
+  const created=j.created_at?new Date(j.created_at).toLocaleString():null;
+  const applicantCount=Number.isFinite(Number(j.applicants))?Number(j.applicants):0;
+  overlay.innerHTML='<section class="job-detail" role="dialog" aria-modal="true" aria-labelledby="jobDetailTitle">'+
+    '<div class="job-detail-head"><div><div class="lab">Full job details</div><h2 id="jobDetailTitle">'+esc(j.title||"Untitled role")+'</h2></div><button type="button" class="btn sm" data-close-job-details aria-label="Close job details">Close ✕</button></div>'+
+    '<div class="job-detail-body">'+
+      '<div class="job-detail-info">'+
+        '<div><small>Department</small><b>'+esc(j.department||"Not specified")+'</b></div>'+
+        '<div><small>Location</small><b>'+esc(j.location||"Not specified")+'</b></div>'+
+        '<div><small>Status</small><b><span class="pill">'+esc(j.status||"Unknown")+'</span></b></div>'+
+        '<div><small>Applicants</small><b>'+applicantCount+'</b></div>'+
+        (created?'<div><small>Created</small><b>'+esc(created)+'</b></div>':'')+
+        '<div><small>Job ID</small><b>'+esc(String(j.id))+'</b></div>'+
+      '</div>'+
+      '<h3>Job description, skills and responsibilities</h3>'+
+      '<div class="job-detail-description">'+esc(j.description||"No job description has been added for this role yet.")+'</div>'+
+      '<div class="job-detail-footer">'+(j.status==="open"?'<a class="btn pri" href="/careers" target="_blank" rel="noopener noreferrer">View public Careers Page</a>':'')+
+      '<button type="button" class="btn" data-close-job-details>Done</button></div>'+
+    '</div></section>';
+  document.body.append(overlay);
+  overlay.addEventListener("click",e=>{if(e.target===overlay||e.target.closest("[data-close-job-details]"))closeJobDetails()});
+  overlay.querySelector("[data-close-job-details]")?.focus();
+}
 /* ---------- jobs ---------- */
 function jobsV(){$("#main").innerHTML=`<form class="card pad" id="jf" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;margin-bottom:14px"><input class="in" id="jt" placeholder="Role title" required aria-label="Role title"><input class="in" id="jd" placeholder="Department" aria-label="Department"><input class="in" id="jl" placeholder="Location" aria-label="Location"><button class="btn pri">Add role</button><textarea class="in" id="jx" rows="2" style="grid-column:1/-1" placeholder="Job description: skills and responsibilities. Used for match scoring." aria-label="Description"></textarea></form>
-<div class="jobs">${S.jobs.map(j=>`<div class="card job ${j.status}"><h3>${esc(j.title)}</h3><p class="mut" style="margin:4px 0 14px">${esc(j.department||"No department")} · ${esc(j.location||"No location")}</p>${j.description?`<p style="margin:-6px 0 14px;font-size:13px">${esc(j.description.slice(0,110))}${j.description.length>110?"…":""}</p>`:""}<div style="display:flex;align-items:center;gap:8px"><span class="pill">${j.applicants} applicant${j.applicants==1?"":"s"}</span><span class="pill">${j.status}</span><span style="flex:1"></span>
+<div class="jobs">${S.jobs.map(j=>`<div class="card job ${j.status}"><h3>${esc(j.title)}</h3><p class="mut" style="margin:4px 0 14px">${esc(j.department||"No department")} · ${esc(j.location||"No location")}</p>${j.description?`<p style="margin:-6px 0 14px;font-size:13px">${esc(j.description.slice(0,110))}${j.description.length>110?"…":""}</p>`:""}<div class="job-actions"><span class="pill">${j.applicants} applicant${j.applicants==1?"":"s"}</span><button type="button" class="pill job-status-btn" data-view-job="${j.id}" title="Click to view full job details" aria-label="View details for ${esc(j.title)}">${esc(j.status)}</button><button type="button" class="btn sm" data-view-job="${j.id}">View details</button><span style="flex:1"></span>
 <button class="btn sm" data-jt="${j.id}" data-s="${j.status=="open"?"closed":"open"}">${j.status=="open"?"Close role":"Reopen role"}</button></div></div>`).join("")}</div>`;
 $("#jf").onsubmit=guard(async e=>{e.preventDefault();await api("/jobs",{method:"POST",body:{title:$("#jt").value,department:$("#jd").value,location:$("#jl").value,description:$("#jx").value}});toast("Role added");refresh()})}
 
@@ -395,9 +445,11 @@ $("#pq").onkeydown=e=>{if(e.key=="ArrowDown"){pSel=Math.min(pSel+1,pItems.length
 /* ---------- global events ---------- */
 document.addEventListener("keydown",e=>{if(!S.user)return;const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
 if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=="k"){e.preventDefault();openPal()}
-else if(e.key=="Escape"){closePal();closeDrawer()}else if(e.key=="n"&&!typing&&!e.ctrlKey&&!e.metaKey){e.preventDefault();openCand(null)}});
+else if(e.key=="Escape"){closePal();closeDrawer();closeJobDetails()}else if(e.key=="n"&&!typing&&!e.ctrlKey&&!e.metaKey){e.preventDefault();openCand(null)}});
 document.addEventListener("click",e=>{
 const clearSem=e.target.closest("[data-clear-sem]");if(clearSem){const box=$("#sem-results");if(box){box.hidden=true;box.innerHTML=""}return}
+const viewJob=e.target.closest("[data-view-job]");if(viewJob){openJobDetails(viewJob.dataset.viewJob);return}
+if(e.target.closest("[data-close-job-details]")){closeJobDetails();return}
 const th=e.target.closest("[data-sort]");if(th){const f=S.f;f.dir=f.sort==th.dataset.sort&&f.dir=="desc"?"asc":"desc";f.sort=th.dataset.sort;return cands()}
 const pg=e.target.closest("[data-pg]");if(pg){S.f.page+=+pg.dataset.pg;return cands()}
 const jt=e.target.closest("[data-jt]");if(jt)return guard(async()=>{await api("/jobs/"+jt.dataset.jt,{method:"PUT",body:{status:jt.dataset.s}});refresh()})();
