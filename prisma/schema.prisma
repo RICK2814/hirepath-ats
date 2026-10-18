@@ -18,14 +18,17 @@ model User {
 }
 
 model Job {
-  id          Int         @id @default(autoincrement())
-  title       String
-  department  String      @default("")
-  location    String      @default("")
-  description String      @default("")
-  status      String      @default("open")
-  created_at  DateTime    @default(now()) @db.Timestamptz(3)
-  candidates  Candidate[]
+  id           Int         @id @default(autoincrement())
+  title        String
+  department   String      @default("")
+  location     String      @default("")
+  job_type     String      @default("Internship")
+  stipend      String      @default("")
+  description  String      @default("")
+  requirements String      @default("")
+  status       String      @default("open")
+  created_at   DateTime    @default(now()) @db.Timestamptz(3)
+  candidates   Candidate[]
 
   @@map("jobs")
 }
