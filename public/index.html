@@ -220,7 +220,23 @@ async function loginView(initialError="") {
       if(clerkFailedSessionId) { showClerkError("Your Clerk identity is signed in, but this account is not approved for HirePath. Ask the administrator to approve the account in Clerk Dashboard.",true); return; }
     }
     const mount=$("#clerk-sign-in");
-    if(mount)clerk.mountSignIn(mount,{forceRedirectUrl:location.origin+"/",fallbackRedirectUrl:location.origin+"/",signUpForceRedirectUrl:location.origin+"/",signUpFallbackRedirectUrl:location.origin+"/",oauthFlow:"redirect"});
+    if(mount) {
+      const appHome = location.origin + "/";
+      clerk.mountSignIn(mount, {
+        // Keep both sign-in and sign-up flows on this app's embedded Clerk widget.
+        signInUrl: appHome,
+        signUpUrl: appHome,
+        forceRedirectUrl: appHome,
+        fallbackRedirectUrl: appHome,
+        signInForceRedirectUrl: appHome,
+        signInFallbackRedirectUrl: appHome,
+        signUpForceRedirectUrl: appHome,
+        signUpFallbackRedirectUrl: appHome,
+        routing: "hash",
+        withSignUp: true,
+        oauthFlow: "redirect"
+      });
+    }
   } catch(error) { showClerkError(error.message,false); }
 }
 function logout(signOutClerk=true) {
