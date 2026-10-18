@@ -1,130 +1,550 @@
-# Hirepath: Applicant Tracking System
+<div align="center">
 
-Full stack ATS. TypeScript Express REST API, PostgreSQL via Prisma, and a vanilla JavaScript single-page frontend. No frontend build step.
+# HirePath ATS
+
+### A modern, full-stack Applicant Tracking System
+
+Manage job openings, candidates, hiring stages, interview feedback, resumes, and recruiter communications from one workspace.
+
+[![CI](https://github.com/RICK2814/hirepath-ats/actions/workflows/ci.yml/badge.svg)](https://github.com/RICK2814/hirepath-ats/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-22.18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+
+</div>
+
+---
+
+## Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Technology stack](#technology-stack)
+- [Architecture](#architecture)
+- [Repository structure](#repository-structure)
+- [Requirements](#requirements)
+- [Quick start with Docker](#quick-start-with-docker)
+- [Manual local setup](#manual-local-setup)
+- [Configuration and environment variables](#configuration-and-environment-variables)
+- [Email provider setup](#email-provider-setup)
+- [Authentication and roles](#authentication-and-roles)
+- [Database and migrations](#database-and-migrations)
+- [API reference](#api-reference)
+- [Testing and quality checks](#testing-and-quality-checks)
+- [Deployment](#deployment)
+- [Security and privacy](#security-and-privacy)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Overview
+
+HirePath ATS is a full-stack applicant tracking system built with **Node.js, TypeScript, Express, PostgreSQL, Prisma, and a lightweight browser frontend**. It provides a hiring pipeline for recruiters and admins, from publishing open roles and capturing applications to reviewing candidates and coordinating interviews.
+
+The frontend is served from `public/`; it does not need a separate React or frontend build step. The Express API and browser interface share the same application.
 
 ## Features
-- Auth: scrypt-hashed passwords, HS256 signed tokens (12h), login rate limit, roles (admin can delete, recruiter cannot)
-- Jobs: create roles, close/reopen, applicant counts
-- Candidates: CRUD, rating 1–5, source, skills, role link, server-side search, filters, sort, pagination, CSV export
-- Pipeline: drag-and-drop kanban, optimistic update, undo toast
-- Resume upload (PDF/TXT/MD, 5 MB): text extracted, known skills merged into profile, file stored in Postgres (so any instance can serve it) and downloadable
-- Role match score 0–100 with strengths and gaps. Uses Claude API when `ANTHROPIC_API_KEY` set, else offline keyword engine. Candidate name and protected traits never sent to the model. Result is advisory only
-- Interviewer scorecards: 4 criteria (1–5), recommendation, comment. One review per interviewer per candidate (edit replaces). Average shown in table, sortable
-- Email templates (invite, received, offer, rejection) with merge fields, editable before send. Supports Brevo (shared HirePath sender; verify the sender address in Brevo; without your own domain, Brevo may replace the sender domain with its own sending domain), Plunk, Gmail SMTP, and Resend. When Brevo is selected, all signed-in recruiters send through the configured HirePath sender; the recruiter's personal email is not used as From or Reply-To. Without a working provider, delivery is not completed. Every email is recorded in the timeline. UI asks confirmation before sending.
-- Public careers page at `/careers`: lists open roles, apply form with optional resume and cover note. Applicants land in Applied with source "Careers page", get an acknowledgement email (logged in the timeline), and are rate limited (5 per IP per 10 min), honeypot protected and de-duplicated per role + email (a repeat gets the same success reply, so the form cannot reveal who applied)
-- Realtime board: WebSocket at `/ws`. First message must be `{type:"auth",token}` (5 s deadline, closed when the token expires). Every successful candidate create, update or delete, plus new careers-page applications, is broadcast to all signed-in recruiters; the pipeline, dashboard and candidate list refresh themselves, and a toast announces new candidates. Your own tab ignores its own echo (`x-client` header). Clients reconnect with backoff and resync on reconnect. Works across multiple instances: events go through Postgres `LISTEN/NOTIFY`, so a change made on one instance reaches recruiters connected to any other
-- Privacy: the apply form has a mandatory consent checkbox (stored as `consent_at`). Admins can **anonymise** a candidate (name, email, phone, skills, resume, notes, emails erased; stage history kept so reports stay right). `RETENTION_DAYS=N` anonymises rejected candidates automatically N days after rejection
-- Email outbox: acknowledgement emails are queued in Postgres and sent by a background worker (every 15 s, several instances never double-send), retried with backoff up to 5 times; the outcome lands in the timeline
-- Ops: JSON log line per API call with a request id (`X-Request-Id`, also returned on 500s), graceful shutdown, shared Postgres rate limits, CSP + HSTS
-- Timeline per candidate: stage changes and recruiter notes
-- Dashboard: KPIs, weekly applicants chart, step-conversion funnel, source breakdown, applicants per role, activity feed
-- UX: command palette (Ctrl/Cmd+K), `N` for new candidate, dark/light theme, responsive, reduced-motion aware
 
-## Run
-Needs Node 22.18+ (native TypeScript type stripping) and PostgreSQL 16+ with `pg_trgm` and `vector` extensions available.
+### Hiring workflow
+- **Jobs:** create roles with department, location, description, and open/closed status.
+- **Candidate management:** add, edit, search, filter, sort, paginate, and export candidate records to CSV.
+- **Hiring pipeline:** track candidates through `Applied`, `Screening`, `Interview`, `Offer`, `Hired`, and `Rejected`.
+- **Candidate timeline:** keep stage changes, recruiter notes, scorecards, and email activity together.
+- **Resume handling:** upload PDF, TXT, or Markdown resumes up to 5 MB. Resume text is extracted and known skills can be added to the candidate profile.
+- **Interview scheduling:** store an interview date and duration, then export scheduled interviews as an authenticated iCalendar feed.
 
-    createdb ats
-    export DATABASE_URL=postgresql://user:pass@localhost:5432/ats
-    npm install          # also runs `prisma generate`
-    npm run db:deploy    # apply migrations
-    npm start            # http://localhost:3000, seeds demo data into an empty database (not in production, see below)
-    createdb ats_test && DATABASE_URL=postgresql://user:pass@localhost:5432/ats_test npx prisma migrate deploy
-    TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/ats_test npm test
+### Candidate evaluation
+- **Interview scorecards:** rate Technical, Communication, Problem solving, and Culture add; save a recommendation and evidence-based comments.
+- **Role matching:** get a 0–100 role-match score, summary, strengths, and skill gaps. Uses Anthropic when configured, otherwise a local keyword-based fallback.
+- **Similar-candidate search:** search candidate profiles with pgvector cosine similarity. OpenAI embeddings are optional; without an OpenAI key, HirePath uses deterministic feature hashing. The fallback is lexical similarity, not a trained semantic model.
 
-Tests wipe and reseed the database in `TEST_DATABASE_URL` (default `postgresql://ats:ats@localhost:5432/ats_test`). They ignore `DATABASE_URL` and refuse to run unless the database name ends in `_test`. Changing `prisma/schema.prisma`: `npm run db:migrate -- --name what_changed` creates a new migration.
+### Email and careers page
+- **Email templates:** prepare interview invitations, application acknowledgements, offers, and rejections. Review and edit drafts before sending.
+- **Email providers:** optional integrations for Brevo, Gmail SMTP, Plunk, and Resend are available in the server code. Provider accounts, sender permissions, and environment variables must be configured before delivery will work.
+- **Public careers page:** `/careers` lists open roles and accepts applications without requiring a recruiter account.
+- **Application safeguards:** the public application form requires consent, applies a rate limit, includes a honeypot, and avoids revealing whether a duplicate application already exists.
+- **Email outbox:** application-acknowledgement emails are queued and retried by the worker in long-running Node deployments. Serverless deployments may need a separate scheduled/worker process for queued email processing.
 
-Env: `DATABASE_URL` (required), `SHADOW_DATABASE_URL` (dev only, for `npm run db:migrate`), `PORT`, `JWT_SECRET` (required in production, 16+ chars, e.g. `openssl rand -hex 32`), `TRUST_PROXY` (proxy hops, e.g. `1`; see Deploy), `RETENTION_DAYS` (optional, see Privacy), `SEED_DEMO=1` (force demo data in production), `ADMIN_EMAIL` + `ADMIN_PASSWORD` + `ADMIN_NAME` (create the first admin in an empty production database), `ANTHROPIC_API_KEY` + `ANTHROPIC_MODEL` (optional role matching), `OPENAI_API_KEY` + `EMBEDDING_MODEL` (optional candidate embeddings), `EMAIL_PROVIDER=brevo` + `BREVO_API_KEY` + `BREVO_FROM_EMAIL` + optional `BREVO_FROM_NAME` (Brevo transactional API; verify sender address; a custom domain is needed for a branded From address), `EMAIL_PROVIDER=gmail` + `GMAIL_USER` + `GMAIL_APP_PASSWORD` (Gmail SMTP), `EMAIL_PROVIDER=plunk` + `PLUNK_SECRET_KEY` + `PLUNK_FROM` (Plunk hosted API; the sender domain must be verified in Plunk), `EMAIL_PROVIDER=resend-production` + `RESEND_API_KEY` + `EMAIL_FROM` (Resend production sending; requires a verified sender domain), `WS_HEARTBEAT_MS` (optional session revocation check interval; default 30000 ms), and `APPLY_LIMIT` (optional application rate limit).
+### Operations and security
+- Passwords are stored as scrypt hashes; application API sessions use signed, short-lived tokens.
+- Clerk authentication is supported when both Clerk keys are configured. Without Clerk, the legacy email/password login is available.
+- Request payloads are validated with Zod.
+- Security headers, request IDs, rate limiting, session revocation, and graceful shutdown are implemented.
+- Candidate anonymisation removes personal information and associated derived data while preserving stage history for reporting.
+- PostgreSQL `LISTEN/NOTIFY` distributes candidate changes between application instances in long-running deployments.
 
-## Docker
-    SEED_DEMO=1 JWT_SECRET=$(openssl rand -hex 32) docker compose up --build   # http://localhost:3000, with demo data
-Starts Postgres 16 (volume `pg-data`) and the app, which applies pending migrations on boot. Set `POSTGRES_PASSWORD` for anything beyond local use (avoid URL-special characters in it). CI (`.github/workflows/ci.yml`) runs migrations and tests against a Postgres service, then builds the image.
-Demo logins (only when demo data is seeded, which never happens in production unless `SEED_DEMO=1`): `admin@ats.dev` / `admin123`, `recruiter@ats.dev` / `recruit123`. For a real deployment skip `SEED_DEMO` and set `ADMIN_EMAIL` and `ADMIN_PASSWORD` instead.
+## Technology stack
 
-## Moving from the SQLite version
-    npm run db:deploy
-    npm i --no-save better-sqlite3
-    DATABASE_URL=... npm run db:import-sqlite -- ./ats.db ./uploads
-Copies users, roles, candidates, timelines, scorecards, emails and resume files into Postgres in one transaction, preserving ids. It refuses to run against a non-empty database.
+| Area | Technology |
+|---|---|
+| Runtime | Node.js 22.18+ |
+| API | Express 5, TypeScript |
+| Frontend | Vanilla JavaScript, HTML, CSS |
+| Database | PostgreSQL 16+ |
+| ORM and migrations | Prisma 7 |
+| Input validation | Zod |
+| Realtime updates | WebSocket and PostgreSQL `LISTEN/NOTIFY` |
+| Authentication | Built-in password authentication or optional Clerk |
+| Resume parsing | `pdf-parse` plus text-file parsing |
+| Role matching | Anthropic API (optional) or local keyword matching |
+| Similarity search | pgvector; OpenAI embeddings optional |
+| Email delivery | Brevo, Gmail SMTP, Plunk, or Resend |
+| Testing | Node integration tests, Playwright |
+| Deployment | Vercel configuration and Docker |
 
-## API (all but login need `Authorization: Bearer <token>`)
-| Method | Path | Notes |
-|---|---|---|
-| POST | /api/auth/login | email, password |
-| POST | /api/auth/revoke-all | revoke every current account session; signs out existing HTTP tokens and connected WebSockets |
-| GET | /api/auth/me | current user |
-| GET/POST | /api/jobs | list / create |
-| PUT | /api/jobs/:id | edit, status open/closed |
-| GET | /api/candidates | q, stage, job, source, minRating, sort, dir, page, limit |
-| GET | /api/candidates/export | CSV, same filters |
-| GET/PUT | /api/candidates/:id | detail + events / partial update |
-| POST | /api/candidates | create |
-| PUT | /api/candidates/:id/interview | schedule or clear an interview when stage is Interview |
-| GET | /api/calendar.ics | export scheduled interviews; bearer token required |
-| GET | /api/candidates/semantic-search?q=... | nearest candidates using pgvector cosine similarity |
-| POST | /api/candidates/:id/embedding | rebuild a candidate embedding |
-| POST | /api/candidates/:id/notes | add note |
-| DELETE | /api/candidates/:id | admin only |
-| POST/GET | /api/candidates/:id/resume | upload raw file (header `x-filename`) / download |
-| POST | /api/candidates/:id/match | score candidate against assigned role |
-| POST | /api/candidates/:id/scorecards | upsert caller's review |
-| GET | /api/candidates/:id/email-draft?template= | rendered draft |
-| POST | /api/candidates/:id/email | authenticated user: send through configured shared sender + log |
-| POST | /api/candidates/:id/anonymise | **admin only.** Erase personal data, keep stage history |
-| GET | /api/public/jobs | **no auth.** Open roles, public fields only |
-| POST | /api/public/apply | **no auth.** JSON: job_id, name, email, phone, cover, resume_name, resume_b64 (max 5 MB decoded), `consent: true` (required) |
-| WS | /ws | realtime events: `{type:"candidate", action:"created"/"updated"/"deleted", id, name, src}`, and `{type:"resync"}` after the server's database listener reconnects (clients refetch) |
-| GET | /health | liveness |
-| GET | /api/stats | dashboard analytics |
+## Architecture
 
-## Deploy (Render / Railway / Fly.io)
-Create a managed Postgres, set `DATABASE_URL`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `TRUST_PROXY`, build with `npm install`, start with `npx prisma migrate deploy && npm start`. No persistent disk is needed: resumes live in the database. You can run several instances behind a load balancer. Seeding on first boot is serialised with a Postgres advisory lock. Set `TRUST_PROXY` to the number of proxies in front of the app (usually `1`; `2` for CDN plus load balancer). Without it every visitor shares the proxy's IP, so one person's failed logins lock everyone out and the careers-page limit applies to the whole world. Rate-limit counters live in Postgres, so all instances share them. HSTS is sent on HTTPS requests. Instances stop gracefully on SIGTERM (`/health` returns 503 while draining).
-
-Search uses a `pg_trgm` index created by migration `20261018180000_outbox_consent_search` (`CREATE EXTENSION pg_trgm`; fine on Render, Railway, Neon, Supabase and RDS). Prisma cannot model that expression index, so it lives only in the migration SQL; keep it if you regenerate migrations. `npm run db:migrate` replays all migrations in a shadow database, so the extension must be allowed there too. Set `SHADOW_DATABASE_URL` to an empty scratch database (e.g. `postgresql://ats:ats@localhost:5432/ats_shadow`, which `docker compose up db` creates on a fresh volume with `pg_trgm` enabled). On a managed host, enable `pg_trgm` there or point the variable at a local Postgres. `pg_trgm` is a trusted extension on Postgres 13+, so a plain database owner can create it; older versions need a superuser. Never point `SHADOW_DATABASE_URL` at a database with data: Prisma wipes it.
-
-Realtime limits: events missed while an instance's Postgres connection is down are not replayed. On reconnect the instance tells its browsers to refetch (`resync`). `LISTEN/NOTIFY` does not work through PgBouncer in transaction mode, so point `DATABASE_URL` at a direct connection.
-
-
-## TypeScript, validation, semantic search, calendar and sessions
-
-- **TypeScript source of truth:** the API is implemented in `server.ts`; `server.js` is a compatibility bridge for older scripts. Node 22.18 or newer is required for native TypeScript type stripping. `npm run build` runs the TypeScript checker after dependencies and the Prisma client have been generated.
-- **Zod validation:** request schemas cover login, candidate create/update, job create/update, notes, scorecards, recruiter email, public applications, interview scheduling and semantic search. They reject extra keys and malformed input. Public role IDs may arrive as strings from HTML controls and are normalized to positive PostgreSQL integer IDs.
-- **Playwright and CI:** `npm run test:e2e` checks the public careers experience, authentication boundary and health endpoint. The GitHub Actions workflow installs Chromium, runs the build, applies migrations, runs the PostgreSQL integration suite, executes browser tests and builds the Docker image.
-- **pgvector candidate search:** use **Find similar** on the Candidates screen to rank candidates against a plain-language skills/experience query. A migration installs `vector`, adds a 384-dimensional embedding column and creates an HNSW cosine index. Candidate create/update and public applications trigger asynchronous embedding refresh; the search endpoint indexes older unindexed candidates in batches. With `OPENAI_API_KEY`, HirePath uses `text-embedding-3-small` at 384 dimensions (configurable through `EMBEDDING_MODEL`). Without the key, it uses deterministic local feature hashing. The fallback is lexical feature similarity, not a trained language embedding, so do not interpret it as full semantic understanding.
-- **Interview scheduling/calendar:** move a candidate to the `Interview` stage, save an explicit date/time and duration, then use the interview calendar controls or call `GET /api/calendar.ics`. The feed contains scheduled interviews only, uses the real interview time and duration, and requires a bearer token.
-- **Session revocation:** `POST /api/auth/revoke-all` increments the signed-in user's `token_version`. Existing bearer tokens immediately fail subsequent HTTP requests; established WebSocket sessions close when the configured heartbeat checks the changed version (30 seconds by default). Sign in again to continue. `WS_HEARTBEAT_MS` can tune the heartbeat; it is set to 1000 ms only in integration tests.
-
-### Local setup and test safety
-
-For the easiest local database, use Docker Compose with a PostgreSQL image that includes pgvector:
-
-```bash
-cp .env.example .env
-# Replace the placeholder JWT_SECRET with a unique value, e.g. openssl rand -hex 32
-# SEED_DEMO=1 enables demo users/data; remove it when setting up a non-demo instance
-
-docker compose up --build
+```mermaid
+flowchart TD
+    Browser[Recruiter / Admin Browser] --> Web[Frontend: public/]
+    Web --> API[Express API: server.ts]
+    Applicant[Public Applicant] --> Careers[Careers Page: /careers]
+    Careers --> API
+    API --> Validate[Zod Validation]
+    Validate --> Auth[Authentication and Roles]
+    Auth --> Prisma[Prisma]
+    Prisma --> DB[(PostgreSQL)]
+    API --> Email[Email Provider API / SMTP]
+    API --> Match[Optional Anthropic / OpenAI APIs]
+    API --> Vector[pgvector Similarity Search]
 ```
 
-For manual installation, use Node 22.18+, PostgreSQL 16+ with both `pg_trgm` and `vector` extensions available, and set `DATABASE_URL` before installation/generation:
+## Repository structure
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # Build, database tests, Playwright, Docker build
+├── e2e/
+│   └── smoke.spec.ts              # Browser-level smoke tests
+├── prisma/
+│   ├── migrations/                # Versioned SQL migrations
+│   └── schema.prisma              # PostgreSQL data model
+├── public/
+│   ├── index.html                 # Main ATS interface
+│   └── careers.html               # Public careers and application page
+├── scripts/
+│   ├── db-init.sql                # Local PostgreSQL initialization
+│   ├── import-sqlite.js            # Legacy SQLite data import helper
+│   └── postgenerate.js             # Prisma post-generation helper
+├── src/
+│   ├── runtime.ts                 # Zod request schemas and validation
+│   ├── runtime.js                 # Runtime compatibility file
+│   └── types/
+│       └── express.d.ts           # Express request type extensions
+├── .env.example                   # Example local environment settings
+├── .dockerignore
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── LICENSE
+├── package.json
+├── package-lock.json
+├── playwright.config.ts
+├── prisma.config.ts
+├── README.md
+├── RELEASE_NOTES.md
+├── server.ts                      # Main application/API implementation
+├── server.js                      # Compatibility bridge
+├── test.js                        # Integration tests
+├── tsconfig.json
+└── vercel.json                    # Vercel framework configuration
+```
+
+## Requirements
+
+- **Node.js 22.18 or newer** for native TypeScript type stripping.
+- **PostgreSQL 16 or newer** with `pgvector` and `pg_trgm` available.
+- **Docker and Docker Compose** for the quickest local setup, or a local PostgreSQL installation for manual setup.
+- API credentials only for optional integrations you plan to use (Clerk, Brevo, Gmail SMTP, Plunk, Resend, Anthropic, or OpenAI).
+
+## Quick start with Docker
+
+Docker Compose starts PostgreSQL with pgvector and the HirePath application.
+
+1. Clone the repository and enter it:
+
+   ```bash
+   git clone https://github.com/RICK2814/hirepath-ats.git
+   cd hirepath-ats
+   ```
+
+2. Create a local environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Change `JWT_SECRET` in `.env` to a unique random secret. For example, with Node.js:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+
+4. Start the services:
+
+   ```bash
+   docker compose up --build
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000).
+
+The example environment file enables demo data for local evaluation. The demo accounts are:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@ats.dev` | `admin123` |
+| Recruiter | `recruiter@ats.dev` | `recruit123` |
+
+**Demo credentials are for local development only. Never use them for a public or production deployment.** For a clean local instance without demo data, set `SEED_DEMO=0` and configure the initial account as described below.
+
+To stop the app, press `Ctrl+C`. To stop the containers while preserving the database volume, run `docker compose down`. To delete local database data as well, use `docker compose down -v` (this is destructive).
+
+## Manual local setup
+
+### 1. Prepare PostgreSQL
+
+Create a database and ensure the `pgvector` and `pg_trgm` extensions are available. The migrations use these extensions for vector similarity and candidate searching.
+
+Set `DATABASE_URL` to the database connection string. For example:
+
+```bash
+export DATABASE_URL="postgresql://ats:your-password@localhost:5432/ats"
+```
+
+Use a database role with permission to apply migrations and create the required extensions.
+
+### 2. Install dependencies and generate Prisma Client
 
 ```bash
 npm install
+```
+
+`npm install` runs the Prisma generation step through `postinstall`.
+
+### 3. Apply database migrations
+
+```bash
 npm run db:deploy
-npm run build
+```
+
+### 4. Start the server
+
+For development with automatic restarts:
+
+```bash
+npm run dev
+```
+
+For a normal start:
+
+```bash
 npm start
 ```
 
-Run automated tests only against a disposable test database with a name ending in `_test`:
+The app listens on port `3000` by default. Set `PORT` to change it.
+
+### Initial account
+
+- In a fresh **local development** database, demo data is seeded by default unless `SEED_DEMO=0`.
+- In **production**, leave demo seeding disabled. Set `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` (at least 10 characters) when using the legacy password login so the first admin can be created.
+- If Clerk is enabled, every verified Clerk user can sign in and is a recruiter by default. Set `ADMIN_EMAIL` to the email that should receive the admin role, or grant the role through server-controlled Clerk public metadata. Do not expose admin-role controls to ordinary users.
+
+## Configuration and environment variables
+
+Set environment variables in your deployment platform (for Vercel, use **Project → Settings → Environment Variables**). Never commit real secrets to Git.
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `DATABASE_URL` | Yes | PostgreSQL connection string. Use a database with `pgvector` and `pg_trgm` enabled. |
+| `JWT_SECRET` | Yes in production | Unique signing secret, at least 16 characters. A random 32-byte secret is recommended. |
+| `PORT` | No | HTTP port; defaults to `3000`. |
+| `ADMIN_EMAIL` | For initial admin / admin override | Initial administrator for legacy login; with Clerk, can designate the admin email. |
+| `ADMIN_PASSWORD` | Legacy login only | Initial admin password; minimum 10 characters. Do not set a demo password in production. |
+| `ADMIN_NAME` | No | Name for the initial admin account. |
+| `SEED_DEMO` | No | `1` seeds demo records; `0` disables demo seeding. Keep demo seeding off in production. |
+| `CLERK_PUBLISHABLE_KEY` | Optional | Enables Clerk when used with the secret key. |
+| `CLERK_SECRET_KEY` | Optional | Server-side Clerk key. Keep it secret. |
+| `TRUST_PROXY` | Deployment-specific | Express proxy trust setting when behind a known proxy. Configure only for the actual proxy topology. |
+| `RETENTION_DAYS` | No | Anonymise rejected candidates after the specified number of days. |
+| `APPLY_LIMIT` | No | Public-application rate limit per IP in the 10-minute window; defaults to `5`. |
+| `WS_HEARTBEAT_MS` | No | WebSocket heartbeat/session-revocation interval; defaults to `30000` ms. |
+| `SHADOW_DATABASE_URL` | Dev/migrations only | Optional empty scratch database for `prisma migrate dev`. Never point it at a database with valuable data. |
+| `ANTHROPIC_API_KEY` | Optional | Enables Anthropic-assisted role matching. |
+| `ANTHROPIC_MODEL` | No | Overrides the Anthropic model name used by the role-matching code. |
+| `OPENAI_API_KEY` | Optional | Enables OpenAI embeddings for similarity search. |
+| `EMBEDDING_MODEL` | No | Overrides the default OpenAI embedding model (`text-embedding-3-small`). |
+| `EMAIL_PROVIDER` | For selecting a provider | Selects the configured email provider; see [Email provider setup](#email-provider-setup). |
+| `BREVO_API_KEY` | Brevo | Server-side Brevo API key. |
+| `BREVO_FROM_EMAIL` | Brevo | Sender address configured in Brevo. |
+| `BREVO_FROM_NAME` | No | Display name for the Brevo sender; defaults to `HirePath ATS`. |
+| `GMAIL_USER` | Gmail SMTP | Gmail mailbox used for SMTP delivery. |
+| `GMAIL_APP_PASSWORD` | Gmail SMTP | Google App Password for that mailbox, not its normal login password. |
+| `PLUNK_SECRET_KEY` | Plunk | Plunk API secret. |
+| `PLUNK_FROM` | Plunk | Sender address on a domain verified in Plunk. |
+| `RESEND_API_KEY` | Resend | Resend API key. |
+| `EMAIL_FROM` | Resend production | Sender formatted as `Name <sender@your-verified-domain.com>`. |
+
+For deployments using Clerk, set **both** Clerk keys. For local password-based login, leave them unset.
+
+## Email provider setup
+
+HirePath calls its email provider from the **server**. Keep API keys, SMTP passwords, and provider credentials in server-side environment variables only.
+
+### Brevo (shared HirePath sender)
+
+Set:
+
+```dotenv
+EMAIL_PROVIDER=brevo
+BREVO_API_KEY=your_brevo_api_key
+BREVO_FROM_EMAIL=your_verified_sender@example.com
+BREVO_FROM_NAME=HirePath ATS
+```
+
+1. Create an API key in the Brevo dashboard under **SMTP & API → API Keys & MCP**.
+2. Add and verify the sender address in Brevo.
+3. Add the four variables above to the deployment environment (for Vercel, select the Production environment), then redeploy.
+4. Send a test message to an address you control before contacting candidates.
+
+**Sender/domain limitation:** verifying a Yahoo/Gmail sender address does not authenticate that provider's domain. Brevo may reject the message, alter the visible sender domain, or require domain authentication depending on its current account and sending policies. A verified sender address is not a substitute for authenticating a domain you control. For a consistent branded sender such as `notifications@yourdomain.com`, configure a domain and complete Brevo's DNS authentication steps.
+
+### Gmail SMTP
+
+Set:
+
+```dotenv
+EMAIL_PROVIDER=gmail
+GMAIL_USER=your_hiring_mailbox@gmail.com
+GMAIL_APP_PASSWORD=your_google_app_password
+```
+
+Create a Google App Password for a dedicated hiring mailbox. Do not use the mailbox's normal password. Email will be sent through this mailbox; use a dedicated account if the system is shared by multiple recruiters. Gmail has sending limits and is not intended for bulk email.
+
+### Plunk
+
+Set:
+
+```dotenv
+EMAIL_PROVIDER=plunk
+PLUNK_SECRET_KEY=your_plunk_secret_key
+PLUNK_FROM=notifications@your-verified-domain.com
+```
+
+The sender domain must be verified in Plunk. Open-source/self-hosted software and the hosted email service have different hosting and account requirements.
+
+### Resend
+
+For production sending:
+
+```dotenv
+EMAIL_PROVIDER=resend-production
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=HirePath ATS <sender@your-verified-domain.com>
+```
+
+Production sending requires a sender domain verified in Resend.
+
+When `RESEND_API_KEY` is configured and `EMAIL_PROVIDER` is **not** `resend-production`, the current code uses Resend's shared test sender (`onboarding@resend.dev`). Treat this as test-only: Resend's test sender is restricted and should not be used to email arbitrary candidate addresses in production.
+
+### General email troubleshooting
+
+- Confirm `EMAIL_PROVIDER` matches the provider you intend to use.
+- Check that all required variables are present in the **Production** environment, with no leading/trailing spaces.
+- After changing environment variables in Vercel, redeploy the application.
+- Verify the sender with the provider and review any sender/domain warnings in its dashboard.
+- Check the response/error in HirePath and the provider's activity/logs. A successful API response means the provider accepted the message; it does not guarantee inbox placement.
+- Do not publish API keys or share them in screenshots, issues, or chat.
+
+## Authentication and roles
+
+### Authentication options
+
+- **Clerk:** enabled when both `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are present. HirePath requires the primary Clerk email to be verified before exchanging the Clerk session for an internal HirePath API token.
+- **Legacy login:** email/password login using scrypt password hashes when Clerk is not enabled.
+- Internal API calls use a short-lived signed bearer token. The token expires after 12 hours.
+
+### Roles
+
+- **Admin:** can delete candidates and anonymise candidate records; can administer the initial admin setup.
+- **Recruiter:** can manage hiring work and use the candidate email workflow, but cannot perform admin-only delete/anonymise actions.
+- New Clerk users default to recruiter. An admin is assigned through the configured `ADMIN_EMAIL` override or server-controlled Clerk public metadata. Users must not be able to edit their own public metadata to grant themselves admin privileges.
+
+All authenticated API endpoints require the HirePath bearer token unless explicitly identified as public or part of the Clerk/legacy login flow.
+
+## Database and migrations
+
+Prisma's schema is in `prisma/schema.prisma`; versioned SQL migrations are in `prisma/migrations/`.
+
+Apply already-created migrations:
 
 ```bash
-TEST_DATABASE_URL='postgresql://ats:ats@localhost:5432/ats_test' npm test
+npm run db:deploy
+```
+
+Create a migration during development:
+
+```bash
+npm run db:migrate -- --name describe_your_change
+```
+
+`prisma migrate dev` may use `SHADOW_DATABASE_URL`. Point it only at an empty scratch database, because Prisma may reset the shadow database. Production deployments should apply reviewed migrations with `prisma migrate deploy`, not `prisma migrate dev`.
+
+The application relies on PostgreSQL extensions including `pg_trgm` and `vector`. Confirm they are available on your provider before applying migrations. Some hosted Postgres providers require enabling pgvector in their dashboard. For features using `LISTEN/NOTIFY`, use a database connection mode that supports it; transaction-mode poolers do not support the listener semantics used by the realtime implementation.
+
+## API reference
+
+Except for login, Clerk session exchange, and public endpoints, requests require:
+
+```http
+Authorization: Bearer <hirepath-token>
+```
+
+### Health and authentication
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/health` | Public | Liveness check |
+| `GET` | `/api/auth/config` | Public | Frontend authentication configuration |
+| `POST` | `/api/auth/login` | Public when Clerk is disabled | Legacy email/password login |
+| `POST` | `/api/auth/clerk` | Clerk session required | Exchange verified Clerk identity for a HirePath token |
+| `GET` | `/api/auth/me` | Authenticated | Current user |
+| `POST` | `/api/auth/revoke-all` | Authenticated | Revoke existing sessions for the current account |
+
+### Jobs and candidates
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET`, `POST` | `/api/jobs` | Authenticated | List or create jobs |
+| `PUT` | `/api/jobs/:id` | Authenticated | Update job details or open/closed status |
+| `GET` | `/api/candidates` | Authenticated | Search, filter, sort, and paginate candidates |
+| `POST` | `/api/candidates` | Authenticated | Create candidate |
+| `GET`, `PUT` | `/api/candidates/:id` | Authenticated | Read or update candidate |
+| `DELETE` | `/api/candidates/:id` | Admin | Delete candidate and related history |
+| `POST` | `/api/candidates/:id/anonymise` | Admin | Erase personal information and preserve stage history |
+| `GET` | `/api/candidates/export` | Authenticated | Export filtered candidates as CSV |
+| `POST` | `/api/candidates/:id/notes` | Authenticated | Add a timeline note |
+| `POST` | `/api/candidates/:id/resume` | Authenticated | Upload PDF, TXT, or Markdown resume (max 5 MB) |
+| `GET` | `/api/candidates/:id/resume` | Authenticated | Download stored resume |
+| `POST` | `/api/candidates/:id/match` | Authenticated | Recalculate role match |
+| `POST` | `/api/candidates/:id/scorecards` | Authenticated | Create or update caller's interview scorecard |
+| `GET` | `/api/candidates/:id/email-draft?template=` | Authenticated | Render an email template |
+| `POST` | `/api/candidates/:id/email` | Authenticated | Send and log an email through the selected provider |
+| `PUT` | `/api/candidates/:id/interview` | Authenticated | Schedule or clear an interview |
+| `POST` | `/api/candidates/:id/embedding` | Authenticated | Rebuild a candidate embedding |
+| `GET` | `/api/candidates/semantic-search?q=...` | Authenticated | Find similar candidates |
+| `GET` | `/api/calendar.ics` | Authenticated | Export scheduled interviews as iCalendar |
+| `GET` | `/api/stats` | Authenticated | Dashboard analytics |
+
+### Public careers page
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/careers` | Public | Public open-roles and application page |
+| `GET` | `/api/public/jobs` | Public | List open roles with public fields |
+| `POST` | `/api/public/apply` | Public | Submit an application with required consent |
+
+### Realtime
+
+| Protocol | Endpoint | Access | Description |
+|---|---|---|---|
+| WebSocket | `/ws` | Authenticated token handshake | Broadcast candidate changes in long-running Node deployments |
+
+API request payloads are validated server-side; see `src/runtime.ts` for the Zod schemas and accepted fields.
+
+## Testing and quality checks
+
+### Type-check
+
+```bash
+npm run build
+```
+
+### Integration tests
+
+Set `TEST_DATABASE_URL` to a **disposable** PostgreSQL database whose name ends in `_test`. The test suite resets its tables and refuses to run if the database name does not end in `_test`.
+
+```bash
+export TEST_DATABASE_URL="postgresql://ats:your-password@localhost:5432/ats_test"
+npx prisma migrate deploy
+npm test
+```
+
+Do not point `TEST_DATABASE_URL` at production or a database containing valuable data.
+
+### Browser smoke tests
+
+Start the app with a configured test database and migrations applied, install the Playwright browser, then run:
+
+```bash
+npx playwright install chromium
 npm run test:e2e
 ```
 
-The integration suite resets and reseeds every table in `TEST_DATABASE_URL`; it refuses database names that do not end with `_test`. Do not point it at production or at a database containing valuable data. The browser suite assumes the application is already running and `BASE_URL` can be set to test another local URL.
+Set `BASE_URL` if the app under test is not at `http://127.0.0.1:3000`.
 
-`CREATE EXTENSION vector` requires a PostgreSQL server/image with pgvector installed and a database role allowed to create the extension. Managed database providers may require enabling pgvector in their dashboard. `pg_trgm` is used by the existing candidate search index and also needs to be available when migrations run.
+### Continuous integration
 
-### Verification note
+The GitHub Actions workflow in `.github/workflows/ci.yml` runs the TypeScript build, migrations, integration tests, Playwright smoke tests, and Docker image build against a PostgreSQL service with pgvector. Check the Actions tab for the current result; this README does not imply that the latest workflow has passed.
 
-A full verification requires a successful dependency install (`npm install`), a running PostgreSQL instance with pgvector/pg_trgm, and a browser runtime for Playwright. The editing environment used to prepare this archive could not reach `registry.npmjs.org` (`EAI_AGAIN`), and it did not provide Docker or PostgreSQL. The incoming lockfile did not include all newly added development tools, so the setup and CI use `npm install` to reconcile it. Source-level syntax checks were run, but dependency-backed build, migrations, integration suite, Playwright suite and Docker image build could not be executed in this environment. CI is configured to run those checks on a network-enabled runner; do not mark the project production-verified until that pipeline passes.
+## Deployment
+
+### Vercel
+
+The repository includes `vercel.json` and a `vercel-build` script.
+
+1. Import the repository into Vercel and select the `main` branch.
+2. Create a PostgreSQL database with the required extensions.
+3. Add production environment variables, at minimum `DATABASE_URL` and a strong `JWT_SECRET`. Configure `ADMIN_EMAIL` and authentication settings for the chosen login method.
+4. Apply the Prisma migrations to the target database using `npm run db:deploy` with the production `DATABASE_URL` configured in a secure environment.
+5. Configure email and optional AI provider variables only if using those integrations.
+6. Redeploy after changing environment variables.
+
+**Serverless note:** long-lived background workers and persistent WebSocket connections may require a separate worker or a long-running Node host. Confirm these capabilities for your chosen deployment platform rather than assuming every process-level worker can run inside a serverless function.
+
+### Docker / long-running Node host
+
+The Docker image applies pending Prisma migrations on boot and then starts the Node server. For a production deployment, provide a managed PostgreSQL database, unique secrets, a real admin account, and the correct `TRUST_PROXY` value for the actual proxy chain. Do not enable demo data in production.
+
+The application stores resumes in PostgreSQL, so no local persistent upload directory is required.
+
+## Security and privacy
+
+- Keep `.env`, API keys, OAuth secrets, database URLs, and SMTP passwords out of Git.
+- Use a unique `JWT_SECRET` in production; do not reuse the example placeholder.
+- Disable demo seeding in production and replace all sample credentials.
+- Restrict administrative access and do not allow users to grant themselves admin roles.
+- Use HTTPS in production.
+- Verify candidate consent and applicable privacy/legal requirements before collecting resumes or other personal data.
+- Use the anonymisation workflow when personal information should be removed; ordinary candidate deletion is destructive.
+- Protect test databases separately from production data.
+
+## Troubleshooting
+
+| Problem | Checks |
+|---|---|
+| App fails at startup with `DATABASE_URL is required` | Add a valid PostgreSQL connection string to the environment. |
+| Migration fails for `vector` or `pg_trgm` | Enable the required extension(s) on the PostgreSQL server and rerun reviewed migrations. |
+| Production reports `JWT_SECRET` is too short | Set a unique secret of at least 16 characters; a random 32-byte secret is recommended. |
+| Clerk login is unavailable | Confirm both `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are set, then redeploy. |
+| Candidate email is not sent | Confirm `EMAIL_PROVIDER`, its required credentials, the verified sender, provider account status, and current provider logs. |
+| Brevo rejects email or changes the sender | A verified Yahoo/Gmail address does not prove domain authentication. Review Brevo's sender and domain requirements; use a domain you control for a stable branded From address. |
+| Resend only allows test recipients | `onboarding@resend.dev` is a test sender. Configure a verified production sender and use `EMAIL_PROVIDER=resend-production` for production mode. |
+| Public application acknowledgement stays queued | Ensure the outbox worker is running; on serverless platforms, configure a separate scheduled/long-running worker if needed. |
+| Playwright cannot reach the app | Start the app, apply migrations, and confirm `BASE_URL` points to the running server. |
+| Realtime events are missing across instances | Check whether the hosting platform supports persistent WebSockets and whether the database connection supports PostgreSQL `LISTEN/NOTIFY`. |
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository and create a feature branch.
+2. Keep changes focused and update tests or documentation where appropriate.
+3. Run `npm run build`, the integration tests, and browser smoke tests when your local environment supports them.
+4. Open a pull request describing the change and the checks you ran.
+
+Do not include real secrets, personal candidate data, or production database dumps in issues or pull requests.
+
+## License
+
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for the full text.
