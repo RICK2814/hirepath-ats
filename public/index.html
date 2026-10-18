@@ -11,9 +11,9 @@
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}}
 :root[data-theme=dark]{--bg:#0b1013;--surf:#131b1f;--ink:#e8f0f0;--mute:#8fa1a5;--line:#243138;--soft:#1b262c;--acc:#3cc4cf;--acc-ink:#06161a;--amb:#f0b852;--bad:#ff8a7a;color-scheme:dark}
-*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:auto;overscroll-behavior-y:contain;overflow-anchor:none}
+*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:24px;scroll-behavior:auto;overscroll-behavior-y:auto;overflow-anchor:auto}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
-body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y;overflow-anchor:none}
+body.login-page-active{overscroll-behavior-y:auto;touch-action:pan-y;overflow-anchor:auto}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
@@ -327,7 +327,7 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(6){animation-delay:175ms}
 
 /* HirePath premium glass layer: calm surfaces, editorial typography, subtle live accents. */
 :root{--sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--ease-premium:cubic-bezier(.22,.8,.25,1)}
-html{scroll-behavior:smooth;scroll-padding-top:24px}
+html{scroll-behavior:smooth;scroll-padding-top:24px;overscroll-behavior-y:auto;overflow-anchor:auto}
 body{font-family:var(--sans);letter-spacing:-.012em}
 body.login-page-active{overflow-x:clip;overflow-y:auto;overscroll-behavior-y:auto;touch-action:pan-y;min-height:100vh}
 .login-shell{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}
@@ -380,15 +380,9 @@ body:not(.login-page-active) .kpis>.kpi:nth-child(3):after{animation-delay:2s}
 body:not(.login-page-active) .kpis>.kpi:nth-child(4):after{animation-delay:3s}
 body:not(.login-page-active) .kpis>.kpi:nth-child(5):after{animation-delay:4s}
 body:not(.login-page-active) .kpis>.kpi:nth-child(6):after{animation-delay:5s}
-body:not(.login-page-active) #main>.card,
-body:not(.login-page-active) #main>.grid,
-body:not(.login-page-active) #main>.kpis,
-body:not(.login-page-active) #main>.tools,
-body:not(.login-page-active) #main>.tbl,
-body:not(.login-page-active) #main>.board,
-body:not(.login-page-active) #main>.jobs,
-body:not(.login-page-active) #main>.chips{animation:premiumSectionIn .42s var(--ease-premium) both}
-body:not(.login-page-active) .kc{box-shadow:0 6px 16px -14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.48);border-color:color-mix(in srgb,var(--line) 80%,var(--acc) 20%)}
+body:not(.login-page-active) #main>:not(.board):not(.job-detail-overlay){animation:premiumSectionIn .36s ease both}
+body:not(.login-page-active) .col{background-image:linear-gradient(135deg,color-mix(in srgb,var(--soft) 92%,var(--acc) 8%),var(--soft) 70%)}
+body:not(.login-page-active) .kc{background-image:linear-gradient(135deg,color-mix(in srgb,var(--surf) 96%,var(--acc) 4%),var(--surf) 70%);transition:border-color .2s ease,box-shadow .2s ease;box-shadow:0 6px 16px -14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.48);border-color:color-mix(in srgb,var(--line) 80%,var(--acc) 20%)}
 body:not(.login-page-active) .kc:hover{border-color:var(--acc)}
 body:not(.login-page-active) .col.over{outline:2px dashed var(--acc);outline-offset:2px;background:color-mix(in srgb,var(--soft) 86%,var(--acc) 14%)}
 body:not(.login-page-active) .job{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -400,7 +394,7 @@ body:not(.login-page-active) .btn.pri{box-shadow:0 8px 20px -13px color-mix(in s
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .login-info-card:after,.login-why-point:after,body:not(.login-page-active) .kpi:after{animation:none!important}
-  body:not(.login-page-active) #main>.card,body:not(.login-page-active) #main>.grid,body:not(.login-page-active) #main>.kpis,body:not(.login-page-active) #main>.tools,body:not(.login-page-active) #main>.tbl,body:not(.login-page-active) #main>.board,body:not(.login-page-active) #main>.jobs,body:not(.login-page-active) #main>.chips{animation:none!important}
+  body:not(.login-page-active) #main>:not(.board):not(.job-detail-overlay){animation:none!important}
 }
 
 </style></head><body>
