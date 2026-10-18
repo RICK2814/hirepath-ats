@@ -5,6 +5,17 @@ const { WebSocketServer } = require("ws");
 const { Client: PgClient } = require("pg");
 const { Prisma, PrismaClient } = require("@prisma/client");
 const { PrismaPg } = require("@prisma/adapter-pg");
+const CLERK_PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || "";
+const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY || "";
+const CLERK_ENABLED = Boolean(CLERK_PUBLISHABLE_KEY && CLERK_SECRET_KEY);
+const CLERK_FRONTEND_HOST = (() => {
+  try {
+    const encoded = CLERK_PUBLISHABLE_KEY.split("_")[2];
+    const decoded = Buffer.from(encoded || "", "base64").toString("utf8").replace(/\\$/, "");
+    return /^[a-z0-9.-]+$/i.test(decoded) ? decoded : "";
+  } catch { return ""; }
+})();
+const clerkSdk = CLERK_ENABLED ? require("@clerk/express") : null;
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 const { loginSchema, candidateCreateSchema, candidateUpdateSchema, jobCreateSchema, jobUpdateSchema, noteSchema, scorecardSchema, emailSendSchema, publicApplicationSchema, interviewScheduleSchema, semanticSearchSchema, parseOrThrow } = require("./src/runtime.js");
 
@@ -46,8 +57,9 @@ const bootstrapAdmin = () => prisma.$transaction(async tx => {
   await tx.$queryRaw`SELECT pg_advisory_xact_lock(727274)::text`;
   if (await tx.user.count()) return;
   const email = str(process.env.ADMIN_EMAIL).toLowerCase(), pw = process.env.ADMIN_PASSWORD || "";
-  if (!email || pw.length < 10) throw Object.assign(new Error("No admin account exists. Set ADMIN_EMAIL and ADMIN_PASSWORD (minimum 10 characters) in Vercel Production environment variables."), { status: 503 });
-  await tx.user.create({ data: { email, name: str(process.env.ADMIN_NAME) || "Admin", pass: hashPw(pw), role: "admin" } });
+  if (!email || (!CLERK_ENABLED && pw.length < 10)) throw Object.assign(new Error("No admin account exists. Set ADMIN_EMAIL and " + (CLERK_ENABLED ? "CLERK_PUBLISHABLE_KEY + CLERK_SECRET_KEY" : "ADMIN_PASSWORD (minimum 10 characters)") + " in Vercel Production environment variables."), { status: 503 });
+  // Clerk owns sign-in when enabled, so the local-only password is a random unusable secret.
+  await tx.user.create({ data: { email, name: str(process.env.ADMIN_NAME) || "Admin", pass: hashPw(pw.length >= 10 ? pw : crypto.randomBytes(48).toString("hex")), role: "admin" } });
   console.log("Created first admin " + email);
 }, { timeout: 60000, maxWait: 60000 });
 const initData = () => (demoAllowed() ? seed() : bootstrapAdmin());
@@ -146,8 +158,12 @@ type HirePathApp = import("express").Express & {
 };
 const app = express() as HirePathApp;
 
+// Clerk middleware validates Clerk session JWTs. HirePath then exchanges a validated
+// Clerk identity for its existing short-lived API token, preserving the app's DB role checks.
+if (CLERK_ENABLED) app.use(clerkSdk.clerkMiddleware());
+
 // Vercel imports the Express app as a module, so the require.main startup block below
-// does not run there. Initialize the production database/admin once before serving requests.
+// does not run there. Initialize the production database/admin lazily when needed.
 let initializationPromise: Promise<unknown> | undefined;
 const ensureInitialized = (): Promise<unknown> => {
   if (!initializationPromise) {
@@ -158,9 +174,8 @@ const ensureInitialized = (): Promise<unknown> => {
   }
   return initializationPromise;
 };
-if (process.env.VERCEL_ENV === "production") {
-  // Serve public pages and public APIs even if first-admin setup is incomplete.
-  // Bootstrap the first account immediately before the first login request only.
+if (process.env.VERCEL_ENV === "production" && !CLERK_ENABLED) {
+  // The legacy password login bootstraps its initial admin before handling sign-in.
   app.use((req, _res, next) => {
     if (req.method !== "POST" || req.path !== "/api/auth/login") return next();
     ensureInitialized().then(() => next(), (error) => next(error));
@@ -181,8 +196,9 @@ const scriptHashes = publicFiles.filter(f => f.endsWith(".html"))
   .map(m => "'sha256-" + crypto.createHash("sha256").update(m[1]).digest("base64") + "'").join(" ");
 app.use((req, res, next) => {
   const host = /^[\w.\-:[\]]+$/.test(req.get("host") || "") ? req.get("host") : "";
+  const clerkOrigin = CLERK_ENABLED && CLERK_FRONTEND_HOST ? " https://" + CLERK_FRONTEND_HOST : "";
   res.set({ "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer",
-    "Content-Security-Policy": `default-src 'self'; script-src 'self' ${scriptHashes}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ws://${host} wss://${host}; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'` });
+    "Content-Security-Policy": `default-src 'self'; script-src 'self' ${scriptHashes}${clerkOrigin}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com${clerkOrigin}; font-src https://fonts.gstatic.com${clerkOrigin}; img-src 'self' data:${clerkOrigin}; connect-src 'self' ws://${host} wss://${host}${clerkOrigin}; frame-src 'self' https://accounts.google.com${clerkOrigin}; object-src 'none'; base-uri 'none'; form-action 'self'${clerkOrigin}; frame-ancestors 'none'` });
   if (req.secure) res.set("Strict-Transport-Security", "max-age=15552000; includeSubDomains");
   next();
 });
@@ -213,7 +229,59 @@ const hit = async (key, windowMs) => { const [r] = await prisma.$queryRaw`INSERT
   ON CONFLICT (key) DO UPDATE SET n = CASE WHEN r.reset_at <= now() THEN 1 ELSE r.n + 1 END, reset_at = CASE WHEN r.reset_at <= now() THEN EXCLUDED.reset_at ELSE r.reset_at END RETURNING n`; return r.n; };
 const peek = async key => { const [r] = await prisma.$queryRaw`SELECT n FROM rate_limits WHERE key = ${key} AND reset_at > now()`; return r ? r.n : 0; };
 const pruneLimits = () => prisma.$executeRaw`DELETE FROM rate_limits WHERE reset_at <= now()`.catch(e => console.error("rate limit prune failed:", e.message));
+app.get("/api/auth/config", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({
+    provider: CLERK_ENABLED ? "clerk" : "password",
+    publishableKey: CLERK_ENABLED ? CLERK_PUBLISHABLE_KEY : null,
+    clerkPartiallyConfigured: Boolean(CLERK_PUBLISHABLE_KEY || CLERK_SECRET_KEY) && !CLERK_ENABLED
+  });
+});
+
+app.post("/api/auth/clerk", async (req, res) => {
+  if (!CLERK_ENABLED) throw fail(503, "Clerk authentication is not configured yet.");
+  const authState = clerkSdk.getAuth(req);
+  if (!authState.isAuthenticated || !authState.userId) throw fail(401, "Please sign in with Clerk.");
+  await ensureInitialized();
+
+  const clerkUser = await clerkSdk.clerkClient.users.getUser(authState.userId);
+  const primary = (clerkUser.emailAddresses || []).find(x => x.id === clerkUser.primaryEmailAddressId);
+  const email = str(primary?.emailAddress, 254).toLowerCase();
+  if (!email || primary?.verification?.status !== "verified") throw fail(403, "A verified primary email address is required.");
+
+  const configuredAdmin = str(process.env.ADMIN_EMAIL, 254).toLowerCase();
+  let localUser = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, role: true, token_version: true } });
+  if (localUser && email === configuredAdmin && localUser.role !== "admin") {
+    localUser = await prisma.user.update({ where: { id: localUser.id }, data: { role: "admin" }, select: { id: true, email: true, name: true, role: true, token_version: true } });
+  }
+  if (!localUser) {
+    const requestedRole = email === configuredAdmin ? "admin" : clerkUser.publicMetadata?.role;
+    if (requestedRole !== "admin" && requestedRole !== "recruiter") {
+      throw fail(403, "Your Clerk account is not approved for HirePath yet. Ask the admin to set public metadata role to \"recruiter\" in Clerk Dashboard.");
+    }
+    const fullName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim();
+    try {
+      localUser = await prisma.user.create({
+        data: {
+          email,
+          name: str(fullName || clerkUser.username || email.split("@")[0]) || "HirePath user",
+          pass: hashPw(crypto.randomBytes(48).toString("hex")),
+          role: requestedRole
+        },
+        select: { id: true, email: true, name: true, role: true, token_version: true }
+      });
+    } catch (error) {
+      if (error?.code !== "P2002") throw error;
+      localUser = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, role: true, token_version: true } });
+    }
+    if (!localUser) throw fail(500, "Could not create the local HirePath profile.");
+  }
+  res.set("Cache-Control", "no-store");
+  res.json({ token: sign(localUser), user: { id: localUser.id, email: localUser.email, name: localUser.name, role: localUser.role } });
+});
+
 app.post("/api/auth/login", async (req, res) => {
+  if (CLERK_ENABLED) throw fail(410, "Password sign-in is disabled. Please use Clerk authentication.");
   const key = "login:" + req.ip;
   if ((await peek(key)) >= 8) throw fail(429, "Too many attempts. Try again in a minute.");
   const credentials = parseOrThrow(loginSchema, req.body);
