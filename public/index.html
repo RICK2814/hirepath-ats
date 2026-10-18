@@ -342,7 +342,7 @@ function renderPasswordLogin(config, initialError="") {
     <p class="mut" style="font-size:12px;margin:15px 0 0;text-align:center">Use the account provided by your HirePath administrator.</p></form>
     <div class="login-security-note"><span class="login-security-shield">✓</span><span>Secure sign-in · Your workspace stays protected</span></div>
   </section>`;
-  $("#root").innerHTML=loginFrameMarkup(auth);
+  loginFrameMarkup(auth);
   $("#lf").onsubmit=async e=>{e.preventDefault();try{const r=await api("/auth/login",{method:"POST",body:{email:$("#em").value,password:$("#pw").value}});S.token=r.token;S.user=r.user;ls.set("ats_token",r.token);await boot()}catch(x){$("#er").textContent=x.message}};
 }
 function showClerkError(message, signedIn=false) {
@@ -379,7 +379,7 @@ async function loginView(initialError="") {
     <div class="err" id="clerk-auth-error" role="alert">${esc(initialError)}</div><button class="btn" id="clerk-signout" type="button" style="display:none">Sign out of Clerk</button>
     <div class="login-security-note"><span class="login-security-shield">✓</span><span>Enterprise-grade authentication and security</span></div>
   </section>`;
-  $("#root").innerHTML=loginFrameMarkup(auth);
+  loginFrameMarkup(auth);
   try {
     const clerk=await loadClerk(config.publishableKey);
     if(!clerkListenerBound && typeof clerk.addListener==="function") {
