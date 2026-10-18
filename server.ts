@@ -407,14 +407,17 @@ async function processEmails(limit = 5) {
 async function deliver(to: string, subject: string, body: string, replyTo = ""): Promise<{ state: "sent" | "failed" | "simulated"; err?: string }> {
   const gmailUser = str(process.env.GMAIL_USER, 254).toLowerCase();
   const gmailAppPassword = (process.env.GMAIL_APP_PASSWORD || "").replace(/\s+/g, "");
-  const from = str(process.env.EMAIL_FROM, 254);
 
-  // Free Gmail delivery path: use a Google-generated App Password, never the normal
-  // Google account password. This is separate from Clerk's Google sign-in.
-  if (gmailUser && gmailAppPassword) {
+  // Gmail SMTP is the default low-cost sender. Always use the authenticated Gmail
+  // address as From; never inherit an invalid/stale Resend EMAIL_FROM value.
+  if (gmailUser || gmailAppPassword) {
+    if (!gmailUser || !gmailAppPassword) {
+      return { state: "failed", err: "Gmail sending is only partially configured. Set both GMAIL_USER and GMAIL_APP_PASSWORD in Vercel Production, then redeploy." };
+    }
+    let transporter: any;
     try {
       const nodemailer = require("nodemailer");
-      const transporter = nodemailer.createTransport({
+      transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
         secure: true,
@@ -424,31 +427,40 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
         socketTimeout: 15000
       });
       await transporter.sendMail({
-        from: from || `HirePath ATS <${gmailUser}>`,
+        from: `HirePath ATS <${gmailUser}>`,
         to,
         subject,
         text: body,
         ...(replyTo ? { replyTo } : {})
       });
-      transporter.close();
       return { state: "sent" };
     } catch (e) {
+      const error = e as any;
       const message = e instanceof Error ? e.message : "Unknown Gmail delivery error";
-      console.error("Gmail delivery failed", JSON.stringify({ code: (e as any)?.code || null, message: message.slice(0, 300) }));
+      console.error("Gmail delivery failed", JSON.stringify({ code: error?.code || null, responseCode: error?.responseCode || null, message: message.slice(0, 300) }));
       return { state: "failed", err: "Gmail delivery failed: " + message.slice(0, 300) };
+    } finally {
+      transporter?.close();
     }
   }
 
-  // Keep Resend available as an alternative if Gmail SMTP is not configured.
-  if (!process.env.RESEND_API_KEY) {
-    return { state: "simulated", err: "Email provider is not configured. Set GMAIL_USER + GMAIL_APP_PASSWORD for free Gmail delivery, or configure Resend." };
+  // Resend is an explicit opt-in only. Otherwise tell the owner how to enable
+  // free Gmail sending rather than attempting a malformed or unverified sender.
+  if (process.env.EMAIL_PROVIDER !== "resend") {
+    return { state: "failed", err: "Free Gmail sender is not configured yet. In Vercel Production add GMAIL_USER (your Gmail address) and GMAIL_APP_PASSWORD (a Google App Password), then redeploy." };
   }
-  if (!from && process.env.NODE_ENV === "production") {
-    return { state: "failed", err: "EMAIL_FROM is not configured. Use an address on your verified Resend domain." };
+  if (!process.env.RESEND_API_KEY) return { state: "failed", err: "EMAIL_PROVIDER=resend requires RESEND_API_KEY." };
+  const from = str(process.env.EMAIL_FROM, 254);
+  if (!from || !/^(?:[^<>]*<)?[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>?$/.test(from)) {
+    return { state: "failed", err: "Invalid EMAIL_FROM. Use sender format: Name <verified-address@your-domain.com>." };
   }
   try {
-    const r = await fetch("https://api.resend.com/emails", { method: "POST", signal: AbortSignal.timeout(15000), headers: { Authorization: "Bearer " + process.env.RESEND_API_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ from: from || "Hirepath <onboarding@resend.dev>", to: [to], subject, text: body, ...(replyTo ? { reply_to: replyTo } : {}) }) });
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      signal: AbortSignal.timeout(15000),
+      headers: { Authorization: "Bearer " + process.env.RESEND_API_KEY, "content-type": "application/json" },
+      body: JSON.stringify({ from, to: [to], subject, text: body, ...(replyTo ? { reply_to: replyTo } : {}) })
+    });
     const payload: any = await r.json().catch(() => null);
     if (!r.ok) {
       const providerMessage = typeof payload?.message === "string" ? payload.message : typeof payload?.error === "string" ? payload.error : "No detailed error message was returned.";
