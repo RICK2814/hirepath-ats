@@ -16,8 +16,8 @@ type CandidateInput = {
   rating?: number;
   stage?: CandidateStage;
 };
-type JobCreateInput = { title: string; department?: string; location?: string; description?: string };
-type JobUpdateInput = { title?: string; department?: string; location?: string; description?: string; status?: "open" | "closed" };
+type JobCreateInput = { title: string; department?: string; location?: string; job_type?: string; stipend?: string; description?: string; requirements?: string };
+type JobUpdateInput = { title?: string; department?: string; location?: string; job_type?: string; stipend?: string; description?: string; requirements?: string; status?: "open" | "closed" };
 type NoteInput = { body: string };
 type ScorecardInput = {
   scores: { Technical: number; Communication: number; "Problem solving": number; "Culture add": number };
@@ -57,13 +57,19 @@ const jobCreateSchema: SchemaType<JobCreateInput> = z.object({
   title: z.string().trim().min(1).max(200),
   department: z.string().trim().max(160).optional(),
   location: z.string().trim().max(160).optional(),
-  description: z.string().trim().max(3000).optional()
+  job_type: z.string().trim().max(80).optional(),
+  stipend: z.string().trim().max(120).optional(),
+  description: z.string().trim().max(3000).optional(),
+  requirements: z.string().trim().max(3000).optional()
 }).strict();
 const jobUpdateSchema: SchemaType<JobUpdateInput> = z.object({
   title: z.string().trim().min(1).max(200).optional(),
   department: z.string().trim().max(160).optional(),
   location: z.string().trim().max(160).optional(),
+  job_type: z.string().trim().max(80).optional(),
+  stipend: z.string().trim().max(120).optional(),
   description: z.string().trim().max(3000).optional(),
+  requirements: z.string().trim().max(3000).optional(),
   status: z.enum(["open", "closed"]).optional()
 }).strict();
 const noteSchema: SchemaType<NoteInput> = z.object({ body: z.string().trim().min(1).max(2000) }).strict();
