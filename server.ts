@@ -408,29 +408,21 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
   const gmailUser = str(process.env.GMAIL_USER, 254).toLowerCase();
   const gmailAppPassword = (process.env.GMAIL_APP_PASSWORD || "").replace(/\s+/g, "");
 
-  // Gmail SMTP is the default low-cost sender. Always use the authenticated Gmail
-  // address as From; never inherit an invalid/stale Resend EMAIL_FROM value.
+  // Optional free Gmail SMTP path. Gmail is separate from Clerk sign-in.
   if (gmailUser || gmailAppPassword) {
     if (!gmailUser || !gmailAppPassword) {
-      return { state: "failed", err: "Gmail sending is only partially configured. Set both GMAIL_USER and GMAIL_APP_PASSWORD in Vercel Production, then redeploy." };
+      return { state: "failed", err: "Gmail sender is only partially configured. Set both GMAIL_USER and GMAIL_APP_PASSWORD, or remove both to use Resend." };
     }
     let transporter: any;
     try {
       const nodemailer = require("nodemailer");
       transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
+        host: "smtp.gmail.com", port: 465, secure: true,
         auth: { user: gmailUser, pass: gmailAppPassword },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000
+        connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000
       });
       await transporter.sendMail({
-        from: `HirePath ATS <${gmailUser}>`,
-        to,
-        subject,
-        text: body,
+        from: `HirePath ATS <${gmailUser}>`, to, subject, text: body,
         ...(replyTo ? { replyTo } : {})
       });
       return { state: "sent" };
@@ -444,26 +436,29 @@ async function deliver(to: string, subject: string, body: string, replyTo = ""):
     }
   }
 
-  // Resend is an explicit opt-in only. Otherwise tell the owner how to enable
-  // free Gmail sending rather than attempting a malformed or unverified sender.
-  if (process.env.EMAIL_PROVIDER !== "resend") {
-    return { state: "failed", err: "Free Gmail sender is not configured yet. In Vercel Production add GMAIL_USER (your Gmail address) and GMAIL_APP_PASSWORD (a Google App Password), then redeploy." };
+  // Resend's shared test sender is a valid sender for development/testing only.
+  // Ignore stale/malformed EMAIL_FROM values when using the test sender.
+  if (!process.env.RESEND_API_KEY) {
+    return { state: "failed", err: "No email provider is configured. Set RESEND_API_KEY to use Resend test mode, or set both GMAIL_USER and GMAIL_APP_PASSWORD for Gmail SMTP." };
   }
-  if (!process.env.RESEND_API_KEY) return { state: "failed", err: "EMAIL_PROVIDER=resend requires RESEND_API_KEY." };
-  const from = str(process.env.EMAIL_FROM, 254);
+  const useResendTestSender = process.env.EMAIL_PROVIDER !== "resend-production";
+  const from = useResendTestSender
+    ? "HirePath ATS <onboarding@resend.dev>"
+    : str(process.env.EMAIL_FROM, 254);
   if (!from || !/^(?:[^<>]*<)?[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+>?$/.test(from)) {
-    return { state: "failed", err: "Invalid EMAIL_FROM. Use sender format: Name <verified-address@your-domain.com>." };
+    return { state: "failed", err: "Invalid EMAIL_FROM. Use Name <sender@your-verified-domain.com> format, and verify that domain in Resend." };
   }
   try {
     const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      signal: AbortSignal.timeout(15000),
+      method: "POST", signal: AbortSignal.timeout(15000),
       headers: { Authorization: "Bearer " + process.env.RESEND_API_KEY, "content-type": "application/json" },
       body: JSON.stringify({ from, to: [to], subject, text: body, ...(replyTo ? { reply_to: replyTo } : {}) })
     });
     const payload: any = await r.json().catch(() => null);
     if (!r.ok) {
-      const providerMessage = typeof payload?.message === "string" ? payload.message : typeof payload?.error === "string" ? payload.error : "No detailed error message was returned.";
+      const providerMessage = typeof payload?.message === "string"
+        ? payload.message
+        : typeof payload?.error === "string" ? payload.error : "No detailed error message was returned.";
       const safeMessage = providerMessage.replace(/re_[A-Za-z0-9_-]{8,}/g, "[redacted]").slice(0, 500);
       console.error("Resend rejected email", JSON.stringify({ status: r.status, name: payload?.name || null, message: safeMessage }));
       return { state: "failed", err: `Resend rejected email (HTTP ${r.status}): ${safeMessage}` };
