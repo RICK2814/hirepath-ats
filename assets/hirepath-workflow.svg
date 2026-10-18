@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">HirePath ATS animated hiring workflow</title>
+  <desc id="desc">An animated demonstration of a recruiter publishing a job, a candidate applying through the Careers Page, and the application appearing automatically in the hiring pipeline.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071525"/><stop offset=".55" stop-color="#0d1831"/><stop offset="1" stop-color="#101b3a"/></linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#40e0d0"/><stop offset="1" stop-color="#32a9c7"/></linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#7c6cf2"/></linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#14253e"/><stop offset="1" stop-color="#101e35"/></linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#94a3b8" stroke-opacity=".055" stroke-width="1"/></pattern>
+    <style>
+      text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+      .muted{fill:#9caec7}.white{fill:#f4f7ff}.teal{fill:#54e2d5}.small{font-size:12px;letter-spacing:1.5px;font-weight:700}.body{font-size:14px}.label{font-size:11px;letter-spacing:1.1px;font-weight:700}
+      .panel{fill:url(#panel);stroke:#2b3e5d;stroke-width:1.4}
+      .flowline{fill:none;stroke:#4bdfd1;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:5 9;animation:dash 1.1s linear infinite}
+      .halo{fill:#41decf;opacity:.13;animation:pulse 2s ease-in-out infinite}
+      .step1{animation:focus1 6.6s ease-in-out infinite}
+      .step2{animation:focus2 6.6s ease-in-out infinite}
+      .step3{animation:focus3 6.6s ease-in-out infinite}
+      .live{animation:pulse 1.5s ease-in-out infinite}
+      .traveler{filter:url(#glow)}
+      .shine{animation:shine 3.5s ease-in-out infinite}
+      @keyframes dash{to{stroke-dashoffset:-28}}
+      @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+      @keyframes focus1{0%,22%,100%{stroke:#43dbd0;stroke-opacity:.9}30%,90%{stroke:#2b3e5d;stroke-opacity:1}}
+      @keyframes focus2{0%,28%,50%,100%{stroke:#2b3e5d;stroke-opacity:1}34%,46%{stroke:#a78bfa;stroke-opacity:1}}
+      @keyframes focus3{0%,54%,100%{stroke:#2b3e5d;stroke-opacity:1}60%,72%{stroke:#43dbd0;stroke-opacity:1}}
+      @keyframes shine{0%,100%{opacity:.25}50%{opacity:.8}}
+      @media(prefers-reduced-motion:reduce){.flowline,.halo,.step1,.step2,.step3,.live,.traveler,.shine{animation:none!important}}
+    </style>
+  </defs>
+  <rect width="1200" height="520" rx="24" fill="url(#bg)"/>
+  <rect width="1200" height="520" rx="24" fill="url(#grid)"/>
+  <circle cx="1120" cy="44" r="125" fill="#7068ff" opacity=".08"/>
+  <circle cx="105" cy="475" r="150" fill="#31d9d0" opacity=".045"/>
+  <g transform="translate(38 28)">
+    <rect width="37" height="37" rx="11" fill="url(#teal)"/>
+    <path d="M11 27V10m0 8h15m0-8v17" fill="none" stroke="#061b2a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="50" y="18" class="white" font-size="19" font-weight="750">HirePath <tspan fill="#56e0d4">ATS</tspan></text>
+    <text x="50" y="35" class="muted" font-size="10" letter-spacing="1.5">HIRING, CONNECTED.</text>
+  </g>
+  <g transform="translate(992 35)">
+    <rect width="170" height="31" rx="15.5" fill="#132b3d" stroke="#2a5a63"/>
+    <circle cx="18" cy="15.5" r="4.5" fill="#43e1b1" class="live"/>
+    <text x="31" y="20" fill="#baf5eb" font-size="11" font-weight="750" letter-spacing="1.1">LIVE WORKFLOW</text>
+  </g>
+  <text x="38" y="93" class="white" font-size="25" font-weight="750">From open role to applicant pipeline</text>
+  <text x="38" y="116" class="muted" font-size="14">One connected flow — applications from your Careers Page go straight into HirePath ATS.</text>
+  <!-- moving connection is drawn behind the cards -->
+  <path d="M374 292H826" class="flowline"/>
+  <path d="M374 292H826" fill="none" stroke="#3cd9cd" stroke-opacity=".10" stroke-width="14" class="shine"/>
+  <circle r="5.5" fill="#a5fff3" class="traveler"><animateMotion dur="5.6s" repeatCount="indefinite" path="M 374 292 L 826 292"/></circle>
+  <g class="halo"><circle cx="204" cy="292" r="175"/><circle cx="600" cy="292" r="175"/><circle cx="996" cy="292" r="175"/></g>
+  <!-- STEP 1 -->
+  <g>
+    <rect class="panel step1" x="30" y="140" width="344" height="300" rx="19"/>
+    <path d="M31 159Q31 141 49 141H355" fill="none" stroke="#45dfd2" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="50" y="161" width="33" height="29" rx="9" fill="#153d49" stroke="#286d75"/>
+    <text x="66.5" y="180" text-anchor="middle" fill="#67efe1" font-size="13" font-weight="800">01</text>
+    <text x="94" y="171" class="teal small">RECRUITER</text>
+    <text x="94" y="188" class="muted" font-size="11">Publish an open role</text>
+    <text x="50" y="230" class="white" font-size="22" font-weight="730">Python Developer</text>
+    <text x="50" y="251" class="muted body">Information Technology · Bengaluru</text>
+    <rect x="50" y="269" width="100" height="25" rx="7" fill="#1c3349"/><text x="63" y="285.5" fill="#c7d5e7" font-size="11" font-weight="650">Full-time</text>
+    <rect x="158" y="269" width="104" height="25" rx="7" fill="#1c3349"/><text x="171" y="285.5" fill="#c7d5e7" font-size="11" font-weight="650">Engineering</text>
+    <path d="M50 315H354" stroke="#2b3e5d"/>
+    <text x="50" y="338" class="muted label">JOB STATUS</text>
+    <rect x="50" y="350" width="84" height="28" rx="14" fill="#123b3b" stroke="#24655d"/>
+    <circle cx="64" cy="364" r="4" fill="#4ce3b4" class="live"/>
+    <text x="75" y="368" fill="#9ef1d5" font-size="11" font-weight="750">OPEN</text>
+    <text x="50" y="410" class="muted" font-size="12">Job details ready to share</text>
+    <circle cx="343" cy="168" r="3" fill="#50ded3" class="live"/>
+  </g>
+  <!-- STEP 2 -->
+  <g>
+    <rect class="panel step2" x="428" y="140" width="344" height="300" rx="19"/>
+    <path d="M429 159Q429 141 447 141H753" fill="none" stroke="#a78bfa" stroke-opacity=".8" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="448" y="161" width="33" height="29" rx="9" fill="#302b5c" stroke="#5a4f9c"/>
+    <text x="464.5" y="180" text-anchor="middle" fill="#c6b8ff" font-size="13" font-weight="800">02</text>
+    <text x="492" y="171" fill="#c6b8ff" class="small">CANDIDATE</text>
+    <text x="492" y="188" class="muted" font-size="11">Apply on public Careers Page</text>
+    <circle cx="486" cy="232" r="24" fill="#2c3667"/>
+    <text x="486" y="237" text-anchor="middle" fill="#ded9ff" font-size="15" font-weight="800">AS</text>
+    <text x="522" y="228" class="white" font-size="17" font-weight="700">Aarav Sharma</text>
+    <text x="522" y="247" class="muted" font-size="12">Applicant · Python Developer</text>
+    <path d="M448 270H752" stroke="#2b3e5d"/>
+    <text x="448" y="293" class="muted label">APPLICATION FORM</text>
+    <rect x="448" y="305" width="304" height="31" rx="7" fill="#0c1a2d" stroke="#2c415e"/>
+    <text x="461" y="325" fill="#879bb5" font-size="12">Full name and email</text>
+    <rect x="448" y="344" width="187" height="31" rx="7" fill="#0c1a2d" stroke="#2c415e"/>
+    <path d="M461 356h13l4 4h-17zM461 361v7h17v-7" fill="none" stroke="#93a7c2" stroke-width="1.2"/>
+    <text x="483" y="364" fill="#c6d5e7" font-size="12">Resume attached</text>
+    <rect x="643" y="344" width="109" height="31" rx="7" fill="url(#violet)"/>
+    <text x="697.5" y="364" text-anchor="middle" fill="#fff" font-size="11" font-weight="750">Apply now ↗</text>
+    <text x="448" y="410" class="muted" font-size="12">Candidate submits once — no duplicate entry</text>
+  </g>
+  <!-- STEP 3 -->
+  <g>
+    <rect class="panel step3" x="826" y="140" width="344" height="300" rx="19"/>
+    <path d="M827 159Q827 141 845 141H1151" fill="none" stroke="#45dfd2" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="846" y="161" width="33" height="29" rx="9" fill="#153d49" stroke="#286d75"/>
+    <text x="862.5" y="180" text-anchor="middle" fill="#67efe1" font-size="13" font-weight="800">03</text>
+    <text x="890" y="171" class="teal small">AUTOMATIC</text>
+    <text x="890" y="188" class="muted" font-size="11">Saved to the candidate pipeline</text>
+    <text x="846" y="229" class="white" font-size="19" font-weight="730">Candidate pipeline</text>
+    <text x="846" y="249" class="muted" font-size="12">Python Developer</text>
+    <rect x="846" y="265" width="304" height="62" rx="10" fill="#122b3a" stroke="#286d64"/>
+    <circle cx="872" cy="296" r="16" fill="#214c57"/>
+    <text x="872" y="300" text-anchor="middle" fill="#a3f4e2" font-size="10" font-weight="800">AS</text>
+    <text x="898" y="291" class="white" font-size="13" font-weight="700">Aarav Sharma</text>
+    <text x="898" y="309" class="muted" font-size="11">Added just now</text>
+    <rect x="1075" y="284" width="61" height="23" rx="11.5" fill="#123c3a" stroke="#28766a"/>
+    <text x="1105.5" y="299" text-anchor="middle" fill="#a2f1d8" font-size="10" font-weight="750">APPLIED</text>
+    <text x="846" y="351" class="muted label">NEXT</text>
+    <rect x="846" y="362" width="89" height="29" rx="7" fill="#1b2945" stroke="#39496f"/>
+    <text x="890.5" y="380" fill="#c6d2e8" font-size="11" text-anchor="middle">Screening</text>
+    <path d="M939 376h10m-4-4 4 4-4 4" stroke="#7687a5" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="954" y="362" width="87" height="29" rx="7" fill="#1b2945" stroke="#39496f"/>
+    <text x="997.5" y="380" fill="#c6d2e8" font-size="11" text-anchor="middle">Interview</text>
+    <path d="M1045 376h10m-4-4 4 4-4 4" stroke="#7687a5" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="1060" y="362" width="90" height="29" rx="7" fill="#1b2945" stroke="#39496f"/>
+    <text x="1105" y="380" fill="#c6d2e8" font-size="11" text-anchor="middle">Decision</text>
+  </g>
+  <g transform="translate(39 469)">
+    <circle cx="5" cy="6" r="4" fill="#4ce3b4" class="live"/>
+    <text x="18" y="10" fill="#b6c7dc" font-size="12">One workflow</text>
+    <circle cx="151" cy="6" r="2.5" fill="#617894"/>
+    <text x="164" y="10" fill="#b6c7dc" font-size="12">Public Careers Page</text>
+    <circle cx="315" cy="6" r="2.5" fill="#617894"/>
+    <text x="328" y="10" fill="#b6c7dc" font-size="12">Automatic candidate capture</text>
+  </g>
+  <text x="1160" y="489" text-anchor="end" fill="#6f85a4" font-size="11">HirePath ATS · Product workflow illustration</text>
+</svg>
