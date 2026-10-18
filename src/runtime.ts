@@ -42,7 +42,7 @@ const loginSchema: SchemaType<LoginInput> = z.object({
   email: emailSchema,
   password: z.string().min(1).max(256)
 }).strict();
-const candidateCreateSchema: SchemaType<CandidateInput> = z.object({
+const candidateCreateSchema = z.object({
   name: z.string().trim().min(1).max(160),
   email: emailSchema,
   phone: z.string().trim().max(40).optional(),
@@ -51,7 +51,7 @@ const candidateCreateSchema: SchemaType<CandidateInput> = z.object({
   source: z.enum(["LinkedIn", "Referral", "Careers page", "Agency", "Job board"]).optional(),
   rating: z.number().int().min(0).max(5).optional(),
   stage: z.enum(["Applied", "Screening", "Interview", "Offer", "Hired", "Rejected"]).optional()
-}).strict();
+}).strict() satisfies SchemaType<CandidateInput>;
 const candidateUpdateSchema: SchemaType<Partial<CandidateInput>> = candidateCreateSchema.partial().strict();
 const jobCreateSchema: SchemaType<JobCreateInput> = z.object({
   title: z.string().trim().min(1).max(200),
