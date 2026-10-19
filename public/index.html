@@ -488,6 +488,17 @@ html.hp-is-scrolling body:not(.login-page-active):before,html.hp-is-scrolling bo
 @media(prefers-reduced-motion:reduce){body:not(.login-page-active):before{animation:none!important}body:not(.login-page-active) #main .kc:not(.kc-ghost):before{animation:none!important}.hp-scroll-progress{display:none!important}}
 @media(max-width:600px){body:not(.login-page-active) aside.nav .nav a:hover{transform:none}}
 
+
+/* HirePath section reveal motion: subtle, lightweight, and safe for drag interactions. */
+body:not(.login-page-active) #main .hp-reveal{opacity:.001;filter:blur(4px);transition:opacity .72s var(--hp-motion-ease),filter .72s ease;will-change:opacity,filter}
+body:not(.login-page-active) #main .hp-reveal.hp-in-view{opacity:1;filter:blur(0)}
+body:not(.login-page-active) #main .kpis>.hp-reveal:nth-child(2){transition-delay:45ms}
+body:not(.login-page-active) #main .kpis>.hp-reveal:nth-child(3){transition-delay:90ms}
+body:not(.login-page-active) #main .kpis>.hp-reveal:nth-child(4){transition-delay:135ms}
+body:not(.login-page-active) #main .kpis>.hp-reveal:nth-child(5){transition-delay:180ms}
+body:not(.login-page-active) #main .kpis>.hp-reveal:nth-child(6){transition-delay:225ms}
+@media(prefers-reduced-motion:reduce){body:not(.login-page-active) #main .hp-reveal,body:not(.login-page-active) #main .hp-reveal.hp-in-view{opacity:1!important;filter:none!important;transition:none!important;will-change:auto}}
+
 </style></head><body>
 <div id="root"></div><div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Candidate details"></aside>
@@ -1186,6 +1197,46 @@ const o=e.target.closest("[data-open],.kc[data-id]");if(o)openCand(o.dataset.ope
     },{passive:true});
     const appRoot=document.getElementById("root");
     if(appRoot&&"MutationObserver"in window)new MutationObserver(()=>{if(document.body.classList.contains("login-page-active"))release()}).observe(appRoot,{childList:true,subtree:true});
+  })();
+
+
+  /* Add gentle section-by-section reveals to dynamically rendered workspace views.
+     Clerk/sign-in UI and candidate drag cards are intentionally left untouched. */
+  (function initWorkspaceSectionReveals(){
+    const root=document.getElementById("root");
+    const main=document.getElementById("main");
+    const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)");
+    if(!root||!main||!("IntersectionObserver" in window)||reduce?.matches)return;
+    const selector="#main > section, #main > .card:not(.pal), #main > .kpis > .kpi, #main .kpis > .kpi, #main .board > .col, #main .jobs > .job, #main .semitem, #main .card:not(.pal), #main .job-create-form";
+    const revealObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting)return;
+        entry.target.classList.add("hp-in-view");
+        revealObserver.unobserve(entry.target);
+      });
+    },{root:null,rootMargin:"0px 0px -5% 0px",threshold:0.06});
+    let queued=false;
+    function scan(){
+      queued=false;
+      if(document.body.classList.contains("login-page-active"))return;
+      document.querySelectorAll(selector).forEach(el=>{
+        if(el.closest(".login-hero,.login-info-panel,.login-auth-panel")||el.classList.contains("kc")||el.classList.contains("kc-ghost"))return;
+        if(el.classList.contains("hp-reveal"))return;
+        el.classList.add("hp-reveal");
+        revealObserver.observe(el);
+      });
+    }
+    function scheduleScan(){
+      if(queued)return;
+      queued=true;
+      requestAnimationFrame(scan);
+    }
+    const domObserver=new MutationObserver(scheduleScan);
+    domObserver.observe(root,{childList:true,subtree:true});
+    const authObserver=new MutationObserver(scheduleScan);
+    authObserver.observe(document.body,{attributes:true,attributeFilter:["class"]});
+    addEventListener("hashchange",scheduleScan,{passive:true});
+    scheduleScan();
   })();
 
   startAuthBootstrap();
