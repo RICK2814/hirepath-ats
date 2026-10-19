@@ -448,6 +448,46 @@ body:not(.login-page-active) .col.over{
   .kc.landed{animation:none!important}
 }
 
+
+/* Workspace-only violet live motion. The Clerk/sign-in experience is intentionally excluded. */
+@property --hp-spot{syntax:"<number>";inherits:false;initial-value:0}
+:root{--hp-violet:#8b5cf6;--hp-lilac:#c084fc;--hp-pink:#e879f9;--hp-motion-ease:cubic-bezier(.16,1,.3,1)}
+body:not(.login-page-active):before{content:"";position:fixed;left:50%;top:50%;width:138vmax;height:138vmax;margin:-69vmax 0 0 -69vmax;z-index:0;pointer-events:none;background:radial-gradient(36vmax 36vmax at 24% 28%,rgba(139,92,246,.12),transparent 70%),radial-gradient(34vmax 34vmax at 74% 24%,rgba(217,70,239,.095),transparent 70%),radial-gradient(38vmax 38vmax at 66% 76%,rgba(96,165,250,.075),transparent 72%);animation:hpAmbientDrift 96s linear infinite;will-change:transform}
+@keyframes hpAmbientDrift{to{transform:rotate(360deg)}}
+body:not(.login-page-active) .app{position:relative;z-index:1}
+body:not(.login-page-active) aside.nav{background:linear-gradient(155deg,color-mix(in srgb,var(--surf) 91%,#8b5cf6 9%),color-mix(in srgb,var(--surf) 97%,#d946ef 3%));border-color:color-mix(in srgb,var(--line) 76%,#8b5cf6 24%);transition:background .4s ease,border-color .35s ease}
+body:not(.login-page-active) aside.nav .nav a{transition:background .32s ease,color .25s ease,box-shadow .32s ease,transform .32s var(--hp-motion-ease)}
+body:not(.login-page-active) aside.nav .nav a:hover{background:color-mix(in srgb,var(--soft) 76%,#a78bfa 24%);box-shadow:inset 0 0 0 1px rgba(167,139,250,.23);transform:translateX(2px)}
+body:not(.login-page-active) aside.nav .nav a[aria-current=page]{background:linear-gradient(110deg,rgba(139,92,246,.22),rgba(217,70,239,.13));color:var(--ink);box-shadow:inset 0 0 0 1px rgba(167,139,250,.34),0 8px 24px -20px rgba(139,92,246,.65)}
+/* Cursor-reactive lilac light for key surfaces; no transform changes on draggable columns/cards. */
+body:not(.login-page-active) :is(#main .kpi,#main .grid>.card,#main .jobs>.job,#main .semitem){background-image:radial-gradient(290px circle at var(--hp-mx,50%) var(--hp-my,0%),rgba(139,92,246,var(--hp-spot,0)),transparent 72%),linear-gradient(135deg,color-mix(in srgb,var(--surf) 96%,#8b5cf6 4%),var(--surf) 70%);border-color:color-mix(in srgb,var(--line) 79%,#a78bfa 21%);transition:border-color .35s ease,box-shadow .4s ease,--hp-spot .42s ease}
+body:not(.login-page-active) #main .col{background-image:radial-gradient(270px circle at var(--hp-mx,50%) var(--hp-my,0%),rgba(139,92,246,var(--hp-spot,0)),transparent 72%),linear-gradient(135deg,color-mix(in srgb,var(--soft) 94%,#8b5cf6 6%),var(--soft) 72%);border-color:color-mix(in srgb,var(--line) 78%,#a78bfa 22%);transition:background-color .35s ease,border-color .35s ease,box-shadow .35s ease,--hp-spot .42s ease}
+body:not(.login-page-active) #main .kc:not(.kc-ghost){position:relative;background-image:radial-gradient(250px circle at var(--hp-mx,50%) var(--hp-my,0%),rgba(139,92,246,var(--hp-spot,0)),transparent 72%),linear-gradient(135deg,color-mix(in srgb,var(--surf) 96%,#8b5cf6 4%),var(--surf) 70%);border-color:color-mix(in srgb,var(--line) 76%,#a78bfa 24%);transition:border-color .3s ease,box-shadow .35s ease,--hp-spot .42s ease,translate .3s var(--hp-motion-ease)}
+body:not(.login-page-active) :is(#main .kpi,#main .grid>.card,#main .jobs>.job,#main .semitem,#main .col,#main .kc):hover{border-color:color-mix(in srgb,var(--line) 48%,#a78bfa 52%);box-shadow:0 15px 36px -25px rgba(139,92,246,.48),inset 0 1px 0 rgba(255,255,255,.24)}
+/* Recolour the existing glass-edge animations violet/lilac/pink. */
+body:not(.login-page-active) :is(#main .kpi,#main .card:not(.pal),#main .job,#main .semitem,#main .col):after{background:linear-gradient(90deg,transparent,rgba(139,92,246,.9),rgba(217,70,239,.78),rgba(96,165,250,.75),transparent)}
+body:not(.login-page-active) #main .kc:not(.kc-ghost):before{content:"";position:absolute;left:-48%;top:0;width:42%;height:1.5px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(139,92,246,.9),rgba(232,121,249,.9),transparent);opacity:0;animation:hpCandidateEdge 8.5s ease-in-out infinite}
+@keyframes hpCandidateEdge{0%,12%{transform:translateX(0);opacity:0}25%{opacity:.85}72%{opacity:.7}92%,100%{transform:translateX(345%);opacity:0}}
+body:not(.login-page-active) #main .kc:nth-child(3n):before{animation-delay:1.6s}
+body:not(.login-page-active) #main .kc:nth-child(3n + 1):before{animation-delay:3.1s}
+body:not(.login-page-active) :is(#main .kpi:nth-child(2):after,#main .jobs>.job:nth-child(2):after){animation-delay:1.1s}
+body:not(.login-page-active) :is(#main .kpi:nth-child(3):after,#main .jobs>.job:nth-child(3):after){animation-delay:2.2s}
+body:not(.login-page-active) :is(#main .kpi:nth-child(4):after,#main .jobs>.job:nth-child(4):after){animation-delay:3.3s}
+body:not(.login-page-active) :is(#main .kpi:nth-child(5):after,#main .jobs>.job:nth-child(5):after){animation-delay:4.4s}
+body:not(.login-page-active) :is(#main .btn,#main .chip,#main .steps button,#drawer .btn,#drawer .steps button){transition:background .28s ease,border-color .28s ease,color .2s ease,box-shadow .3s ease,transform .3s var(--hp-motion-ease)}
+body:not(.login-page-active) :is(#main .btn:hover,#main .chip:hover,#main .steps button:hover,#drawer .btn:hover,#drawer .steps button:hover){border-color:rgba(167,139,250,.65);box-shadow:0 8px 22px -16px rgba(139,92,246,.72)}
+body:not(.login-page-active) .btn:before{background:linear-gradient(105deg,transparent,rgba(139,92,246,.2),rgba(232,121,249,.2),transparent)}
+body:not(.login-page-active) :is(#main input,#main select,#main textarea,#drawer input,#drawer select,#drawer textarea):focus-visible{outline:2px solid rgba(167,139,250,.72);outline-offset:1px;border-color:#a78bfa;box-shadow:0 0 0 4px rgba(139,92,246,.14)}
+body:not(.login-page-active) :is(#main .tbl tbody tr,#main .who[data-open]){transition:background-color .24s ease}
+body:not(.login-page-active) :is(#main .tbl tbody tr:hover,#main .who[data-open]:hover){background-color:color-mix(in srgb,var(--soft) 82%,#a78bfa 18%)}
+body:not(.login-page-active) #drawer{border-left-color:color-mix(in srgb,var(--line) 66%,#a78bfa 34%);box-shadow:-24px 0 70px -50px rgba(139,92,246,.68)}
+body:not(.login-page-active) .toast{border:1px solid rgba(167,139,250,.34);box-shadow:0 14px 38px -22px rgba(139,92,246,.68),0 8px 26px rgba(0,0,0,.18)}
+.hp-scroll-progress{position:fixed;left:0;right:0;top:0;height:2px;z-index:70;pointer-events:none;transform:scaleX(0);transform-origin:0 50%;background:linear-gradient(90deg,#60a5fa,#8b5cf6,#d946ef,#c084fc);box-shadow:0 0 14px rgba(167,139,250,.55);will-change:transform}
+body.login-page-active .hp-scroll-progress{display:none}
+html.hp-is-scrolling body:not(.login-page-active):before,html.hp-is-scrolling body:not(.login-page-active) :is(#main .kpi:after,#main .card:after,#main .job:after,#main .semitem:after,#main .col:after,#main .kc:before){animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){body:not(.login-page-active):before{animation:none!important}body:not(.login-page-active) #main .kc:not(.kc-ghost):before{animation:none!important}.hp-scroll-progress{display:none!important}}
+@media(max-width:600px){body:not(.login-page-active) aside.nav .nav a:hover{transform:none}}
+
 </style></head><body>
 <div id="root"></div><div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Candidate details"></aside>
@@ -1116,5 +1156,37 @@ const jt=e.target.closest("[data-jt]");if(jt)return guard(async()=>{await api("/
 const jb=e.target.closest("[data-job]");if(jb)S.f.job=jb.dataset.job;
 if(e.target.closest("[data-rate]")&&!e.target.closest("#drawer")){const c=e.target.closest("[data-id]");if(c){e.stopPropagation()}return}
 const o=e.target.closest("[data-open],.kc[data-id]");if(o)openCand(o.dataset.open||o.dataset.id)});
-startAuthBootstrap();
+
+  /* Workspace violet motion controller: ignores Clerk/sign-in and pauses during drag. */
+  (()=>{
+    const reduce=matchMedia("(prefers-reduced-motion: reduce)");
+    const targets="#main .kpi,#main .grid>.card,#main .jobs>.job,#main .semitem,#main .col,#main .kc:not(.kc-ghost)";
+    let current=null,px=0,py=0,frame=0,scrollTimer=0,progressFrame=0;
+    const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+    function release(){if(!current)return;current.style.setProperty("--hp-spot","0");current.classList.remove("hp-spot-active");current=null}
+    function pointerMove(e){
+      if(e.pointerType!=="mouse"||reduce.matches||document.body.classList.contains("login-page-active")||document.body.classList.contains("is-dragging"))return;
+      const next=e.target.closest?.(targets)||null;
+      if(next!==current){release();current=next;if(current)current.classList.add("hp-spot-active")}
+      if(!current)return;
+      const rect=current.getBoundingClientRect();px=clamp(e.clientX-rect.left,0,rect.width);py=clamp(e.clientY-rect.top,0,rect.height);
+      if(!frame)frame=requestAnimationFrame(()=>{frame=0;if(!current||!current.isConnected)return;current.style.setProperty("--hp-mx",px+"px");current.style.setProperty("--hp-my",py+"px");current.style.setProperty("--hp-spot",reduce.matches?"0":".2")});
+    }
+    document.addEventListener("pointermove",pointerMove,{passive:true});
+    document.addEventListener("pointerout",e=>{if(!e.relatedTarget)release()},{passive:true});
+    addEventListener("blur",release);
+    document.addEventListener("pointerdown",()=>{if(document.body.classList.contains("is-dragging"))release()},{passive:true});
+    reduce.addEventListener?.("change",()=>{if(reduce.matches)release()});
+    const bar=document.createElement("div");bar.className="hp-scroll-progress";bar.setAttribute("aria-hidden","true");document.body.appendChild(bar);
+    addEventListener("scroll",()=>{
+      document.documentElement.classList.add("hp-is-scrolling");clearTimeout(scrollTimer);
+      scrollTimer=setTimeout(()=>document.documentElement.classList.remove("hp-is-scrolling"),150);
+      if(progressFrame)return;
+      progressFrame=requestAnimationFrame(()=>{progressFrame=0;const range=document.documentElement.scrollHeight-innerHeight;bar.style.transform="scaleX("+(range>0?clamp(scrollY/range,0,1):0)+")"});
+    },{passive:true});
+    const appRoot=document.getElementById("root");
+    if(appRoot&&"MutationObserver"in window)new MutationObserver(()=>{if(document.body.classList.contains("login-page-active"))release()}).observe(appRoot,{childList:true,subtree:true});
+  })();
+
+  startAuthBootstrap();
 </script></body></html>
