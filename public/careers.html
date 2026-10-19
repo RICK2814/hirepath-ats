@@ -123,6 +123,16 @@ form#f:not([hidden]){backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18p
 @keyframes careerGlassEdge{0%,12%{transform:translateX(0);opacity:0}25%{opacity:.85}76%{opacity:.7}92%,100%{transform:translateX(330%);opacity:0}}
 @media(prefers-reduced-motion:reduce){.job-card:after{animation:none!important}}
 
+
+/* Premium scroll-reveal motion for each public Careers Page section and role card. */
+.hp-reveal{opacity:.001;filter:blur(4px);transition:opacity .7s cubic-bezier(.16,1,.3,1),filter .7s ease;will-change:opacity,filter}
+.hp-reveal.hp-in-view{opacity:1;filter:blur(0)}
+.job-card.hp-reveal:nth-child(2){transition-delay:55ms}
+.job-card.hp-reveal:nth-child(3){transition-delay:110ms}
+.job-card.hp-reveal:nth-child(4){transition-delay:165ms}
+.job-card.hp-reveal:nth-child(5){transition-delay:220ms}
+@media(prefers-reduced-motion:reduce){.hp-reveal,.hp-reveal.hp-in-view{opacity:1!important;filter:none!important;transition:none!important;will-change:auto}}
+
 </style>
 </head>
 <body>
@@ -250,6 +260,37 @@ $("f").addEventListener("submit", async e => {
   } catch (er) { msg.className = "err"; msg.textContent = er.message; }
   finally { btn.disabled = false; }
 });
+
+/* Reveal public page sections as they enter the viewport. New job cards are observed after API rendering. */
+(function initCareersSectionReveals(){
+  if(!("IntersectionObserver" in window)||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const selector=".site-header,.hero,.jobs-section,.site-footer,.job-card,.job-detail-section,.highlight,.empty,#f";
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      entry.target.classList.add("hp-in-view");
+      observer.unobserve(entry.target);
+    });
+  },{root:null,rootMargin:"0px 0px -5% 0px",threshold:0.06});
+  let queued=false;
+  function scan(){
+    queued=false;
+    document.querySelectorAll(selector).forEach(el=>{
+      if(el.classList.contains("hp-reveal"))return;
+      el.classList.add("hp-reveal");
+      observer.observe(el);
+    });
+  }
+  function scheduleScan(){
+    if(queued)return;
+    queued=true;
+    requestAnimationFrame(scan);
+  }
+  const mutationObserver=new MutationObserver(scheduleScan);
+  mutationObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
+  scheduleScan();
+})();
+
 </script>
 </body>
 </html>
