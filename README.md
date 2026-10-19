@@ -1,20 +1,36 @@
 <div align="center">
 
-# HirePath ATS <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+# HirePath ATS
 
-### A modern, full-stack Applicant Tracking System <img width="38" height="38" src="assets/robot-mascot.svg" alt="" />
+### A polished, full-stack Applicant Tracking System
 
-Manage job openings, candidates, hiring stages, interview feedback, resumes, and recruiter communications from one workspace.
+**A single workspace for job openings, candidate pipelines, interview evaluation, and public applications.**
+
+[**Open Live App ↗**](https://hirepath-ats.vercel.app/) · [**View Careers Page ↗**](https://hirepath-ats.vercel.app/careers) · [**Explore Source Code ↗**](https://github.com/RICK2814/hirepath-ats)
 
 [![CI](https://github.com/RICK2814/hirepath-ats/actions/workflows/ci.yml/badge.svg)](https://github.com/RICK2814/hirepath-ats/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-22.18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-7C3AED.svg)](LICENSE)
+[![Node.js 22.18+](https://img.shields.io/badge/Node.js-22.18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9%2B-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 </div>
 
 ---
 
-## Contents <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## At a glance
+
+| Area | What it does |
+|---|---|
+| **Recruitment workspace** | Organises roles, candidate records, and pipeline stages in one interface. |
+| **Candidate evaluation** | Supports interview scorecards, role matching, candidate timelines, and similarity search. |
+| **Public careers experience** | Publishes open roles and accepts applications through a dedicated public page. |
+| **Backend foundation** | Uses Express, TypeScript, PostgreSQL, Prisma, and Zod validation. |
+| **Operational controls** | Includes authentication options, rate limiting, request IDs, tests, and deployment configuration. |
+
+> **Live links:** The deployed interface and Careers Page are provided for product exploration. Optional capabilities such as authentication providers, AI matching, email delivery, and persistent realtime connections depend on the required services and environment variables being configured.
+
+## Contents
 
 - [Overview](#overview)
 - [Animated workflow demo](#animated-workflow-demo)
@@ -38,13 +54,13 @@ Manage job openings, candidates, hiring stages, interview feedback, resumes, and
 - [Contributing](#contributing)
 - [License](#license)
 
-## Overview <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Overview
 
 HirePath ATS is a full-stack applicant tracking system built with **Node.js, TypeScript, Express, PostgreSQL, Prisma, and a lightweight browser frontend**. It provides a hiring pipeline for recruiters and admins, from publishing open roles and capturing applications to reviewing candidates and coordinating interviews.
 
 The frontend is served from `public/`; it does not need a separate React or frontend build step. The Express API and browser interface share the same application.
 
-## Animated workflow demo <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Animated workflow demo
 
 The animation below illustrates the end-to-end hiring flow in HirePath ATS. It loops automatically on GitHub—no setup or playback button needed.
 
@@ -56,9 +72,9 @@ The animation below illustrates the end-to-end hiring flow in HirePath ATS. It l
 
 **Workflow at a glance:** publish an open role in **Jobs** → share the [public Careers Page](https://hirepath-ats.vercel.app/careers) → a candidate submits the form → their application is saved to the ATS and can be reviewed under **Candidates** or **Pipeline**.
 
-## Features <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Features
 
-### Hiring workflow <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Hiring workflow
 - **Jobs:** create roles with department, location, description, and open/closed status.
 - **Candidate management:** add, edit, search, filter, sort, paginate, and export candidate records to CSV.
 - **Hiring pipeline:** track candidates through `Applied`, `Screening`, `Interview`, `Offer`, `Hired`, and `Rejected`.
@@ -66,19 +82,19 @@ The animation below illustrates the end-to-end hiring flow in HirePath ATS. It l
 - **Resume handling:** upload PDF, TXT, or Markdown resumes up to 5 MB. Resume text is extracted and known skills can be added to the candidate profile.
 - **Interview scheduling:** store an interview date and duration, then export scheduled interviews as an authenticated iCalendar feed.
 
-### Candidate evaluation <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Candidate evaluation
 - **Interview scorecards:** rate Technical, Communication, Problem solving, and Culture add; save a recommendation and evidence-based comments.
 - **Role matching:** get a 0–100 role-match score, summary, strengths, and skill gaps. Uses Anthropic when configured, otherwise a local keyword-based fallback.
 - **Similar-candidate search:** search candidate profiles with pgvector cosine similarity. OpenAI embeddings are optional; without an OpenAI key, HirePath uses deterministic feature hashing. The fallback is lexical similarity, not a trained semantic model.
 
-### Email and careers page <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Email and careers page
 - **Email templates:** prepare interview invitations, application acknowledgements, offers, and rejections. Review and edit drafts before sending.
 - **Email providers:** optional integrations for Brevo, Gmail SMTP, Plunk, and Resend are available in the server code. Provider accounts, sender permissions, and environment variables must be configured before delivery will work.
 - **Public careers page:** `/careers` lists open roles and accepts applications without requiring a recruiter account.
 - **Application safeguards:** the public application form requires consent, applies a rate limit, includes a honeypot, and avoids revealing whether a duplicate application already exists.
 - **Email outbox:** application-acknowledgement emails are queued and retried by the worker in long-running Node deployments. Serverless deployments may need a separate scheduled/worker process for queued email processing.
 
-### Operations and security <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Operations and security
 - Passwords are stored as scrypt hashes; application API sessions use signed, short-lived tokens.
 - Clerk authentication is supported when both Clerk keys are configured. Without Clerk, the legacy email/password login is available.
 - Request payloads are validated with Zod.
@@ -86,13 +102,13 @@ The animation below illustrates the end-to-end hiring flow in HirePath ATS. It l
 - Candidate anonymisation removes personal information and associated derived data while preserving stage history for reporting.
 - PostgreSQL `LISTEN/NOTIFY` distributes candidate changes between application instances in long-running deployments.
 
-## Using the public Careers Page <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Using the public Careers Page
 
 **Production page:** [https://hirepath-ats.vercel.app/careers](https://hirepath-ats.vercel.app/careers)
 
 Share this URL with applicants. It is a separate public-facing page, not a menu inside the recruiter dashboard.
 
-### Recruiter workflow <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Recruiter workflow
 
 1. Sign in to HirePath ATS and open **Jobs**.
 2. Create the role with its title, department, location, and description. Make sure the role is marked **Open**.
@@ -102,15 +118,15 @@ Share this URL with applicants. It is a separate public-facing page, not a menu 
 
 The public form collects the applicant's name and email, with optional phone number, resume, and additional message. Applicants must accept the data-consent checkbox to submit.
 
-### When manual entry is needed <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### When manual entry is needed
 
 Candidates who contact you through email, referrals, LinkedIn, or another job portal will not automatically appear in HirePath unless a separate integration/import flow is configured. Add those records manually using the dashboard's candidate form. Avoid creating a duplicate record for someone who has already applied through the Careers Page.
 
-### Public-access deployment check <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Public-access deployment check
 
 Before sharing the URL, open it in a private/incognito browser window where you are **not** signed in to Vercel. The Careers Page and its public application endpoint must be reachable without recruiter login. If Vercel Deployment Protection or SSO blocks the page, adjust the deployment's public-access configuration before sharing it; keep recruiter dashboard and protected APIs secured. The `/careers` page and `/api/public/jobs` and `/api/public/apply` endpoints are the public application flow.
 
-## Technology stack <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Technology stack
 
 | Area | Technology |
 |---|---|
@@ -129,7 +145,7 @@ Before sharing the URL, open it in a private/incognito browser window where you 
 | Testing | Node integration tests, Playwright |
 | Deployment | Vercel configuration and Docker |
 
-## Architecture <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -146,7 +162,7 @@ flowchart TD
     API --> Vector[pgvector Similarity Search]
 ```
 
-## Repository structure <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Repository structure
 
 ```text
 .
@@ -189,14 +205,14 @@ flowchart TD
 └── vercel.json                    # Vercel framework configuration
 ```
 
-## Requirements <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Requirements
 
 - **Node.js 22.18 or newer** for native TypeScript type stripping.
 - **PostgreSQL 16 or newer** with `pgvector` and `pg_trgm` available.
 - **Docker and Docker Compose** for the quickest local setup, or a local PostgreSQL installation for manual setup.
 - API credentials only for optional integrations you plan to use (Clerk, Brevo, Gmail SMTP, Plunk, Resend, Anthropic, or OpenAI).
 
-## Quick start with Docker <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Quick start with Docker
 
 Docker Compose starts PostgreSQL with pgvector and the HirePath application.
 
@@ -238,9 +254,9 @@ The example environment file enables demo data for local evaluation. The demo ac
 
 To stop the app, press `Ctrl+C`. To stop the containers while preserving the database volume, run `docker compose down`. To delete local database data as well, use `docker compose down -v` (this is destructive).
 
-## Manual local setup <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Manual local setup
 
-### 1. Prepare PostgreSQL <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### 1. Prepare PostgreSQL
 
 Create a database and ensure the `pgvector` and `pg_trgm` extensions are available. The migrations use these extensions for vector similarity and candidate searching.
 
@@ -252,7 +268,7 @@ export DATABASE_URL="postgresql://ats:your-password@localhost:5432/ats"
 
 Use a database role with permission to apply migrations and create the required extensions.
 
-### 2. Install dependencies and generate Prisma Client <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### 2. Install dependencies and generate Prisma Client
 
 ```bash
 npm install
@@ -260,13 +276,13 @@ npm install
 
 `npm install` runs the Prisma generation step through `postinstall`.
 
-### 3. Apply database migrations <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### 3. Apply database migrations
 
 ```bash
 npm run db:deploy
 ```
 
-### 4. Start the server <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### 4. Start the server
 
 For development with automatic restarts:
 
@@ -282,13 +298,13 @@ npm start
 
 The app listens on port `3000` by default. Set `PORT` to change it.
 
-### Initial account <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Initial account
 
 - In a fresh **local development** database, demo data is seeded by default unless `SEED_DEMO=0`.
 - In **production**, leave demo seeding disabled. Set `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` (at least 10 characters) when using the legacy password login so the first admin can be created.
 - If Clerk is enabled, every verified Clerk user can sign in and is a recruiter by default. Set `ADMIN_EMAIL` to the email that should receive the admin role, or grant the role through server-controlled Clerk public metadata. Do not expose admin-role controls to ordinary users.
 
-## Configuration and environment variables <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Configuration and environment variables
 
 Set environment variables in your deployment platform (for Vercel, use **Project → Settings → Environment Variables**). Never commit real secrets to Git.
 
@@ -325,11 +341,11 @@ Set environment variables in your deployment platform (for Vercel, use **Project
 
 For deployments using Clerk, set **both** Clerk keys. For local password-based login, leave them unset.
 
-## Email provider setup <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Email provider setup
 
 HirePath calls its email provider from the **server**. Keep API keys, SMTP passwords, and provider credentials in server-side environment variables only.
 
-### Brevo (shared HirePath sender) <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Brevo (shared HirePath sender)
 
 Set:
 
@@ -347,7 +363,7 @@ BREVO_FROM_NAME=HirePath ATS
 
 **Sender/domain limitation:** verifying a Yahoo/Gmail sender address does not authenticate that provider's domain. Brevo may reject the message, alter the visible sender domain, or require domain authentication depending on its current account and sending policies. A verified sender address is not a substitute for authenticating a domain you control. For a consistent branded sender such as `notifications@yourdomain.com`, configure a domain and complete Brevo's DNS authentication steps.
 
-### Gmail SMTP <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Gmail SMTP
 
 Set:
 
@@ -359,7 +375,7 @@ GMAIL_APP_PASSWORD=your_google_app_password
 
 Create a Google App Password for a dedicated hiring mailbox. Do not use the mailbox's normal password. Email will be sent through this mailbox; use a dedicated account if the system is shared by multiple recruiters. Gmail has sending limits and is not intended for bulk email.
 
-### Plunk <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Plunk
 
 Set:
 
@@ -371,7 +387,7 @@ PLUNK_FROM=notifications@your-verified-domain.com
 
 The sender domain must be verified in Plunk. Open-source/self-hosted software and the hosted email service have different hosting and account requirements.
 
-### Resend <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Resend
 
 For production sending:
 
@@ -385,7 +401,7 @@ Production sending requires a sender domain verified in Resend.
 
 When `RESEND_API_KEY` is configured and `EMAIL_PROVIDER` is **not** `resend-production`, the current code uses Resend's shared test sender (`onboarding@resend.dev`). Treat this as test-only: Resend's test sender is restricted and should not be used to email arbitrary candidate addresses in production.
 
-### General email troubleshooting <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### General email troubleshooting
 
 - Confirm `EMAIL_PROVIDER` matches the provider you intend to use.
 - Check that all required variables are present in the **Production** environment, with no leading/trailing spaces.
@@ -394,15 +410,15 @@ When `RESEND_API_KEY` is configured and `EMAIL_PROVIDER` is **not** `resend-prod
 - Check the response/error in HirePath and the provider's activity/logs. A successful API response means the provider accepted the message; it does not guarantee inbox placement.
 - Do not publish API keys or share them in screenshots, issues, or chat.
 
-## Authentication and roles <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Authentication and roles
 
-### Authentication options <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Authentication options
 
 - **Clerk:** enabled when both `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are present. HirePath requires the primary Clerk email to be verified before exchanging the Clerk session for an internal HirePath API token.
 - **Legacy login:** email/password login using scrypt password hashes when Clerk is not enabled.
 - Internal API calls use a short-lived signed bearer token. The token expires after 12 hours.
 
-### Roles <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Roles
 
 - **Admin:** can delete candidates and anonymise candidate records; can administer the initial admin setup.
 - **Recruiter:** can manage hiring work and use the candidate email workflow, but cannot perform admin-only delete/anonymise actions.
@@ -410,7 +426,7 @@ When `RESEND_API_KEY` is configured and `EMAIL_PROVIDER` is **not** `resend-prod
 
 All authenticated API endpoints require the HirePath bearer token unless explicitly identified as public or part of the Clerk/legacy login flow.
 
-## Database and migrations <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Database and migrations
 
 Prisma's schema is in `prisma/schema.prisma`; versioned SQL migrations are in `prisma/migrations/`.
 
@@ -430,7 +446,7 @@ npm run db:migrate -- --name describe_your_change
 
 The application relies on PostgreSQL extensions including `pg_trgm` and `vector`. Confirm they are available on your provider before applying migrations. Some hosted Postgres providers require enabling pgvector in their dashboard. For features using `LISTEN/NOTIFY`, use a database connection mode that supports it; transaction-mode poolers do not support the listener semantics used by the realtime implementation.
 
-## API reference <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## API reference
 
 Except for login, Clerk session exchange, and public endpoints, requests require:
 
@@ -438,7 +454,7 @@ Except for login, Clerk session exchange, and public endpoints, requests require
 Authorization: Bearer <hirepath-token>
 ```
 
-### Health and authentication <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Health and authentication
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
@@ -449,7 +465,7 @@ Authorization: Bearer <hirepath-token>
 | `GET` | `/api/auth/me` | Authenticated | Current user |
 | `POST` | `/api/auth/revoke-all` | Authenticated | Revoke existing sessions for the current account |
 
-### Jobs and candidates <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Jobs and candidates
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
@@ -474,7 +490,7 @@ Authorization: Bearer <hirepath-token>
 | `GET` | `/api/calendar.ics` | Authenticated | Export scheduled interviews as iCalendar |
 | `GET` | `/api/stats` | Authenticated | Dashboard analytics |
 
-### Public careers page <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Public careers page
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
@@ -482,7 +498,7 @@ Authorization: Bearer <hirepath-token>
 | `GET` | `/api/public/jobs` | Public | List open roles with public fields |
 | `POST` | `/api/public/apply` | Public | Submit an application with required consent |
 
-### Realtime <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Realtime
 
 | Protocol | Endpoint | Access | Description |
 |---|---|---|---|
@@ -490,15 +506,15 @@ Authorization: Bearer <hirepath-token>
 
 API request payloads are validated server-side; see `src/runtime.ts` for the Zod schemas and accepted fields.
 
-## Testing and quality checks <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Testing and quality checks
 
-### Type-check <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Type-check
 
 ```bash
 npm run build
 ```
 
-### Integration tests <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Integration tests
 
 Set `TEST_DATABASE_URL` to a **disposable** PostgreSQL database whose name ends in `_test`. The test suite resets its tables and refuses to run if the database name does not end in `_test`.
 
@@ -510,7 +526,7 @@ npm test
 
 Do not point `TEST_DATABASE_URL` at production or a database containing valuable data.
 
-### Browser smoke tests <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Browser smoke tests
 
 Start the app with a configured test database and migrations applied, install the Playwright browser, then run:
 
@@ -521,13 +537,13 @@ npm run test:e2e
 
 Set `BASE_URL` if the app under test is not at `http://127.0.0.1:3000`.
 
-### Continuous integration <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Continuous integration
 
 The GitHub Actions workflow in `.github/workflows/ci.yml` runs the TypeScript build, migrations, integration tests, Playwright smoke tests, and Docker image build against a PostgreSQL service with pgvector. Check the Actions tab for the current result; this README does not imply that the latest workflow has passed.
 
-## Deployment <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Deployment
 
-### Vercel <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Vercel
 
 The repository includes `vercel.json` and a `vercel-build` script.
 
@@ -540,13 +556,13 @@ The repository includes `vercel.json` and a `vercel-build` script.
 
 **Serverless note:** long-lived background workers and persistent WebSocket connections may require a separate worker or a long-running Node host. Confirm these capabilities for your chosen deployment platform rather than assuming every process-level worker can run inside a serverless function.
 
-### Docker / long-running Node host <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+### Docker / long-running Node host
 
 The Docker image applies pending Prisma migrations on boot and then starts the Node server. For a production deployment, provide a managed PostgreSQL database, unique secrets, a real admin account, and the correct `TRUST_PROXY` value for the actual proxy chain. Do not enable demo data in production.
 
 The application stores resumes in PostgreSQL, so no local persistent upload directory is required.
 
-## Security and privacy <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Security and privacy
 
 - Keep `.env`, API keys, OAuth secrets, database URLs, and SMTP passwords out of Git.
 - Use a unique `JWT_SECRET` in production; do not reuse the example placeholder.
@@ -557,7 +573,7 @@ The application stores resumes in PostgreSQL, so no local persistent upload dire
 - Use the anonymisation workflow when personal information should be removed; ordinary candidate deletion is destructive.
 - Protect test databases separately from production data.
 
-## Troubleshooting <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Troubleshooting
 
 | Problem | Checks |
 |---|---|
@@ -572,7 +588,7 @@ The application stores resumes in PostgreSQL, so no local persistent upload dire
 | Playwright cannot reach the app | Start the app, apply migrations, and confirm `BASE_URL` points to the running server. |
 | Realtime events are missing across instances | Check whether the hosting platform supports persistent WebSockets and whether the database connection supports PostgreSQL `LISTEN/NOTIFY`. |
 
-## Contributing <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## Contributing
 
 Contributions are welcome.
 
@@ -583,6 +599,6 @@ Contributions are welcome.
 
 Do not include real secrets, personal candidate data, or production database dumps in issues or pull requests.
 
-## License <img align="right" width="46" height="46" src="assets/robot-mascot.svg" alt="" />
+## License
 
 This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for the full text.
