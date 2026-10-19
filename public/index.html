@@ -1206,7 +1206,7 @@ const o=e.target.closest("[data-open],.kc[data-id]");if(o)openCand(o.dataset.ope
     const root=document.getElementById("root");
     const main=document.getElementById("main");
     const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)");
-    if(!root||!main||!("IntersectionObserver" in window)||reduce?.matches)return;
+    if(!root||!("IntersectionObserver" in window)||reduce?.matches)return;
     const selector="#main > section, #main > .card:not(.pal), #main > .kpis > .kpi, #main .kpis > .kpi, #main .board > .col, #main .jobs > .job, #main .semitem, #main .card:not(.pal), #main .job-create-form";
     const revealObserver=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
